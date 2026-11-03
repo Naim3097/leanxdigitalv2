@@ -1,0 +1,23 @@
+---
+import Base from '../layouts/Base.astro';
+import { site } from '../data/site';
+---
+
+<Base
+  title={`Page not found | ${site.name}`}
+  description="This page does not exist on the Lean X Digital website."
+  noindex
+>
+  <section class="notfound wrap">
+    <p class="eyebrow">404</p>
+    <h1 style="margin-top: 1.25rem">Page not found.</h1>
+    <p class="lede" style="margin-top: 1.5rem">
+      This page doesn’t exist. It may have moved when we rebuilt the site.
+    </p>
+    <div class="actions" style="margin-top: 2rem">
+      <a class="btn btn-solid" href="/">Home</a>
+      <a class="btn btn-line" href="/products/">Products</a>
+      <a class="btn btn-line" href="/contact/">Contact</a>
+    </div>
+  </section>
+</Base>

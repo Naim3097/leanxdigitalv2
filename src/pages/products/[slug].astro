@@ -1,0 +1,139 @@
+---
+import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import Facts from '../../components/Facts.astro';
+import Faq from '../../components/Faq.astro';
+import RowList from '../../components/RowList.astro';
+import Icon from '../../components/Icon.astro';
+import Features from '../../components/Features.astro';
+import { site, formatDate } from '../../data/site';
+import { products, type Product } from '../../data/products';
+import { services } from '../../data/services';
+import { webPage, breadcrumbs, softwareApp, faqPage, softwareId } from '../../lib/schema';
+import { productRows, serviceRows } from '../../lib/rows';
+import { lcFirst } from '../../lib/text';
+
+export function getStaticPaths() {
+  return products.map((product) => ({ params: { slug: product.slug }, props: { product } }));
+}
+
+const { product: p } = Astro.props as { product: Product };
+const path = `/products/${p.slug}/`;
+const title = `${p.seoTitle} | ${site.name}`;
+const crumbs: [string, string][] = [
+  ['Home', '/'],
+  ['Products', '/products/'],
+  [p.name, path],
+];
+const others = products.filter((o) => o.slug !== p.slug);
+const image = `/og/${p.slug}.png`;
+const primary = p.website ?? p.buy;
+
+const schema = [
+  webPage({
+    path,
+    title,
+    description: p.metaDescription,
+    updated: p.updated,
+    hasBreadcrumb: true,
+    about: softwareId(p),
+    image,
+  }),
+  breadcrumbs(path, crumbs),
+  ...softwareApp(p),
+  faqPage(path, p.faqs),
+];
+---
+
+<Base
+  title={title}
+  description={p.metaDescription}
+  image={image}
+  imageAlt={`${p.name}, ${lcFirst(p.category)} by ${site.name}`}
+  schema={schema}
+>
+  <Breadcrumbs items={crumbs} />
+
+  <article>
+    <header class="page-head wrap">
+      <p class="eyebrow">{p.category}</p>
+      <h1>{p.name}</h1>
+      <p class="lede">{p.definition}</p>
+      <div class="actions">
+        {
+          primary && (
+            <a class="btn btn-solid" href={primary.url} rel="noopener">
+              {p.website ? `Visit ${p.website.label}` : p.buy?.label}
+              <Icon name="external" />
+            </a>
+          )
+        }
+        <a class="btn btn-line" href={site.whatsapp}>Ask us on WhatsApp</a>
+      </div>
+    </header>
+
+    <div class="wrap product-body">
+      <div class="prose">
+        <section aria-labelledby="for-title">
+          <h2 id="for-title">Who {p.name} is for</h2>
+          <p>{p.audience}</p>
+        </section>
+
+        <section aria-labelledby="features-title">
+          <h2 id="features-title">What {p.name} does</h2>
+          <Features items={p.features} />
+        </section>
+
+        <section aria-labelledby="steps-title">
+          <h2 id="steps-title">{p.stepsTitle}</h2>
+          <ol class="steps">{p.steps.map((s) => <li>{s}</li>)}</ol>
+        </section>
+
+        {
+          p.sections.map((s, i) => (
+            <section aria-labelledby={`s${i}-title`}>
+              <h2 id={`s${i}-title`}>{s.title}</h2>
+              {s.body.map((para) => (
+                <p>{para}</p>
+              ))}
+            </section>
+          ))
+        }
+
+        <section aria-labelledby="faq-title">
+          <h2 id="faq-title">Questions about {p.name}</h2>
+          <Faq faqs={p.faqs} />
+        </section>
+      </div>
+
+      <aside class="product-aside" aria-labelledby="facts-title">
+        <h2 id="facts-title">Key facts</h2>
+        <Facts facts={[...p.facts, ['Made by', site.name]]} />
+        <p class="updated">
+          Updated <time datetime={p.updated}>{formatDate(p.updated)}</time>
+        </p>
+      </aside>
+    </div>
+  </article>
+
+  <section class="section" aria-labelledby="others-title">
+    <div class="wrap section-grid">
+      {
+        others.length ? (
+          <div class="section-head">
+            <h2 id="others-title">Other products</h2>
+            <p>
+              Also made by {site.name}. We offer services too: <a href="/services/">see the services</a>.
+            </p>
+          </div>
+        ) : (
+          <div class="section-head">
+            <h2 id="others-title">Rather have it done for you?</h2>
+            <p>The same tools, run by our team.</p>
+          </div>
+        )
+      }
+      <RowList items={others.length ? productRows(others) : serviceRows(services)} />
+    </div>
+  </section>
+</Base>

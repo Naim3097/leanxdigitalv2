@@ -1,0 +1,17 @@
+---
+import { site } from '../data/site';
+---
+
+<section class="cta" aria-labelledby="cta-title">
+  <div class="wrap">
+    <h2 id="cta-title">Tell us what you sell and what isn’t working.</h2>
+    <p>
+      Send a WhatsApp message with your business name and a link to your website or shop. We reply in
+      English or Bahasa Malaysia.
+    </p>
+    <div class="actions">
+      <a class="btn btn-solid" href={site.whatsapp}>WhatsApp {site.phoneDisplay}</a>
+      <a class="btn btn-line" href={`mailto:${site.email}`}>Email us</a>
+    </div>
+  </div>
+</section>

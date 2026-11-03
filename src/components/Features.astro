@@ -1,0 +1,21 @@
+---
+// A grid of short titled items, three across on wide screens.
+interface Props {
+  items: readonly (readonly [string, string])[];
+  /** Heading level for item titles, to fit the page outline. */
+  level?: 'h3' | 'h4';
+}
+const { items, level = 'h3' } = Astro.props;
+const Tag = level;
+---
+
+<div class="cols">
+  {
+    items.map(([title, text]) => (
+      <div>
+        <Tag>{title}</Tag>
+        <p>{text}</p>
+      </div>
+    ))
+  }
+</div>

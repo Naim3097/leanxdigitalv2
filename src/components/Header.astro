@@ -1,0 +1,37 @@
+---
+import Logo from './Logo.astro';
+import { site } from '../data/site';
+
+const path = Astro.url.pathname;
+const nav = [
+  ['Nexova', '/products/nexova/'],
+  ['Services', '/services/'],
+  ['About', '/about/'],
+  ['Contact', '/contact/'],
+] as const;
+
+const current = (href: string) =>
+  path === href ? 'page' : href !== '/' && path.startsWith(href) ? 'true' : undefined;
+---
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label={`${site.name} home`}>
+      <Logo />
+      <span class="brand-text">lean.x digital</span>
+    </a>
+    <nav class="nav" aria-label="Main">
+      <ul>
+        {
+          nav.map(([label, href]) => (
+            <li>
+              <a href={href} aria-current={current(href)}>
+                {label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </div>
+</header>

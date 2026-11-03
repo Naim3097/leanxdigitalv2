@@ -1,0 +1,127 @@
+---
+import Base from '../layouts/Base.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import { site, fullAddress } from '../data/site';
+import { services, whatsappUrl } from '../data/services';
+import { updatedFor } from '../data/pages';
+import { webPage, breadcrumbs } from '../lib/schema';
+import { hasPublicFile } from '../lib/files';
+
+const path = '/contact/';
+const title = `Contact ${site.name} | WhatsApp, phone, email and office`;
+const description = `Contact Lean X Digital in Kuala Lumpur. WhatsApp or call ${site.phoneDisplay}, email ${site.email}, or visit our office at 8trium, Bandar Sri Damansara.`;
+const crumbs: [string, string][] = [
+  ['Home', '/'],
+  ['Contact', path],
+];
+const showPdf = hasPublicFile(site.companyProfilePdf);
+
+const schema = [
+  webPage({
+    path,
+    title,
+    description,
+    updated: updatedFor(path),
+    type: 'ContactPage',
+    hasBreadcrumb: true,
+  }),
+  breadcrumbs(path, crumbs),
+];
+---
+
+<Base title={title} description={description} schema={schema} cta={false}>
+  <Breadcrumbs items={crumbs} />
+
+  <header class="page-head wrap">
+    <p class="eyebrow">Contact</p>
+    <h1>Contact Lean X Digital</h1>
+    <p class="lede">
+      WhatsApp is usually the quickest way to reach us. We reply in English or Bahasa Malaysia.
+    </p>
+  </header>
+
+  <section class="wrap" aria-label="Ways to contact us" style="padding-bottom: var(--space)">
+    <div class="methods">
+      <a href={site.whatsapp}>
+        <span class="eyebrow">WhatsApp</span>
+        <strong>{site.phoneDisplay}</strong>
+        <span class="muted">Message us with your business name and website or shop link.</span>
+      </a>
+      <a href={`tel:${site.phone}`}>
+        <span class="eyebrow">Phone</span>
+        <strong>{site.phoneDisplay}</strong>
+        <span class="muted">Same number as WhatsApp.</span>
+      </a>
+      <a href={`mailto:${site.email}`}>
+        <span class="eyebrow">Email</span>
+        <strong>{site.email}</strong>
+        <span class="muted">For proposals, documents and anything long.</span>
+      </a>
+      <a href={site.mapUrl} rel="noopener">
+        <span class="eyebrow">Office</span>
+        <strong>8trium, Bandar Sri Damansara</strong>
+        <span class="muted">{fullAddress}. Open in Google Maps.</span>
+      </a>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="first-title">
+    <div class="wrap section-grid">
+      <div class="section-head">
+        <h2 id="first-title">What to send us</h2>
+      </div>
+      <div>
+        <p>
+          Your business name, a link to your website or shop, and the one thing you most want to fix.
+          That is enough for us to come back with questions or a time to talk.
+        </p>
+        {
+          showPdf && (
+            <p>
+              Want to know more about us first? <a href={site.companyProfilePdf}>Download our company profile (PDF)</a>.
+            </p>
+          )
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="ads-title">
+    <div class="wrap section-grid">
+      <div class="section-head">
+        <h2 id="ads-title">Ask about a service</h2>
+        <p>Each link opens WhatsApp with a message ready to send.</p>
+      </div>
+      <dl class="facts">
+        {
+          services.map((s) => (
+            <div>
+              <dt>
+                <a href={`/services/${s.slug}/`}>{s.name}</a>
+              </dt>
+              <dd>
+                <a href={whatsappUrl(s)}>WhatsApp us about {s.short}</a>
+              </dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="help-title">
+    <div class="wrap section-grid">
+      <div class="section-head">
+        <h2 id="help-title">Help with Nexova</h2>
+      </div>
+      <div>
+        <p>
+          Nexova has its own support line: WhatsApp <a
+            href="https://wa.me/60107648227?text=Hi%20Nexova%2C%20I%27d%20like%20help%20setting%20up%20my%20store."
+            >+60 10-764 8227</a
+          >.
+        </p>
+      </div>
+    </div>
+  </section>
+</Base>

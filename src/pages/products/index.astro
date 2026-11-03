@@ -1,0 +1,82 @@
+---
+import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import Features from '../../components/Features.astro';
+import Icon from '../../components/Icon.astro';
+import { site } from '../../data/site';
+import { products } from '../../data/products';
+import { updatedFor } from '../../data/pages';
+import { webPage, breadcrumbs, productList } from '../../lib/schema';
+import { countWord, listOf } from '../../lib/text';
+
+const path = '/products/';
+const count = countWord(products.length);
+const names = listOf(products.map((p) => p.name));
+const title = `Products: ${names} | ${site.name}`;
+const description =
+  'Nexova, from Lean X Digital: a store website that grows itself, with auto content, auto Meta ads and auto SEO, and stock synced to Shopee and TikTok Shop.';
+const crumbs: [string, string][] = [
+  ['Home', '/'],
+  ['Products', path],
+];
+
+const schema = [
+  webPage({
+    path,
+    title,
+    description,
+    updated: updatedFor(path),
+    type: 'CollectionPage',
+    hasBreadcrumb: true,
+  }),
+  breadcrumbs(path, crumbs),
+  productList(path),
+];
+---
+
+<Base title={title} description={description} schema={schema}>
+  <Breadcrumbs items={crumbs} />
+
+  <header class="page-head wrap">
+    <p class="eyebrow">{products.length === 1 ? 'Our product' : `${count} products`}</p>
+    <h1>Products</h1>
+    <p class="lede">
+      Lean X Digital makes {names}, a store website that grows itself. It runs the same content, Meta ads
+      and SEO workflows our team uses with clients, automatically.
+    </p>
+  </header>
+
+  {
+    products.map((p, i) => (
+      <section class="section" aria-labelledby={`${p.slug}-title`}>
+        <div class="wrap section-grid">
+          <div class="section-head">
+            <p class="eyebrow">
+              {String(i + 1).padStart(2, '0')} · {p.category}
+            </p>
+            <h2 id={`${p.slug}-title`} style="margin-top: 0.75rem">
+              <a href={`/products/${p.slug}/`}>{p.name}</a>
+            </h2>
+          </div>
+          <div>
+            <p>{p.definition}</p>
+            <div class="actions" style="margin-top: 1.5rem">
+              <a class="btn btn-solid" href={`/products/${p.slug}/`}>
+                About {p.name}
+                <Icon name="arrow" />
+              </a>
+              {p.website && (
+                <a class="btn btn-line" href={p.website.url} rel="noopener">
+                  {p.website.label}
+                  <Icon name="external" />
+                </a>
+              )}
+            </div>
+            <h3 class="subhead">What {p.name} does</h3>
+            <Features items={p.features} level="h4" />
+          </div>
+        </div>
+      </section>
+    ))
+  }
+</Base>

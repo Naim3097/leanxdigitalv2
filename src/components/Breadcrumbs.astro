@@ -1,0 +1,23 @@
+---
+// Visible breadcrumb trail. Pass the same items to schema.breadcrumbs() so the markup matches.
+interface Props {
+  items: [string, string][];
+}
+const { items } = Astro.props;
+---
+
+<nav class="crumbs wrap" aria-label="Breadcrumb">
+  <ol>
+    {
+      items.map(([name, href], i) =>
+        i === items.length - 1 ? (
+          <li aria-current="page">{name}</li>
+        ) : (
+          <li>
+            <a href={href}>{name}</a>
+          </li>
+        ),
+      )
+    }
+  </ol>
+</nav>

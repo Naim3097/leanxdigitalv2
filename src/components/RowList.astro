@@ -1,0 +1,28 @@
+---
+// Numbered rows linking to product or service pages. Build items with productRows() / serviceRows().
+import Icon from './Icon.astro';
+import type { Row } from '../lib/rows';
+
+interface Props {
+  items: Row[];
+}
+const { items } = Astro.props;
+---
+
+<ol class="plist">
+  {
+    items.map((r, i) => (
+      <li>
+        <a href={r.href}>
+          <span class="num">{String(i + 1).padStart(2, '0')}</span>
+          <span class="name">
+            <strong>{r.name}</strong>
+            <span>{r.label}</span>
+          </span>
+          <span class="text">{r.text}</span>
+          <Icon name="arrow" class="arrow" />
+        </a>
+      </li>
+    ))
+  }
+</ol>

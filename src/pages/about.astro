@@ -1,0 +1,168 @@
+---
+import Base from '../layouts/Base.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import RowList from '../components/RowList.astro';
+import Facts from '../components/Facts.astro';
+import { site, fullAddress, formatDate } from '../data/site';
+import { products } from '../data/products';
+import { services, people } from '../data/services';
+import { updatedFor } from '../data/pages';
+import { webPage, breadcrumbs, person } from '../lib/schema';
+import { productRows, serviceRows } from '../lib/rows';
+
+const path = '/about/';
+const updated = updatedFor(path);
+const nexova = products[0];
+const title = `About ${site.name} | Digital solutions company in Kuala Lumpur`;
+const description =
+  'Lean X Digital is a Kuala Lumpur company that makes Nexova, a self-growing store website, and offers creative work, paid ads, SEO and development as services.';
+const crumbs: [string, string][] = [
+  ['Home', '/'],
+  ['About', path],
+];
+const ownSites = people.flatMap((m) => (m.ownSite ? [{ person: m, ...m.ownSite }] : []));
+
+const details: [string, string][] = [
+  ['Name', site.name],
+  ...(site.legalName ? [['Registered name', site.legalName] as [string, string]] : []),
+  ...(site.registrationNumber
+    ? [['SSM registration', site.registrationNumber] as [string, string]]
+    : []),
+  ...(site.foundingDate ? [['Founded', site.foundingDate] as [string, string]] : []),
+  ['Address', fullAddress],
+  ['Phone and WhatsApp', site.phoneDisplay],
+  ['Email', site.email],
+  ['Languages', 'English and Bahasa Malaysia'],
+];
+
+const schema = [
+  webPage({ path, title, description, updated, type: 'AboutPage', hasBreadcrumb: true }),
+  breadcrumbs(path, crumbs),
+  ...people.map(person),
+];
+---
+
+<Base title={title} description={description} schema={schema}>
+  <Breadcrumbs items={crumbs} />
+
+  <header class="page-head wrap">
+    <p class="eyebrow">About</p>
+    <h1>About Lean X Digital</h1>
+    <p class="lede">
+      Lean X Digital (written “lean.x digital” in our logo) is a digital solutions company in Bandar Sri
+      Damansara, Kuala Lumpur. We make {nexova.name}, and our team offers the same work as a service.
+    </p>
+  </header>
+
+  <section class="section" aria-labelledby="approach-title">
+    <div class="wrap section-grid">
+      <div class="section-head">
+        <h2 id="approach-title">How we work</h2>
+      </div>
+      <div>
+        <p>
+          Our line is “{site.tagline}” Clicks and followers are only worth something when some of them
+          become paying customers. So we look at the whole path a customer takes: the content they see, the
+          ad or search result they click, and the page or WhatsApp chat where they decide to buy.
+        </p>
+        <p>
+          Our strategists built their workflows for that path over years of client work. {nexova.name} runs
+          those workflows automatically, as a store website that grows itself. Our services are the same work,
+          done by the people who built it.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="make-title">
+    <div class="wrap section-grid">
+      <div class="section-head">
+        <h2 id="make-title">Product</h2>
+      </div>
+      <RowList items={productRows(products)} />
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="services-title">
+    <div class="wrap section-grid">
+      <div class="section-head">
+        <h2 id="services-title">Services</h2>
+      </div>
+      <RowList items={serviceRows(services)} />
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="industries-title">
+    <div class="wrap section-grid">
+      <div class="section-head">
+        <h2 id="industries-title">Industries</h2>
+        <p>Sectors our clients work in.</p>
+      </div>
+      <ul class="inline-list">{site.industries.map((i) => <li>{i}</li>)}</ul>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="team-title">
+    <div class="wrap section-grid">
+      <div class="section-head">
+        <h2 id="team-title">Team</h2>
+        <p>The strategists who lead our work. Both co-founded {nexova.name}.</p>
+      </div>
+      <div>
+        <div class="split">
+          {
+            people.map((m) => (
+              <div id={m.slug}>
+                <p class="eyebrow">{m.focus}</p>
+                <h3>{m.name}</h3>
+                <p>
+                  {m.role}. {m.bio}
+                </p>
+              </div>
+            ))
+          }
+        </div>
+        {
+          ownSites.length > 0 && (
+            <p class="muted" style="margin-top: 1.5rem">
+              Our strategists also share how they work at{' '}
+              {ownSites.map((x, i) => (
+                <>{i > 0 && (i === ownSites.length - 1 ? ' and ' : ', ')}<a href={x.url} rel="noopener">{x.brand}</a></>
+              ))}.{' '}
+              {ownSites.map((x) => x.disclaimer).join(' ')}
+            </p>
+          )
+        }
+        {
+          site.team.length > 0 && (
+            <dl class="facts" style="margin-top: 2rem">
+              {site.team.map((m) => (
+                <div>
+                  <dt>{m.role}</dt>
+                  <dd>{m.url ? <a href={m.url}>{m.name}</a> : <strong>{m.name}</strong>}</dd>
+                </div>
+              ))}
+            </dl>
+          )
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="details-title">
+    <div class="wrap section-grid">
+      <div class="section-head">
+        <h2 id="details-title">Company details</h2>
+        <p class="updated">Updated <time datetime={updated}>{formatDate(updated)}</time></p>
+      </div>
+      <div>
+        <Facts facts={details} />
+        <div class="actions" style="margin-top: 1.5rem">
+          <a class="btn btn-line" href={site.mapUrl} rel="noopener">Open in Google Maps</a>
+          <a class="btn btn-line" href={site.social.instagram} rel="me noopener">Instagram</a>
+          <a class="btn btn-line" href={site.social.facebook} rel="me noopener">Facebook</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>

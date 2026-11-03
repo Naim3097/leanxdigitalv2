@@ -1,0 +1,18 @@
+---
+// Questions are visible on the page. The FAQPage JSON-LD is built from the same list.
+interface Props {
+  faqs: readonly (readonly [string, string])[];
+}
+const { faqs } = Astro.props;
+---
+
+<div class="faq">
+  {
+    faqs.map(([q, a]) => (
+      <div>
+        <h3>{q}</h3>
+        <p>{a}</p>
+      </div>
+    ))
+  }
+</div>

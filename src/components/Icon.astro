@@ -1,0 +1,22 @@
+---
+interface Props {
+  name: 'arrow' | 'external';
+  class?: string;
+}
+const { name, class: className } = Astro.props;
+---
+
+<svg
+  class={className}
+  viewBox="0 0 20 20"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.6"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+  focusable="false"
+>
+  {name === 'arrow' && <path d="M4 10h12M11 5l5 5-5 5" />}
+  {name === 'external' && <path d="M7 13l6-6M8 7h5v5" />}
+</svg>

@@ -1,0 +1,140 @@
+---
+import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import Facts from '../../components/Facts.astro';
+import Faq from '../../components/Faq.astro';
+import RowList from '../../components/RowList.astro';
+import Icon from '../../components/Icon.astro';
+import { site, formatDate } from '../../data/site';
+import { services, whatsappUrl, type Service } from '../../data/services';
+import { products } from '../../data/products';
+import { webPage, breadcrumbs, serviceNodes, faqPage, serviceId } from '../../lib/schema';
+import { serviceRows } from '../../lib/rows';
+import { lcFirst } from '../../lib/text';
+
+export function getStaticPaths() {
+  return services.map((service) => ({ params: { slug: service.slug }, props: { service } }));
+}
+
+const { service: s } = Astro.props as { service: Service };
+const path = `/services/${s.slug}/`;
+const title = `${s.seoTitle} | ${site.name}`;
+const crumbs: [string, string][] = [
+  ['Home', '/'],
+  ['Services', '/services/'],
+  [s.name, path],
+];
+const others = services.filter((o) => o.slug !== s.slug);
+const nexova = products[0];
+const image = `/og/${s.slug}.png`;
+
+const schema = [
+  webPage({
+    path,
+    title,
+    description: s.metaDescription,
+    updated: s.updated,
+    hasBreadcrumb: true,
+    about: serviceId(s),
+    image,
+  }),
+  breadcrumbs(path, crumbs),
+  ...serviceNodes(s),
+  faqPage(path, s.faqs),
+];
+---
+
+<Base
+  title={title}
+  description={s.metaDescription}
+  image={image}
+  imageAlt={`${s.name}, a service by ${site.name}`}
+  schema={schema}
+>
+  <Breadcrumbs items={crumbs} />
+
+  <article>
+    <header class="page-head wrap">
+      <p class="eyebrow">Service · {s.category}</p>
+      <h1>{s.name}</h1>
+      <p class="lede">{s.definition}</p>
+      <div class="actions">
+        <a class="btn btn-solid" href={whatsappUrl(s)}>WhatsApp us</a>
+        <a class="btn btn-line" href={`tel:${site.phone}`}>Call {site.phoneDisplay}</a>
+      </div>
+    </header>
+
+    <div class="wrap product-body">
+      <div class="prose">
+        <section aria-labelledby="for-title">
+          <h2 id="for-title">Who it’s for</h2>
+          <p>{s.audience}</p>
+        </section>
+
+        <section aria-labelledby="includes-title">
+          <h2 id="includes-title">{s.includesTitle}</h2>
+          <Facts facts={s.includes} />
+        </section>
+
+        <section aria-labelledby="steps-title">
+          <h2 id="steps-title">{s.stepsTitle}</h2>
+          <ol class="steps">{s.steps.map((step) => <li>{step}</li>)}</ol>
+        </section>
+
+        {
+          s.sections.map((sec, i) => (
+            <section aria-labelledby={`s${i}-title`}>
+              <h2 id={`s${i}-title`}>{sec.title}</h2>
+              {sec.body.map((para) => (
+                <p>{para}</p>
+              ))}
+            </section>
+          ))
+        }
+
+        {
+          s.automated && (
+            <section aria-labelledby="auto-title" class="lead-card">
+              <p class="eyebrow">Prefer it automated?</p>
+              <h2 id="auto-title">
+                {nexova.name} {s.automated.feature}
+              </h2>
+              <p>{s.automated.text}</p>
+              <div class="actions" style="margin-top: 1.25rem">
+                <a class="btn btn-line" href={`/products/${nexova.slug}/`}>
+                  See {nexova.name}
+                  <Icon name="arrow" />
+                </a>
+              </div>
+            </section>
+          )
+        }
+
+        <section aria-labelledby="faq-title">
+          <h2 id="faq-title">Questions about {lcFirst(s.name)}</h2>
+          <Faq faqs={s.faqs} />
+        </section>
+      </div>
+
+      <aside class="product-aside" aria-labelledby="facts-title">
+        <h2 id="facts-title">Key facts</h2>
+        <Facts facts={[...s.facts, ['Run by', site.name]]} />
+        <p class="updated">
+          Updated <time datetime={s.updated}>{formatDate(s.updated)}</time>
+        </p>
+      </aside>
+    </div>
+  </article>
+
+  <section class="section" aria-labelledby="others-title">
+    <div class="wrap section-grid">
+      <div class="section-head">
+        <h2 id="others-title">Other services</h2>
+        <p>
+          Also from {site.name}. Selling online? <a href={`/products/${nexova.slug}/`}>See {nexova.name}</a>.
+        </p>
+      </div>
+      <RowList items={serviceRows(others)} />
+    </div>
+  </section>
+</Base>

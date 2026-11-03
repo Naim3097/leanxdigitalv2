@@ -1,0 +1,103 @@
+---
+import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import Icon from '../../components/Icon.astro';
+import { site } from '../../data/site';
+import { services, whatsappUrl } from '../../data/services';
+import { products } from '../../data/products';
+import { updatedFor } from '../../data/pages';
+import { webPage, breadcrumbs, serviceList } from '../../lib/schema';
+import { countWord, lcFirst } from '../../lib/text';
+
+const path = '/services/';
+const count = countWord(services.length);
+const nexova = products[0];
+const title = `Services: creative, paid ads, SEO and development | ${site.name}`;
+const description =
+  'Lean X Digital’s team does the work for you: a creative agency, paid advertising, SEO, and website, CRM and app development for Malaysian businesses.';
+const crumbs: [string, string][] = [
+  ['Home', '/'],
+  ['Services', path],
+];
+
+const schema = [
+  webPage({
+    path,
+    title,
+    description,
+    updated: updatedFor(path),
+    type: 'CollectionPage',
+    hasBreadcrumb: true,
+  }),
+  breadcrumbs(path, crumbs),
+  serviceList(path),
+];
+---
+
+<Base title={title} description={description} schema={schema}>
+  <Breadcrumbs items={crumbs} />
+
+  <header class="page-head wrap">
+    <p class="eyebrow">Done for you</p>
+    <h1>Services</h1>
+    <p class="lede">
+      Our team does the work for you. {count.charAt(0).toUpperCase() + count.slice(1)} services, from the
+      same team that builds {nexova.name}.
+    </p>
+  </header>
+
+  {
+    services.map((s, i) => (
+      <section class="section" aria-labelledby={`${s.slug}-title`}>
+        <div class="wrap section-grid">
+          <div class="section-head">
+            <p class="eyebrow">
+              {String(i + 1).padStart(2, '0')} · {s.category}
+            </p>
+            <h2 id={`${s.slug}-title`} style="margin-top: 0.75rem">
+              <a href={`/services/${s.slug}/`}>{s.name}</a>
+            </h2>
+          </div>
+          <div>
+            <p>{s.definition}</p>
+            {s.automated && (
+              <p class="muted">
+                Prefer it automated? <a href={`/products/${nexova.slug}/`}>{nexova.name} {s.automated.feature}</a>{' '}
+                does this on its own.
+              </p>
+            )}
+            <div class="actions" style="margin-top: 1.5rem">
+              <a class="btn btn-solid" href={`/services/${s.slug}/`}>
+                About {lcFirst(s.name)}
+                <Icon name="arrow" />
+              </a>
+              <a class="btn btn-line" href={whatsappUrl(s)}>
+                WhatsApp us
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+    ))
+  }
+
+  <section class="section" aria-labelledby="auto-title">
+    <div class="wrap section-grid">
+      <div class="section-head">
+        <h2 id="auto-title">Rather it ran itself?</h2>
+      </div>
+      <div>
+        <p>
+          {nexova.name} is our self-growing store website. It does the content, Meta ads and SEO work on its
+          own, following the same workflows our team uses with clients.
+        </p>
+        <div class="actions" style="margin-top: 1.5rem">
+          <a class="btn btn-solid" href={`/products/${nexova.slug}/`}>
+            See {nexova.name}
+            <Icon name="arrow" />
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>

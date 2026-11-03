@@ -1,0 +1,175 @@
+---
+import Base from '../layouts/Base.astro';
+import RowList from '../components/RowList.astro';
+import Features from '../components/Features.astro';
+import Facts from '../components/Facts.astro';
+import Faq from '../components/Faq.astro';
+import Icon from '../components/Icon.astro';
+import { site, fullAddress } from '../data/site';
+import { products } from '../data/products';
+import { services } from '../data/services';
+import { updatedFor } from '../data/pages';
+import { webPage, productList, serviceList, faqPage } from '../lib/schema';
+import { serviceRows } from '../lib/rows';
+import { countWord, listOf } from '../lib/text';
+
+const path = '/';
+const nexova = products[0];
+const serviceNames = listOf(services.map((s) => s.short));
+const count = countWord(services.length);
+
+const title = 'Lean X Digital | Nexova and digital services, Kuala Lumpur';
+const description =
+  'Lean X Digital makes Nexova, a store website that grows itself, and its team does creative work, paid ads, SEO and development for Malaysian businesses.';
+
+const facts: [string, string][] = [
+  ['Company', `${site.name} (written “lean.x digital” in the logo)`],
+  ...(site.legalName ? [['Registered name', site.legalName] as [string, string]] : []),
+  ...(site.foundingDate ? [['Founded', site.foundingDate] as [string, string]] : []),
+  ['What we do', 'Help Malaysian businesses turn traffic into sales'],
+  ['Product', `${nexova.name}, a ${nexova.category.toLowerCase()}`],
+  ['Services', services.map((s) => s.name).join(' · ')],
+  ['Office', `${site.address.area}, ${site.address.city}`],
+  ['Clients', 'Businesses across Malaysia'],
+  ['Languages', 'English and Bahasa Malaysia'],
+  ['Phone and WhatsApp', site.phoneDisplay],
+  ['Email', site.email],
+];
+
+const faqs: [string, string][] = [
+  [
+    'What is Lean X Digital?',
+    `Lean X Digital is a digital solutions company in Kuala Lumpur, Malaysia. It helps businesses turn traffic into sales in two ways: ${nexova.name}, a store website that grows itself, and a team that does ${serviceNames} for you.`,
+  ],
+  [`What is ${nexova.name}?`, nexova.definition],
+  [
+    'Should I use Nexova or your services?',
+    'Nexova if you sell online and want the content, Meta ads and SEO work done automatically. Our services if you want people to do the work, need Google Ads, or need a website, CRM or app that Nexova doesn’t cover.',
+  ],
+  ['What services does Lean X Digital offer?', services.map((s) => `${s.name}: ${s.summary}`).join(' ')],
+  ['Who does the work?', `Our own team, the same people who build ${nexova.name}.`],
+  ['Where is Lean X Digital located?', `Our office is at ${fullAddress}.`],
+  [
+    'Does Lean X Digital work with businesses outside Kuala Lumpur?',
+    'Yes. We work with businesses across Malaysia.',
+  ],
+  ['How do I contact Lean X Digital?', `WhatsApp or call ${site.phoneDisplay}, or email ${site.email}.`],
+];
+
+const schema = [
+  webPage({ path, title, description, updated: updatedFor(path) }),
+  productList(path),
+  serviceList(path),
+  faqPage(path, faqs),
+];
+---
+
+<Base title={title} description={description} schema={schema}>
+  <section class="hero wrap" aria-labelledby="hero-title">
+    <p class="eyebrow">Digital solutions · Kuala Lumpur</p>
+    <h1 id="hero-title">{site.tagline}</h1>
+    <p class="lede">
+      Lean X Digital helps Malaysian businesses sell more, two ways. {nexova.name} is a store website that
+      grows itself. Or our team does the work for you: creative, ads, SEO and development.
+    </p>
+    <div class="actions">
+      <a class="btn btn-solid" href="#nexova">See {nexova.name}</a>
+      <a class="btn btn-line" href="#services">See the services</a>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="ways-title">
+    <div class="wrap section-grid">
+      <div class="section-head">
+        <h2 id="ways-title">Two ways to grow</h2>
+        <p>{nexova.name} automates the same workflows our team runs for clients.</p>
+      </div>
+      <div class="split">
+        <div>
+          <p class="eyebrow">Automated</p>
+          <h3>{nexova.name}</h3>
+          <p>
+            A store website that grows itself. It creates its own content, runs its own Meta ads and handles its
+            own SEO, with stock synced to Shopee and TikTok Shop. Free to start.
+          </p>
+          <a class="btn btn-solid" href={`/products/${nexova.slug}/`}>
+            See {nexova.name}
+            <Icon name="arrow" />
+          </a>
+        </div>
+        <div>
+          <p class="eyebrow">Done for you</p>
+          <h3>Our team</h3>
+          <p>
+            Our team makes your ads, runs your campaigns, works on your SEO and builds your website, CRM or
+            app. {count.charAt(0).toUpperCase() + count.slice(1)} services, priced to the job.
+          </p>
+          <a class="btn btn-line" href="/services/">
+            See the services
+            <Icon name="arrow" />
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="nexova" aria-labelledby="nexova-title">
+    <div class="wrap section-grid">
+      <div class="section-head">
+        <p class="eyebrow">Product · {nexova.category}</p>
+        <h2 id="nexova-title" style="margin-top: 0.75rem">
+          <a href={`/products/${nexova.slug}/`}>{nexova.name}</a>
+        </h2>
+      </div>
+      <div>
+        <p>{nexova.definition}</p>
+        <div class="actions" style="margin-top: 1.5rem">
+          <a class="btn btn-solid" href={`/products/${nexova.slug}/`}>
+            About {nexova.name}
+            <Icon name="arrow" />
+          </a>
+          {
+            nexova.website && (
+              <a class="btn btn-line" href={nexova.website.url} rel="noopener">
+                Start free at {nexova.website.label}
+                <Icon name="external" />
+              </a>
+            )
+          }
+        </div>
+        <h3 class="subhead">What {nexova.name} does</h3>
+        <Features items={nexova.features} level="h4" />
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="services" aria-labelledby="services-title">
+    <div class="wrap section-grid">
+      <div class="section-head">
+        <p class="eyebrow">Done for you</p>
+        <h2 id="services-title" style="margin-top: 0.75rem">Services</h2>
+        <p>Priced to the job. Message us on WhatsApp to start.</p>
+      </div>
+      <RowList items={serviceRows(services)} />
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="facts-title">
+    <div class="wrap section-grid">
+      <div class="section-head">
+        <h2 id="facts-title">At a glance</h2>
+        <p>The short version, for anyone who needs the facts in one place.</p>
+      </div>
+      <Facts facts={facts} />
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="faq-title">
+    <div class="wrap section-grid">
+      <div class="section-head">
+        <h2 id="faq-title">Questions</h2>
+      </div>
+      <Faq faqs={faqs} />
+    </div>
+  </section>
+</Base>
