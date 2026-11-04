@@ -1,0 +1,137 @@
+---
+import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import DraftNote from '../../components/DraftNote.astro';
+import Facts from '../../components/Facts.astro';
+import Faq from '../../components/Faq.astro';
+import { pageTitle, whatsappLink } from '../../data/site';
+import { showDrafts } from '../../lib/drafts';
+import { webPage, breadcrumbs } from '../../lib/schema';
+
+// Draft page, built only in local preview (lib/drafts.ts). To publish it: settle the price and scope,
+// rename this file to index.astro, remove the draft notes and add the page to data/pages.ts.
+export function getStaticPaths() {
+  return showDrafts ? [{ params: { page: undefined } }] : [];
+}
+
+const path = '/sales-leak-audit/';
+const title = pageTitle('Sales leak audit: where buyers drop off after the click');
+const description =
+  'A fixed-price check of your tracking, ads, landing page, WhatsApp follow-up and checkout that shows where buyers drop off between the ad click and the paid order.';
+const whatsapp = whatsappLink('Hi Lean X Digital! I’d like a sales leak audit. Here’s my website or shop: ');
+const crumbs: [string, string][] = [
+  ['Home', '/'],
+  ['Sales leak audit', path],
+];
+
+const checks: [string, string][] = [
+  [
+    'Tracking',
+    'Whether every enquiry and paid order is recorded, and sent back to Meta and Google so their bidding learns from real sales.',
+  ],
+  ['Ads', 'Where the budget goes, and which ads and searches bring buyers who pay rather than clicks alone.'],
+  [
+    'Landing page',
+    'What a buyer sees after the click, on a phone: how fast it loads, the offer, the price and the next step.',
+  ],
+  ['WhatsApp', 'How fast enquiries get a reply, and what happens to buyers who ask the price and then go quiet.'],
+  [
+    'Checkout',
+    'Which ways to pay buyers are offered, how many payments fail, and how many orders are cash on delivery.',
+  ],
+];
+
+const steps = [
+  'Send us your website or shop link on WhatsApp, and give us view access to your ad accounts and analytics.',
+  'We follow the path from ad click to paid order and measure where buyers drop off.',
+  'You get a written report: each leak, what it costs you in ringgit and how to fix it, most valuable first.',
+  'We go through it with you on a call. Fix it yourself, or ask us to.',
+];
+
+const faqs: [string, string][] = [
+  ['How much does the audit cost?', '[RM amount], fixed. [Say whether the fee is credited if the client then hires us.]'],
+  ['How long does it take?', '[Number] working days from when we get access.'],
+  [
+    'What access do you need?',
+    'View access to your ad accounts and analytics, and a test order through your checkout. Every account stays in your name.',
+  ],
+  ['Do I have to hire you afterwards?', 'No. The report is yours to act on with any team.'],
+];
+
+const schema = [
+  webPage({ path, title, description, updated: '2026-11-04', hasBreadcrumb: true }),
+  breadcrumbs(path, crumbs),
+];
+---
+
+<Base title={title} description={description} schema={schema} noindex whatsapp={whatsapp}>
+  <Breadcrumbs items={crumbs} />
+
+  <header class="page-head wrap">
+    <p class="eyebrow">Fixed-price audit</p>
+    <h1>Sales leak audit</h1>
+    <p class="lede">
+      Ads running but sales not coming in? We check your tracking, ads, landing page, WhatsApp follow-up and
+      checkout, and show you where buyers drop off after the click.
+    </p>
+    <div class="actions">
+      <a class="btn btn-solid" href={whatsapp}>Ask for an audit on WhatsApp</a>
+    </div>
+  </header>
+
+  <div class="wrap" style="padding-bottom: 3rem">
+    <DraftNote label="Draft page: not on the live site">
+      <p>
+        The strategy report recommends this audit as the entry offer that the service pages and the “traffic but no
+        sales” guide lead to. Before it goes live, decide:
+      </p>
+      <ul>
+        <li>The fixed price, and whether it is credited against later work</li>
+        <li>The turnaround time, what the report includes and whether the call is part of it</li>
+        <li>Whether checkout checks stay in scope before the payment-provider questions are answered</li>
+        <li>The final page title, after the keyword check</li>
+      </ul>
+      <p>Bahasa Malaysia headline to test: “Iklan jalan, sales tak masuk? Kami cari di mana jualan tercicir.”</p>
+    </DraftNote>
+  </div>
+
+  <section class="section" aria-labelledby="checks-title">
+    <div class="wrap section-grid">
+      <div class="section-head">
+        <h2 id="checks-title">What we check</h2>
+        <p>Five places a sale can leak between the ad and the payment.</p>
+      </div>
+      <Facts facts={checks} />
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="steps-title">
+    <div class="wrap section-grid">
+      <div class="section-head">
+        <h2 id="steps-title">How it works</h2>
+      </div>
+      <ol class="steps">{steps.map((s) => <li>{s}</li>)}</ol>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="price-title">
+    <div class="wrap section-grid">
+      <div class="section-head">
+        <h2 id="price-title">Price</h2>
+      </div>
+      <p>
+        <span class="placeholder">RM [amount]</span>, fixed, as of <span class="placeholder">[month and year]</span>.
+        The report arrives within <span class="placeholder">[number]</span> working days of getting access.
+      </p>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="faq-title">
+    <div class="wrap section-grid">
+      <div class="section-head">
+        <h2 id="faq-title">Questions</h2>
+      </div>
+      <Faq faqs={faqs} />
+    </div>
+  </section>
+</Base>

@@ -2,7 +2,8 @@
 // services carry no personal names. The team is introduced once, on the About page.
 // Everything here appears on the site and in JSON-LD and llms.txt, so keep it true and current.
 // When a fact changes, edit it here and bump `updated` to the date of the change.
-import { site } from './site';
+import { site, whatsappLink } from './site';
+import { showDrafts } from '../lib/drafts';
 
 export interface Person {
   /** Used in URLs and JSON-LD ids. */
@@ -15,6 +16,8 @@ export interface Person {
   bio: string;
   knowsAbout: string[];
   sameAs?: string[];
+  /** A real headshot in /public, e.g. '/team/izzad-iskandar.jpg'. Square, at least 800 px. */
+  photo?: string;
   /** Their own site, mentioned once on the About page. Keep these mentions to a minimum. */
   ownSite?: { brand: string; url: string; disclaimer: string };
 }
@@ -44,6 +47,8 @@ export interface Service {
   steps: string[];
   sections: { title: string; body: string[] }[];
   faqs: [string, string][];
+  /** Starting price, only once decided. Never estimate. e.g. { from: 'RM 2,500', per: 'month', asOf: 'November 2026' } */
+  pricing?: { from: string; per: string; asOf: string };
   /** ISO date this page's content last changed. */
   updated: string;
 }
@@ -100,11 +105,15 @@ export const people: Person[] = [
   },
 ];
 
+/** A strategist's own profile page needs a real photo and a LinkedIn link before it goes live. */
+export const profileReady = (m: Person) =>
+  Boolean(m.photo && m.sameAs?.some((u) => u.includes('linkedin.com')));
+
+/** Profile pages are built in local preview as drafts, and in production once ready. */
+export const hasProfilePage = (m: Person) => showDrafts || profileReady(m);
+
 /** WhatsApp link to the company number, pre-filled for this service. */
-export const whatsappUrl = (s: Service) =>
-  `https://wa.me/${site.phone.replace('+', '')}?text=${encodeURIComponent(
-    `Hi Lean X Digital! ${s.whatsappAsk}`,
-  )}`;
+export const whatsappUrl = (s: Service) => whatsappLink(`Hi Lean X Digital! ${s.whatsappAsk}`);
 
 export const services: Service[] = [
   {

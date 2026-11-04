@@ -1,11 +1,13 @@
 ---
 import Base from '../layouts/Base.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
+import DraftNote from '../components/DraftNote.astro';
 import { site, fullAddress } from '../data/site';
 import { services, whatsappUrl } from '../data/services';
 import { updatedFor } from '../data/pages';
 import { webPage, breadcrumbs } from '../lib/schema';
 import { hasPublicFile } from '../lib/files';
+import { showDrafts } from '../lib/drafts';
 
 const path = '/contact/';
 const title = `Contact ${site.name} | WhatsApp, phone, email and office`;
@@ -15,6 +17,9 @@ const crumbs: [string, string][] = [
   ['Contact', path],
 ];
 const showPdf = hasPublicFile(site.companyProfilePdf);
+const hours = site.openingHours.map(
+  (h) => `${h.days.length > 1 ? `${h.days[0]} to ${h.days.at(-1)}` : h.days[0]}, ${h.opens} to ${h.closes}`,
+);
 
 const schema = [
   webPage({
@@ -63,6 +68,20 @@ const schema = [
         <span class="muted">{fullAddress}. Open in Google Maps.</span>
       </a>
     </div>
+    {hours.length > 0 && <p class="muted" style="margin-top: 1.25rem">Office hours: {hours.join('. ')}.</p>}
+    {
+      showDrafts && hours.length === 0 && (
+        <div style="margin-top: 1.25rem">
+          <DraftNote>
+            <p>
+              Office hours go here once you confirm them, for example “Monday to Friday, 09:00 to 18:00”. Google
+              recommends them in the structured data for local businesses. Add them to <code>openingHours</code> in
+              <code>src/data/site.ts</code>.
+            </p>
+          </DraftNote>
+        </div>
+      )
+    }
   </section>
 
   <section class="section" aria-labelledby="first-title">

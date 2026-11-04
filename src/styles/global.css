@@ -846,3 +846,92 @@ h4 {
 .notfound {
   padding-block: clamp(5rem, 14vw, 10rem);
 }
+
+/* Client quotes */
+.quote {
+  margin: 0;
+  padding-left: 1.25rem;
+  border-left: 2px solid var(--fg);
+}
+
+.quote p {
+  font-size: 1.125rem;
+  line-height: 1.5;
+}
+
+.quote footer {
+  margin-top: 0.75rem;
+  font-size: 0.9375rem;
+  color: var(--muted);
+}
+
+.quote + .quote {
+  margin-top: 2rem;
+}
+
+/* Drafts: mock-ups waiting for review. They render only in dev (lib/drafts.ts). */
+.draft-note {
+  padding: 1rem 1.25rem;
+  border: 1px dashed var(--fg);
+  border-radius: 4px;
+  background: var(--soft);
+  font-size: 0.9375rem;
+}
+
+.draft-note .eyebrow {
+  margin-bottom: 0.5rem;
+  color: var(--fg);
+}
+
+.draft-note p,
+.draft-note ul {
+  color: var(--muted);
+}
+
+.draft-note ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+}
+
+.draft-note li + li {
+  margin-top: 0.25rem;
+}
+
+.draft-note * + p,
+.draft-note * + ul {
+  margin-top: 0.5rem;
+}
+
+.placeholder {
+  padding: 0 0.25em;
+  border: 1px dashed var(--muted);
+  border-radius: 2px;
+  background: var(--soft);
+}
+
+.image-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1.5rem;
+  border: 1px dashed var(--muted);
+  border-radius: 4px;
+  background: var(--soft);
+  color: var(--muted);
+  font-size: 0.9375rem;
+  text-align: center;
+}
+
+.draft-bar {
+  display: block;
+  padding: 0.5rem var(--gutter);
+  border-bottom: 1px dashed var(--fg);
+  background: var(--soft);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-align: center;
+  text-decoration: none;
+}

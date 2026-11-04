@@ -5,10 +5,13 @@ import { hasPublicFile } from '../lib/files';
 
 // Hand-built so <lastmod> is the real date each page changed, not the build date.
 // Google ignores priority and changefreq, so they are left out.
+// Bing asks for a full date and time, so each date is given at midnight Malaysian time.
+const at = (date: string) => `${date}T00:00:00+08:00`;
+
 export const GET: APIRoute = () => {
-  const entries = allPages.map((p) => ({ loc: absoluteUrl(p.path), lastmod: p.updated }));
+  const entries = allPages.map((p) => ({ loc: absoluteUrl(p.path), lastmod: at(p.updated) }));
   if (hasPublicFile(site.companyProfilePdf)) {
-    entries.push({ loc: absoluteUrl(site.companyProfilePdf), lastmod: staticPages[0].updated });
+    entries.push({ loc: absoluteUrl(site.companyProfilePdf), lastmod: at(staticPages[0].updated) });
   }
 
   const body = `<?xml version="1.0" encoding="UTF-8"?>

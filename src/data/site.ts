@@ -38,11 +38,22 @@ export const site = {
   mapUrl:
     'https://www.google.com/maps/search/?api=1&query=8trium+Tower+1+Bandar+Sri+Damansara+Kuala+Lumpur',
   languages: ['English', 'Malay'],
+  // Office hours, shown on the Contact page and in the structured data once filled in.
+  // e.g. [{ days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'], opens: '09:00', closes: '18:00' }]
+  openingHours: [] as { days: string[]; opens: string; closes: string }[],
+  // Typical project price range for the structured data, e.g. 'RM 1,500 to RM 10,000'.
+  priceRange: '' as string,
+  // Google Analytics 4 measurement ID, e.g. 'G-XXXXXXXXXX'. Pages load Google's tag only when this
+  // is set; until then the site ships no JavaScript.
+  ga4Id: '' as string,
 
   // Public profiles of this company only. Do not list sister companies here.
+  // Empty ones are left out everywhere.
   social: {
     facebook: 'https://www.facebook.com/profile.php?id=61553581582150',
     instagram: 'https://www.instagram.com/leanxdigitalmy/',
+    // Company page, e.g. 'https://www.linkedin.com/company/leanxdigital/'
+    linkedin: '' as string,
   },
 
   // Put the PDF in /public with this exact name to keep the old link working.
@@ -93,6 +104,16 @@ export const fullAddress = [
 ].join(', ');
 
 export const absoluteUrl = (path: string) => new URL(path, site.url).href;
+
+/** A WhatsApp link to the company number with a message ready to send. */
+export const whatsappLink = (text: string) =>
+  `https://wa.me/${site.phone.replace('+', '')}?text=${encodeURIComponent(text)}`;
+
+/** "<title> | Lean X Digital", unless that runs past 65 characters, where Google cuts titles short. */
+export const pageTitle = (title: string) => {
+  const full = `${title} | ${site.name}`;
+  return full.length <= 65 ? full : title;
+};
 
 export const formatDate = (iso: string) =>
   new Date(iso + 'T00:00:00+08:00').toLocaleDateString('en-MY', {

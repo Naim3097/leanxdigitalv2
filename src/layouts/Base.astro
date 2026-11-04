@@ -7,6 +7,7 @@ import Footer from '../components/Footer.astro';
 import Cta from '../components/Cta.astro';
 import { site, absoluteUrl } from '../data/site';
 import { organization, website } from '../lib/schema';
+import { showDrafts } from '../lib/drafts';
 
 interface Props {
   title: string;
@@ -16,6 +17,8 @@ interface Props {
   schema?: Record<string, unknown>[];
   noindex?: boolean;
   cta?: boolean;
+  /** WhatsApp link for this page's call to action and footer, pre-filled for the page's topic. */
+  whatsapp?: string;
 }
 
 const {
@@ -26,6 +29,7 @@ const {
   schema = [],
   noindex = false,
   cta = true,
+  whatsapp = site.whatsapp,
 } = Astro.props;
 
 const canonical = absoluteUrl(Astro.url.pathname);
@@ -56,6 +60,7 @@ const jsonLd = {
     <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#0b0b0b" media="(prefers-color-scheme: dark)" />
     <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
@@ -83,14 +88,32 @@ const jsonLd = {
     <meta name="geo.position" content={`${site.geo.lat};${site.geo.lng}`} />
 
     <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    {
+      site.ga4Id && (
+        <>
+          <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${site.ga4Id}`} />
+          <script
+            is:inline
+            set:html={`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config',${JSON.stringify(site.ga4Id)});`}
+          />
+        </>
+      )
+    }
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
+    {
+      showDrafts && (
+        <a class="draft-bar" href="/drafts/">
+          Local preview: drafts are shown here and hidden on the live site. See everything waiting for review
+        </a>
+      )
+    }
     <Header />
     <main id="main">
       <slot />
     </main>
-    {cta && <Cta />}
-    <Footer />
+    {cta && <Cta whatsapp={whatsapp} />}
+    <Footer whatsapp={whatsapp} />
   </body>
 </html>

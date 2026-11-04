@@ -6,6 +6,11 @@
   "trailingSlash": true,
   "redirects": [
     {
+      "source": "/og-image.png",
+      "destination": "/og/default.png",
+      "permanent": true
+    },
+    {
       "source": "/services/google-ads/",
       "destination": "/services/paid-advertising/",
       "permanent": true

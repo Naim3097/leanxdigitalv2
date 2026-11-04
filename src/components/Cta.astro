@@ -1,5 +1,11 @@
 ---
 import { site } from '../data/site';
+
+interface Props {
+  /** WhatsApp link pre-filled for the page's topic. */
+  whatsapp?: string;
+}
+const { whatsapp = site.whatsapp } = Astro.props;
 ---
 
 <section class="cta" aria-labelledby="cta-title">
@@ -10,7 +16,7 @@ import { site } from '../data/site';
       English or Bahasa Malaysia.
     </p>
     <div class="actions">
-      <a class="btn btn-solid" href={site.whatsapp}>WhatsApp {site.phoneDisplay}</a>
+      <a class="btn btn-solid" href={whatsapp}>WhatsApp {site.phoneDisplay}</a>
       <a class="btn btn-line" href={`mailto:${site.email}`}>Email us</a>
     </div>
   </div>

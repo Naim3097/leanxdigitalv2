@@ -1,0 +1,101 @@
+---
+import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import Facts from '../../components/Facts.astro';
+import DraftNote from '../../components/DraftNote.astro';
+import ImageSlot from '../../components/ImageSlot.astro';
+import { formatDate, pageTitle } from '../../data/site';
+import { services } from '../../data/services';
+import { products } from '../../data/products';
+import { visibleCaseStudies, type CaseStudy } from '../../data/work';
+import { webPage, breadcrumbs } from '../../lib/schema';
+
+export function getStaticPaths() {
+  return visibleCaseStudies.map((study) => ({ params: { slug: study.slug }, props: { study } }));
+}
+
+const { study: c } = Astro.props as { study: CaseStudy };
+const path = `/work/${c.slug}/`;
+const title = pageTitle(`${c.client}: ${c.industry} case study`);
+const crumbs: [string, string][] = [
+  ['Home', '/'],
+  ['Work', '/work/'],
+  [c.client, path],
+];
+const nexova = products[0];
+const facts: [string, string][] = [
+  ['Client', c.client],
+  ['Industry', c.industry],
+  ['Services', services.filter((s) => c.services.includes(s.slug)).map((s) => s.name).join(', ')],
+  ...(c.nexova ? [['Built on', nexova.name] as [string, string]] : []),
+];
+
+const schema = [
+  webPage({ path, title, description: c.summary, updated: c.updated, hasBreadcrumb: true }),
+  breadcrumbs(path, crumbs),
+];
+---
+
+<Base title={title} description={c.summary} schema={schema} noindex={c.draft}>
+  <Breadcrumbs items={crumbs} />
+
+  <article>
+    <header class="page-head wrap">
+      <p class="eyebrow">Case study · {c.industry}</p>
+      <h1>{c.client}</h1>
+      <p class="lede">{c.summary}</p>
+    </header>
+
+    <div class="wrap product-body">
+      <div class="prose">
+        {
+          c.draft && (
+            <DraftNote label="Draft case study: placeholders only">
+              <p>
+                Nothing on this page is real yet. Every bracketed line needs a checkable fact from you, and the client’s
+                written permission, before it goes live. Still needed:
+              </p>
+              {c.todo && <ul>{c.todo.map((t) => <li>{t}</li>)}</ul>}
+            </DraftNote>
+          )
+        }
+
+        <section aria-labelledby="problem-title">
+          <h2 id="problem-title">The problem</h2>
+          <p>{c.problem}</p>
+        </section>
+
+        <section aria-labelledby="work-title">
+          <h2 id="work-title">What we did</h2>
+          <ol class="steps">{c.work.map((w) => <li>{w}</li>)}</ol>
+        </section>
+
+        <section aria-labelledby="results-title">
+          <h2 id="results-title">Results</h2>
+          <Facts facts={c.results} />
+        </section>
+
+        {
+          c.quote && (
+            <blockquote class="quote">
+              <p>{c.quote.text}</p>
+              <footer>
+                {c.quote.name}, {c.quote.role}
+              </footer>
+            </blockquote>
+          )
+        }
+
+        {c.draft && <ImageSlot label="One screenshot of the work: the store, an ad or a results dashboard, shared with the client’s permission" />}
+      </div>
+
+      <aside class="product-aside" aria-labelledby="facts-title">
+        <h2 id="facts-title">Key facts</h2>
+        <Facts facts={facts} />
+        <p class="updated">
+          Updated <time datetime={c.updated}>{formatDate(c.updated)}</time>
+        </p>
+      </aside>
+    </div>
+  </article>
+</Base>

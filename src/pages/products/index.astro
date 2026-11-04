@@ -3,7 +3,9 @@ import Base from '../../layouts/Base.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import Features from '../../components/Features.astro';
 import Icon from '../../components/Icon.astro';
+import DraftNote from '../../components/DraftNote.astro';
 import { site } from '../../data/site';
+import { showDrafts } from '../../lib/drafts';
 import { products } from '../../data/products';
 import { updatedFor } from '../../data/pages';
 import { webPage, breadcrumbs, productList } from '../../lib/schema';
@@ -45,6 +47,20 @@ const schema = [
       and SEO workflows our team uses with clients, automatically.
     </p>
   </header>
+
+  {
+    showDrafts && (
+      <div class="wrap" style="padding-bottom: 3rem">
+        <DraftNote label="Draft: merge proposal, for your decision">
+          <p>
+            With one product, this page repeats the {products[0].name} page. The strategy report suggests merging it into
+            that page and redirecting /products/ there. Keep it if more products are coming soon, and give it a more
+            descriptive H1 than “Products”.
+          </p>
+        </DraftNote>
+      </div>
+    )
+  }
 
   {
     products.map((p, i) => (

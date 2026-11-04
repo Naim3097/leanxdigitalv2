@@ -11,7 +11,9 @@ export const WEBSITE_ID = absoluteUrl('/#website');
 
 export function organization(): Node {
   return {
-    '@type': ['Organization', 'ProfessionalService'],
+    // Google asks for the most specific LocalBusiness type, and schema.org deprecated
+    // ProfessionalService in release 30.1 (September 2026).
+    '@type': ['Organization', 'LocalBusiness'],
     '@id': ORG_ID,
     name: site.name,
     alternateName: site.alternateNames,
@@ -50,9 +52,18 @@ export function organization(): Node {
       longitude: site.geo.lng,
     },
     hasMap: site.mapUrl,
+    ...(site.priceRange && { priceRange: site.priceRange }),
+    ...(site.openingHours.length > 0 && {
+      openingHoursSpecification: site.openingHours.map((h) => ({
+        '@type': 'OpeningHoursSpecification',
+        dayOfWeek: h.days,
+        opens: h.opens,
+        closes: h.closes,
+      })),
+    }),
     areaServed: { '@type': 'Country', name: 'Malaysia' },
     knowsAbout: site.knowsAbout,
-    sameAs: Object.values(site.social),
+    sameAs: Object.values(site.social).filter(Boolean),
     contactPoint: {
       '@type': 'ContactPoint',
       contactType: 'sales',
@@ -108,6 +119,8 @@ export function webPage(opts: {
   type?: string;
   hasBreadcrumb?: boolean;
   about?: string;
+  /** The @id of the thing the page is mainly about, e.g. the person on a profile page. */
+  mainEntity?: string;
   image?: string;
 }): Node {
   const url = absoluteUrl(opts.path);
@@ -120,6 +133,7 @@ export function webPage(opts: {
     inLanguage: site.locale,
     isPartOf: { '@id': WEBSITE_ID },
     about: { '@id': opts.about ?? ORG_ID },
+    ...(opts.mainEntity && { mainEntity: { '@id': opts.mainEntity } }),
     publisher: { '@id': ORG_ID },
     dateModified: opts.updated,
     primaryImageOfPage: {

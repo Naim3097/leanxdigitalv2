@@ -1,0 +1,113 @@
+---
+import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import DraftNote from '../../components/DraftNote.astro';
+import Facts from '../../components/Facts.astro';
+import RowList from '../../components/RowList.astro';
+import ImageSlot from '../../components/ImageSlot.astro';
+import { site, fullAddress, pageTitle } from '../../data/site';
+import { services } from '../../data/services';
+import { showDrafts } from '../../lib/drafts';
+import { webPage, breadcrumbs } from '../../lib/schema';
+import { serviceRows } from '../../lib/rows';
+
+// Draft page, built only in local preview (lib/drafts.ts). The strategy report found thin local results
+// for agencies around Damansara. To publish it: add the hours, directions, a local client story and real
+// photos, rename this file to index.astro and add the page to data/pages.ts.
+export function getStaticPaths() {
+  return showDrafts ? [{ params: { page: undefined } }] : [];
+}
+
+const path = '/bandar-sri-damansara/';
+const title = pageTitle('Digital agency in Bandar Sri Damansara, Kuala Lumpur');
+const description = `Lean X Digital’s office is at 8trium, Bandar Sri Damansara, Kuala Lumpur. Call or WhatsApp ${site.phoneDisplay} about ads, websites or a store of your own.`;
+const crumbs: [string, string][] = [
+  ['Home', '/'],
+  ['Bandar Sri Damansara', path],
+];
+const hours = site.openingHours.map(
+  (h) => `${h.days.length > 1 ? `${h.days[0]} to ${h.days.at(-1)}` : h.days[0]}, ${h.opens} to ${h.closes}`,
+);
+
+const office: [string, string][] = [
+  ['Address', fullAddress],
+  ['Phone and WhatsApp', site.phoneDisplay],
+  ['Email', site.email],
+  ['Office hours', hours.length > 0 ? hours.join('. ') : '[Office hours, e.g. Monday to Friday, 09:00 to 18:00]'],
+  ['Getting here', '[Parking at 8trium, and the nearest public transport]'],
+  ['Languages', 'English and Bahasa Malaysia'],
+];
+
+const schema = [
+  webPage({ path, title, description, updated: '2026-11-04', hasBreadcrumb: true }),
+  breadcrumbs(path, crumbs),
+];
+---
+
+<Base title={title} description={description} schema={schema} noindex>
+  <Breadcrumbs items={crumbs} />
+
+  <header class="page-head wrap">
+    <p class="eyebrow">Kuala Lumpur</p>
+    <h1>Lean X Digital in Bandar Sri Damansara</h1>
+    <p class="lede">
+      Our office is at 8trium, Bandar Sri Damansara. Call, WhatsApp or email to talk about ads, your website or a store
+      of your own, in English or Bahasa Malaysia.
+    </p>
+    <div class="actions">
+      <a class="btn btn-solid" href={site.whatsapp}>WhatsApp {site.phoneDisplay}</a>
+      <a class="btn btn-line" href={site.mapUrl} rel="noopener">Open in Google Maps</a>
+    </div>
+  </header>
+
+  <div class="wrap" style="padding-bottom: 3rem">
+    <DraftNote label="Draft page: not on the live site">
+      <p>Before it goes live, this page needs:</p>
+      <ul>
+        <li>Office hours. Google’s Business Profile rules expect the office to be staffed during the hours you list.</li>
+        <li>Directions: parking and the nearest public transport</li>
+        <li>A short story about a client nearby, with their permission</li>
+        <li>Real photos of the office or building</li>
+        <li>Your Google Business Profile link, once verified, in place of the map search link</li>
+      </ul>
+    </DraftNote>
+  </div>
+
+  <section class="section" aria-labelledby="office-title">
+    <div class="wrap section-grid">
+      <div class="section-head">
+        <h2 id="office-title">The office</h2>
+      </div>
+      <div>
+        <Facts facts={office} />
+        <div style="margin-top: 1.5rem">
+          <ImageSlot label="Photo of the office or the 8trium building entrance" ratio="16 / 9" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="services-title">
+    <div class="wrap section-grid">
+      <div class="section-head">
+        <h2 id="services-title">What we do</h2>
+        <p>For businesses in Bandar Sri Damansara and across Malaysia.</p>
+      </div>
+      <RowList items={serviceRows(services)} />
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="client-title">
+    <div class="wrap section-grid">
+      <div class="section-head">
+        <h2 id="client-title">A client near you</h2>
+      </div>
+      <p>
+        <span class="placeholder"
+          >[A short story about a client in or near Bandar Sri Damansara: who they are, what we did and the result,
+          with their permission.]</span
+        >
+      </p>
+    </div>
+  </section>
+</Base>

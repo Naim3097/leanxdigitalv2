@@ -3,12 +3,15 @@ import Base from '../layouts/Base.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import RowList from '../components/RowList.astro';
 import Facts from '../components/Facts.astro';
+import DraftNote from '../components/DraftNote.astro';
+import ImageSlot from '../components/ImageSlot.astro';
 import { site, fullAddress, formatDate } from '../data/site';
 import { products } from '../data/products';
-import { services, people } from '../data/services';
+import { services, people, hasProfilePage } from '../data/services';
 import { updatedFor } from '../data/pages';
 import { webPage, breadcrumbs, person } from '../lib/schema';
 import { productRows, serviceRows } from '../lib/rows';
+import { showDrafts } from '../lib/drafts';
 
 const path = '/about/';
 const updated = updatedFor(path);
@@ -113,8 +116,17 @@ const schema = [
           {
             people.map((m) => (
               <div id={m.slug}>
+                {m.photo ? (
+                  <img src={m.photo} alt={m.fullName} width="160" height="160" style="width: 5rem; border-radius: 4px" />
+                ) : (
+                  showDrafts && (
+                    <div style="width: 100%">
+                      <ImageSlot label={`Headshot of ${m.name}, square, at least 800 px`} ratio="3 / 1" />
+                    </div>
+                  )
+                )}
                 <p class="eyebrow">{m.focus}</p>
-                <h3>{m.name}</h3>
+                <h3>{hasProfilePage(m) ? <a href={`/about/${m.slug}/`}>{m.name}</a> : m.name}</h3>
                 <p>
                   {m.role}. {m.bio}
                 </p>
@@ -161,7 +173,33 @@ const schema = [
           <a class="btn btn-line" href={site.mapUrl} rel="noopener">Open in Google Maps</a>
           <a class="btn btn-line" href={site.social.instagram} rel="me noopener">Instagram</a>
           <a class="btn btn-line" href={site.social.facebook} rel="me noopener">Facebook</a>
+          {
+            site.social.linkedin && (
+              <a class="btn btn-line" href={site.social.linkedin} rel="me noopener">
+                LinkedIn
+              </a>
+            )
+          }
         </div>
+        {
+          showDrafts && !(site.legalName && site.registrationNumber && site.foundingDate) && (
+            <div style="margin-top: 1.5rem">
+              <DraftNote>
+                <p>
+                  Missing company details. Add them in <code>src/data/site.ts</code> and they appear here, in the footer,
+                  in llms.txt and in the structured data:
+                </p>
+                <ul>
+                  {!site.legalName && <li>Registered company name, as on the SSM certificate</li>}
+                  {!site.registrationNumber && <li>SSM registration number</li>}
+                  {!site.foundingDate && <li>Year the company started</li>}
+                  {!site.social.linkedin && <li>LinkedIn company page</li>}
+                  <li>One line on how Lean X Digital relates to Nexova, Lean.x and Leanis, as the strategy report recommends</li>
+                </ul>
+              </DraftNote>
+            </div>
+          )
+        }
       </div>
     </div>
   </section>

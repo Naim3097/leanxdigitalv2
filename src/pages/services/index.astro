@@ -2,7 +2,9 @@
 import Base from '../../layouts/Base.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import Icon from '../../components/Icon.astro';
-import { site } from '../../data/site';
+import DraftNote from '../../components/DraftNote.astro';
+import { pageTitle } from '../../data/site';
+import { showDrafts } from '../../lib/drafts';
 import { services, whatsappUrl } from '../../data/services';
 import { products } from '../../data/products';
 import { updatedFor } from '../../data/pages';
@@ -12,7 +14,7 @@ import { countWord, lcFirst } from '../../lib/text';
 const path = '/services/';
 const count = countWord(services.length);
 const nexova = products[0];
-const title = `Services: creative, paid ads, SEO and development | ${site.name}`;
+const title = pageTitle('Services: creative, paid ads, SEO and development');
 const description =
   'Lean X Digital’s team does the work for you: a creative agency, paid advertising, SEO, and website, CRM and app development for Malaysian businesses.';
 const crumbs: [string, string][] = [
@@ -45,6 +47,29 @@ const schema = [
       same team that builds {nexova.name}.
     </p>
   </header>
+
+  {
+    showDrafts && (
+      <div class="wrap" style="padding-bottom: 3rem">
+        <DraftNote label="Draft: proposed structure, for your decision">
+          <p>
+            The strategy report suggests ordering the services the way a buyer moves, from traffic to conversion to
+            checkout to a store of their own, so the list stops reading like a generalist menu:
+          </p>
+          <ul>
+            <li>Rename Paid advertising to performance marketing, reported in paid orders, and fold Creative agency into it</li>
+            <li>
+              Split Websites, CRM and apps into own store launch, landing pages and funnels, and checkout and payment
+              integration, the last only after the payment lawyer’s answers
+            </li>
+            <li>Reframe SEO as search and AI visibility for online stores, at a lower priority</li>
+            <li>Give the page a more descriptive H1 than “Services”, once you have keyword data</li>
+          </ul>
+          <p>Renamed pages change URLs. Before launch that costs nothing; after launch each one needs a redirect.</p>
+        </DraftNote>
+      </div>
+    )
+  }
 
   {
     services.map((s, i) => (

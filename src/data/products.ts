@@ -13,6 +13,8 @@ export interface Product {
   audience: string;
   seoTitle: string;
   metaDescription: string;
+  /** Pre-filled WhatsApp text. Follows "Hi Lean X Digital! ". */
+  whatsappAsk: string;
   /** The product's own website, if it has one. */
   website?: { url: string; label: string };
   /** Where to buy or sign up, when that is not the product website. */
@@ -50,6 +52,7 @@ export const products: Product[] = [
     seoTitle: 'Nexova: the self-growing store website for Malaysian sellers',
     metaDescription:
       'Nexova is a store website that grows itself: auto content, auto Meta ads and auto SEO, with stock synced to Shopee and TikTok Shop. Free to start.',
+    whatsappAsk: 'I have a question about Nexova. Here’s my shop: ',
     website: { url: 'https://www.nexova.my/', label: 'nexova.my' },
     appCategory: 'BusinessApplication',
     operatingSystem: 'Web browser',

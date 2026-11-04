@@ -1,0 +1,13 @@
+---
+// A visible "draft" label saying what needs the owner's review before the content goes live.
+// Only place it inside content that is already gated by showDrafts (lib/drafts.ts).
+interface Props {
+  label?: string;
+}
+const { label = 'Draft for review' } = Astro.props;
+---
+
+<aside class="draft-note">
+  <p class="eyebrow">{label}</p>
+  <slot />
+</aside>

@@ -1,0 +1,192 @@
+---
+import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import DraftNote from '../../components/DraftNote.astro';
+import Facts from '../../components/Facts.astro';
+import Faq from '../../components/Faq.astro';
+import RowList from '../../components/RowList.astro';
+import Icon from '../../components/Icon.astro';
+import { pageTitle, whatsappLink } from '../../data/site';
+import { products } from '../../data/products';
+import { visibleCaseStudies } from '../../data/work';
+import { showDrafts } from '../../lib/drafts';
+import { webPage, breadcrumbs } from '../../lib/schema';
+import { workRows } from '../../lib/rows';
+
+// Draft page, built only in local preview (lib/drafts.ts). The strategy report's lead offer:
+// own-store growth for established marketplace sellers, measured in paid orders. To publish it:
+// settle every bracketed item, rename this file to index.astro and add the page to data/pages.ts.
+export function getStaticPaths() {
+  return showDrafts ? [{ params: { page: undefined } }] : [];
+}
+
+const path = '/online-sellers/';
+const nexova = products[0];
+const title = pageTitle('Own store growth for Shopee and TikTok Shop sellers');
+const description =
+  'Keep Shopee and TikTok Shop, and add a store you own. Lean X Digital builds it from your listings, sets up checkout and runs the ads that feed it, reported in paid orders.';
+const whatsapp = whatsappLink(
+  'Hi Lean X Digital! I sell on Shopee or TikTok Shop and want a store of my own. Here’s my shop: ',
+);
+const crumbs: [string, string][] = [
+  ['Home', '/'],
+  ['Online sellers', path],
+];
+const related = visibleCaseStudies.filter((c) => c.nexova);
+
+const steps = [
+  `We build your store on ${nexova.name} from your Shopee or TikTok Shop link. Stock stays in sync, so an order on one channel updates the others.`,
+  'We set up checkout for FPX, DuitNow, cards and e-wallets through [named registered payment provider]. You sign up with the provider directly.',
+  'We run Meta ads that bring buyers to your store, alongside your marketplace listing.',
+  '[If offered: we follow up WhatsApp enquiries, so buyers who ask the price don’t go quiet.]',
+  'Every month you see paid orders, the ad cost per paid order and repeat buyers, from your own store’s data.',
+];
+
+const yours: [string, string][] = [
+  ['Your marketplace shops', 'Keep selling on Shopee and TikTok Shop as before.'],
+  ['Your accounts', '[Confirm: the ad accounts, domain and store are in your name.]'],
+  ['Your customers', '[Confirm: order and customer details from your store stay yours.]'],
+];
+
+const faqs: [string, string][] = [
+  [
+    'Do I have to leave Shopee or TikTok Shop?',
+    `No. Your store sits alongside your marketplace shops, and ${nexova.name} keeps stock in sync between them.`,
+  ],
+  [
+    'Who processes the payments?',
+    '[Named registered payment provider]. You sign up with them directly, and they pay out to your bank account.',
+  ],
+  [
+    'How do you measure results?',
+    'In paid orders from your own store: how many, what each one cost in ads, and how many buyers came back.',
+  ],
+  ['What does it cost?', '[Starting prices, once decided.]'],
+];
+
+const schema = [
+  webPage({ path, title, description, updated: '2026-11-04', hasBreadcrumb: true }),
+  breadcrumbs(path, crumbs),
+];
+---
+
+<Base title={title} description={description} schema={schema} noindex whatsapp={whatsapp}>
+  <Breadcrumbs items={crumbs} />
+
+  <header class="page-head wrap">
+    <p class="eyebrow">For online sellers</p>
+    <h1>Keep Shopee and TikTok Shop. Add a store you own.</h1>
+    <p class="lede">
+      For established Malaysian sellers. We build a store you own from your existing listings, set up checkout
+      through a registered payment provider and run the ads that bring buyers to it. Then we report what counts: paid
+      orders.
+    </p>
+    <div class="actions">
+      <a class="btn btn-solid" href={whatsapp}>Talk to us about your store</a>
+      <a class="btn btn-line" href={`/products/${nexova.slug}/`}>
+        See {nexova.name}
+        <Icon name="arrow" />
+      </a>
+    </div>
+  </header>
+
+  <div class="wrap" style="padding-bottom: 3rem">
+    <DraftNote label="Draft page: not on the live site">
+      <p>
+        The strategy report puts this offer at the centre of the positioning: own-store growth for established
+        marketplace sellers, measured in paid orders. Before it goes live:
+      </p>
+      <ul>
+        <li>Decide whether it leads the home page, and which brand fronts it: Lean X Digital or {nexova.name}</li>
+        <li>Set prices for the store launch and the monthly service</li>
+        <li>Name the registered payment provider, once the payment lawyer has answered in writing</li>
+        <li>Confirm or remove each promise in brackets</li>
+        <li>Add at least one case study measured in paid orders</li>
+      </ul>
+    </DraftNote>
+  </div>
+
+  <section class="section" aria-labelledby="why-title">
+    <div class="wrap section-grid">
+      <div class="section-head">
+        <h2 id="why-title">Why add a store of your own</h2>
+      </div>
+      <div>
+        <p>
+          On a marketplace, every buyer reaches you through the platform’s search, next to competing sellers, under
+          fees and rules the platform sets.
+        </p>
+        <p>
+          A store of your own is an address you control. Buyers who come back can order there directly, and your own
+          ads and messages bring them back without paying the marketplace again for the same customer.
+        </p>
+        <p>
+          <span class="placeholder">[Optional, once checked: the 2025–26 marketplace fee changes, with their sources.]</span>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="how-title">
+    <div class="wrap section-grid">
+      <div class="section-head">
+        <h2 id="how-title">How it works</h2>
+      </div>
+      <ol class="steps">{steps.map((s) => <li>{s}</li>)}</ol>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="yours-title">
+    <div class="wrap section-grid">
+      <div class="section-head">
+        <h2 id="yours-title">What stays yours</h2>
+      </div>
+      <Facts facts={yours} />
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="price-title">
+    <div class="wrap section-grid">
+      <div class="section-head">
+        <h2 id="price-title">Price</h2>
+      </div>
+      <div>
+        <p>
+          Store launch from <span class="placeholder">RM [amount]</span>. The monthly service from
+          <span class="placeholder">RM [amount]</span> a month, plus ad spend. Prices as of
+          <span class="placeholder">[month and year]</span>.
+        </p>
+        <div style="margin-top: 1rem">
+          <DraftNote>
+            <p>
+              For reference, {nexova.name}’s pricing page lists managed marketing plans at RM 1,500 and RM 3,000 a month
+              (read on 4 November 2026). Decide how this offer relates to those plans.
+            </p>
+          </DraftNote>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {
+    related.length > 0 && (
+      <section class="section" aria-labelledby="work-title">
+        <div class="wrap section-grid">
+          <div class="section-head">
+            <h2 id="work-title">Results</h2>
+          </div>
+          <RowList items={workRows(related)} />
+        </div>
+      </section>
+    )
+  }
+
+  <section class="section" aria-labelledby="faq-title">
+    <div class="wrap section-grid">
+      <div class="section-head">
+        <h2 id="faq-title">Questions</h2>
+      </div>
+      <Faq faqs={faqs} />
+    </div>
+  </section>
+</Base>

@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import { site, fullAddress, absoluteUrl } from '../data/site';
 import { products } from '../data/products';
 import { services, people } from '../data/services';
+import { liveCaseStudies } from '../data/work';
 import { countWord, listOf } from '../lib/text';
 import { hasPublicFile } from '../lib/files';
 
@@ -43,6 +44,14 @@ export const GET: APIRoute = () => {
       ...s.facts.map(([k, v]) => `  - ${k}: ${v}`),
       ...(s.automated ? [`  - Automated in ${products[0].name}: ${s.automated.text}`] : []),
     ]),
+    ...(liveCaseStudies.length > 0
+      ? [
+          '',
+          '## Client work',
+          '',
+          ...liveCaseStudies.map((c) => `- [${c.client}](${absoluteUrl(`/work/${c.slug}/`)}): ${c.summary}`),
+        ]
+      : []),
     '',
     '## Team',
     '',

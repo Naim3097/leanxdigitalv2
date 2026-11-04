@@ -5,12 +5,16 @@ import Facts from '../../components/Facts.astro';
 import Faq from '../../components/Faq.astro';
 import RowList from '../../components/RowList.astro';
 import Icon from '../../components/Icon.astro';
-import { site, formatDate } from '../../data/site';
+import DraftNote from '../../components/DraftNote.astro';
+import { site, formatDate, pageTitle } from '../../data/site';
 import { services, whatsappUrl, type Service } from '../../data/services';
 import { products } from '../../data/products';
 import { webPage, breadcrumbs, serviceNodes, faqPage, serviceId } from '../../lib/schema';
-import { serviceRows } from '../../lib/rows';
+import { serviceRows, workRows } from '../../lib/rows';
 import { lcFirst } from '../../lib/text';
+import { showDrafts } from '../../lib/drafts';
+import { visibleCaseStudies } from '../../data/work';
+import { priceReferences } from '../../data/review';
 
 export function getStaticPaths() {
   return services.map((service) => ({ params: { slug: service.slug }, props: { service } }));
@@ -18,7 +22,7 @@ export function getStaticPaths() {
 
 const { service: s } = Astro.props as { service: Service };
 const path = `/services/${s.slug}/`;
-const title = `${s.seoTitle} | ${site.name}`;
+const title = pageTitle(s.seoTitle);
 const crumbs: [string, string][] = [
   ['Home', '/'],
   ['Services', '/services/'],
@@ -27,6 +31,8 @@ const crumbs: [string, string][] = [
 const others = services.filter((o) => o.slug !== s.slug);
 const nexova = products[0];
 const image = `/og/${s.slug}.png`;
+const related = visibleCaseStudies.filter((c) => c.services.includes(s.slug));
+const quote = related.find((c) => c.quote)?.quote;
 
 const schema = [
   webPage({
@@ -50,6 +56,7 @@ const schema = [
   image={image}
   imageAlt={`${s.name}, a service by ${site.name}`}
   schema={schema}
+  whatsapp={whatsappUrl(s)}
 >
   <Breadcrumbs items={crumbs} />
 
@@ -90,6 +97,70 @@ const schema = [
               ))}
             </section>
           ))
+        }
+
+        {
+          (s.pricing || showDrafts) && (
+            <section aria-labelledby="price-title">
+              <h2 id="price-title">Prices</h2>
+              {s.pricing ? (
+                <p>
+                  From {s.pricing.from} a {s.pricing.per}, as of {s.pricing.asOf}. We agree the exact scope and price with
+                  you before any work starts.
+                </p>
+              ) : (
+                <>
+                  <p>
+                    From <span class="placeholder">RM [amount]</span> a <span class="placeholder">[month or project]</span>,
+                    as of <span class="placeholder">[month and year]</span>.{' '}
+                    <span class="placeholder">[What the starting price covers.]</span>
+                  </p>
+                  <div style="margin-top: 1rem">
+                    <DraftNote>
+                      <p>
+                        A starting price answers the first question most buyers ask, and gives search and AI answers a fact
+                        to quote. Your content guide asks for prices in RM with a date. If you publish one, the FAQ answer
+                        about cost changes too.
+                      </p>
+                      {priceReferences[s.slug] && (
+                        <p>
+                          For reference: {priceReferences[s.slug]} (competitors’ published prices, checked 4 November
+                          2026)
+                        </p>
+                      )}
+                    </DraftNote>
+                  </div>
+                </>
+              )}
+            </section>
+          )
+        }
+
+        {
+          related.length > 0 && (
+            <section aria-labelledby="work-title">
+              <h2 id="work-title">Results for clients</h2>
+              {related.some((c) => c.draft) && (
+                <div style="margin-bottom: 1.5rem">
+                  <DraftNote>
+                    <p>
+                      Case studies tagged with this service appear here. The ones below are placeholders until you supply
+                      real results and the client agrees.
+                    </p>
+                  </DraftNote>
+                </div>
+              )}
+              <RowList items={workRows(related)} />
+              {quote && (
+                <blockquote class="quote" style="margin-top: 2rem">
+                  <p>{quote.text}</p>
+                  <footer>
+                    {quote.name}, {quote.role}
+                  </footer>
+                </blockquote>
+              )}
+            </section>
+          )
         }
 
         {

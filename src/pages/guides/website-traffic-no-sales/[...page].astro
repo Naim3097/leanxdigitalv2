@@ -1,0 +1,178 @@
+---
+import Base from '../../../layouts/Base.astro';
+import Breadcrumbs from '../../../components/Breadcrumbs.astro';
+import DraftNote from '../../../components/DraftNote.astro';
+import Facts from '../../../components/Facts.astro';
+import { pageTitle, whatsappLink } from '../../../data/site';
+import { showDrafts } from '../../../lib/drafts';
+import { webPage, breadcrumbs } from '../../../lib/schema';
+
+// Draft page, built only in local preview (lib/drafts.ts): pillar guide 1 from the strategy report.
+// To publish it: name the author, check the title against keyword data, rename this file to
+// index.astro and add the page to data/pages.ts.
+export function getStaticPaths() {
+  return showDrafts ? [{ params: { page: undefined } }] : [];
+}
+
+const path = '/guides/website-traffic-no-sales/';
+const title = pageTitle('Website traffic but no sales? Where buyers drop off');
+const description =
+  'Visitors but no sales? The five places Malaysian businesses usually lose buyers between the click and the payment, how to check each one and what to fix first.';
+const whatsapp = whatsappLink('Hi Lean X Digital! I get traffic but not enough sales. Here’s my website or shop: ');
+const crumbs: [string, string][] = [
+  ['Home', '/'],
+  ['Traffic but no sales', path],
+];
+
+const example: [string, string][] = [
+  ['Visitors in a month', '5,000'],
+  ['Share who buy', '1%'],
+  ['Average order', 'RM 80'],
+  ['Sales', 'RM 4,000'],
+];
+
+const leaks: { title: string; looks: string; check: string; fix: string }[] = [
+  {
+    title: '1. Tracking: you can’t see which ads bring paid orders',
+    looks:
+      'You see likes, reach and clicks, but not which ads led to a sale. Sales you close on WhatsApp never show up in Meta or Google.',
+    check:
+      'In Meta Events Manager and in Google Ads, find a purchase or lead conversion recorded in the last seven days. Compare the count with the orders you actually received.',
+    fix: 'Record purchases and enquiries as conversions, and send the sales you close on WhatsApp back to Meta and Google, so their bidding learns which clicks become buyers.',
+  },
+  {
+    title: '2. Ads: the budget reaches people who won’t buy',
+    looks:
+      'Boosted posts collect likes from outside Malaysia, or searches unrelated to what you sell use up the budget.',
+    check:
+      'In Meta Ads Manager, break results down by country and placement. In Google Ads, read the search terms report.',
+    fix: 'Run campaigns in Ads Manager rather than with the Boost button, target the places you deliver to, and exclude searches that never turn into sales.',
+  },
+  {
+    title: '3. Landing page: the page after the click doesn’t sell',
+    looks: 'People click the ad, look for a few seconds and leave.',
+    check:
+      'Open your own ad on a phone, on mobile data. Can you see the product, the price and how to buy without scrolling or waiting?',
+    fix: 'Send each ad to a page about that one product or offer, show the price, and make the next step one tap: buy now, or chat on WhatsApp.',
+  },
+  {
+    title: '4. WhatsApp: buyers ask the price, then go quiet',
+    looks: 'Plenty of chats, few sales. Many buyers stop replying after the first answer.',
+    check:
+      'For one week, note how long your first reply takes and how many chats get a second message from you.',
+    fix: 'Reply within minutes during working hours, answer the price question with the price and the next step, and follow up once or twice with buyers who go quiet.',
+  },
+  {
+    title: '5. Checkout: buyers can’t pay the way they want',
+    looks:
+      'Orders started but never paid, payments that fail on the bank page, or cash on delivery parcels refused at the door.',
+    check:
+      'Place a test order with FPX, DuitNow QR, a card and an e-wallet. Then count last month’s unpaid orders and returned COD parcels.',
+    fix: 'Offer the ways Malaysians pay online through a registered payment provider, and move repeat COD buyers to online payment.',
+  },
+];
+
+const schema = [
+  webPage({ path, title, description, updated: '2026-11-04', hasBreadcrumb: true }),
+  breadcrumbs(path, crumbs),
+];
+---
+
+<Base title={title} description={description} schema={schema} noindex whatsapp={whatsapp}>
+  <Breadcrumbs items={crumbs} />
+
+  <article>
+    <header class="page-head wrap">
+      <p class="eyebrow">Guide</p>
+      <h1>Website traffic but no sales?</h1>
+      <p class="lede">
+        If people visit but don’t buy, the sale is leaking somewhere between the click and the payment. These are the
+        five places it usually leaks, how to spot each one and what to fix first.
+      </p>
+      <p class="updated" style="margin-top: 1.5rem">
+        By <span class="placeholder">[author]</span> · Updated <span class="placeholder">[date]</span>
+      </p>
+    </header>
+
+    <div class="wrap" style="padding-bottom: 3rem">
+      <DraftNote label="Draft guide: not on the live site">
+        <p>Pillar guide 1 from the strategy report. Before it goes live:</p>
+        <ul>
+          <li>Name the author: one of the two strategists, with a link to their profile page</li>
+          <li>Check the title against keyword data; it aims at searches like “website traffic but no sales”</li>
+          <li>
+            Decide whether to add a small calculator for the example below. It needs a few lines of JavaScript on this
+            page, and the site ships none today.
+          </li>
+          <li>Read it through once and change anything you wouldn’t say to a client</li>
+        </ul>
+      </DraftNote>
+    </div>
+
+    <section class="section" aria-labelledby="cost-title">
+      <div class="wrap section-grid">
+        <div class="section-head">
+          <h2 id="cost-title">Work out what the leak costs</h2>
+          <p>Example numbers, not a benchmark.</p>
+        </div>
+        <div>
+          <p>
+            Sales from a website come down to three numbers: visitors, the share of them who buy, and the average order.
+            Multiply them together.
+          </p>
+          <div style="margin-top: 1.5rem">
+            <Facts facts={example} />
+          </div>
+          <p style="margin-top: 1.5rem">
+            Raise the share who buy from 1% to 1.5% and the same 5,000 visitors bring RM 6,000. That extra RM 2,000
+            comes without spending more on ads.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    {
+      leaks.map((l, i) => (
+        <section class="section" aria-labelledby={`leak-${i}`}>
+          <div class="wrap section-grid">
+            <div class="section-head">
+              <h2 id={`leak-${i}`}>{l.title}</h2>
+            </div>
+            <dl class="facts">
+              <div>
+                <dt>What it looks like</dt>
+                <dd>{l.looks}</dd>
+              </div>
+              <div>
+                <dt>How to check</dt>
+                <dd>{l.check}</dd>
+              </div>
+              <div>
+                <dt>What to fix</dt>
+                <dd>{l.fix}</dd>
+              </div>
+            </dl>
+          </div>
+        </section>
+      ))
+    }
+
+    <section class="section" aria-labelledby="help-title">
+      <div class="wrap section-grid">
+        <div class="section-head">
+          <h2 id="help-title">Not sure where your leak is?</h2>
+        </div>
+        <div>
+          <p>
+            Our sales leak audit checks all five for a fixed price and shows you what each leak costs in ringgit, most
+            valuable first.
+          </p>
+          <div class="actions" style="margin-top: 1.5rem">
+            <a class="btn btn-solid" href="/sales-leak-audit/">About the audit</a>
+            <a class="btn btn-line" href={whatsapp}>Ask us on WhatsApp</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </article>
+</Base>

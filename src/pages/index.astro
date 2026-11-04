@@ -5,6 +5,7 @@ import Features from '../components/Features.astro';
 import Facts from '../components/Facts.astro';
 import Faq from '../components/Faq.astro';
 import Icon from '../components/Icon.astro';
+import DraftNote from '../components/DraftNote.astro';
 import { site, fullAddress } from '../data/site';
 import { products } from '../data/products';
 import { services } from '../data/services';
@@ -12,6 +13,7 @@ import { updatedFor } from '../data/pages';
 import { webPage, productList, serviceList, faqPage } from '../lib/schema';
 import { serviceRows } from '../lib/rows';
 import { countWord, listOf } from '../lib/text';
+import { showDrafts } from '../lib/drafts';
 
 const path = '/';
 const nexova = products[0];
@@ -77,6 +79,33 @@ const schema = [
       <a class="btn btn-line" href="#services">See the services</a>
     </div>
   </section>
+
+  {
+    showDrafts && (
+      <div class="wrap" style="padding-bottom: 3rem">
+        <DraftNote label="Draft: proposed hero copy and title, for your decision">
+          <p>
+            The strategy report recommends keeping the promise and adding one line that says who it is for and how
+            results are measured:
+          </p>
+          <ul>
+            <li>Promise, kept: “We turn traffic into sales.”</li>
+            <li>Sub-headline: “Own-store growth for Malaysian online sellers, measured in paid orders.”</li>
+            <li>
+              Seller headline, to test in ads first: “Keep Shopee and TikTok Shop. Add a store you own, with ads that
+              bring paid orders.”
+            </li>
+            <li>Bahasa Malaysia promise, to test with native speakers: “Kami tukar traffic jadi sales.”</li>
+          </ul>
+          <p>
+            Also settle the page title. The live site’s title includes “Digital Marketing Agency In Kuala Lumpur” and
+            v2’s does not. This is the only page with ranking history, so decide with your keyword data. A draft of the
+            seller page is at <a href="/online-sellers/">/online-sellers/</a>.
+          </p>
+        </DraftNote>
+      </div>
+    )
+  }
 
   <section class="section" aria-labelledby="ways-title">
     <div class="wrap section-grid">

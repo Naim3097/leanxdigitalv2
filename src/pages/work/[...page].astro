@@ -1,0 +1,67 @@
+---
+import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import RowList from '../../components/RowList.astro';
+import DraftNote from '../../components/DraftNote.astro';
+import { pageTitle } from '../../data/site';
+import { visibleCaseStudies, liveCaseStudies } from '../../data/work';
+import { webPage, breadcrumbs } from '../../lib/schema';
+import { workRows } from '../../lib/rows';
+
+// /work/ is built only when there is a case study to show. In production that means one that is
+// no longer a draft, so the live site never shows an empty or placeholder page.
+export function getStaticPaths() {
+  return visibleCaseStudies.length > 0 ? [{ params: { page: undefined } }] : [];
+}
+
+const path = '/work/';
+const title = pageTitle('Client work and case studies');
+const description =
+  'Case studies from Lean X Digital’s client work, with numbers and dates, each published with the client’s permission.';
+const crumbs: [string, string][] = [
+  ['Home', '/'],
+  ['Work', path],
+];
+const updated = visibleCaseStudies.map((c) => c.updated).sort().at(-1) ?? '';
+
+const schema = [
+  webPage({ path, title, description, updated, type: 'CollectionPage', hasBreadcrumb: true }),
+  breadcrumbs(path, crumbs),
+];
+---
+
+<Base title={title} description={description} schema={schema} noindex={liveCaseStudies.length === 0}>
+  <Breadcrumbs items={crumbs} />
+
+  <header class="page-head wrap">
+    <p class="eyebrow">Work</p>
+    <h1>Client work</h1>
+    <p class="lede">
+      What we did for clients and what came of it, with numbers and dates. Each case study is published with the
+      client’s permission.
+    </p>
+  </header>
+
+  <section class="section" aria-labelledby="list-title">
+    <div class="wrap section-grid">
+      <div class="section-head">
+        <h2 id="list-title">Case studies</h2>
+      </div>
+      <div>
+        {
+          liveCaseStudies.length === 0 && (
+            <div style="margin-bottom: 1.5rem">
+              <DraftNote label="Draft section">
+                <p>
+                  This page goes live with the first real case study a client has approved. Until then it shows only in
+                  local preview, and the menu link to it does too.
+                </p>
+              </DraftNote>
+            </div>
+          )
+        }
+        <RowList items={workRows(visibleCaseStudies)} />
+      </div>
+    </div>
+  </section>
+</Base>

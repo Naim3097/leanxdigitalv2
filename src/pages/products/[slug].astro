@@ -6,12 +6,17 @@ import Faq from '../../components/Faq.astro';
 import RowList from '../../components/RowList.astro';
 import Icon from '../../components/Icon.astro';
 import Features from '../../components/Features.astro';
-import { site, formatDate } from '../../data/site';
+import DraftNote from '../../components/DraftNote.astro';
+import ImageSlot from '../../components/ImageSlot.astro';
+import { site, formatDate, pageTitle, whatsappLink } from '../../data/site';
 import { products, type Product } from '../../data/products';
 import { services } from '../../data/services';
 import { webPage, breadcrumbs, softwareApp, faqPage, softwareId } from '../../lib/schema';
-import { productRows, serviceRows } from '../../lib/rows';
+import { productRows, serviceRows, workRows } from '../../lib/rows';
 import { lcFirst } from '../../lib/text';
+import { showDrafts } from '../../lib/drafts';
+import { visibleCaseStudies } from '../../data/work';
+import { productNotes } from '../../data/review';
 
 export function getStaticPaths() {
   return products.map((product) => ({ params: { slug: product.slug }, props: { product } }));
@@ -19,7 +24,7 @@ export function getStaticPaths() {
 
 const { product: p } = Astro.props as { product: Product };
 const path = `/products/${p.slug}/`;
-const title = `${p.seoTitle} | ${site.name}`;
+const title = pageTitle(p.seoTitle);
 const crumbs: [string, string][] = [
   ['Home', '/'],
   ['Products', '/products/'],
@@ -28,6 +33,8 @@ const crumbs: [string, string][] = [
 const others = products.filter((o) => o.slug !== p.slug);
 const image = `/og/${p.slug}.png`;
 const primary = p.website ?? p.buy;
+const whatsapp = whatsappLink(`Hi Lean X Digital! ${p.whatsappAsk}`);
+const related = visibleCaseStudies.filter((c) => c.nexova);
 
 const schema = [
   webPage({
@@ -51,6 +58,7 @@ const schema = [
   image={image}
   imageAlt={`${p.name}, ${lcFirst(p.category)} by ${site.name}`}
   schema={schema}
+  whatsapp={whatsapp}
 >
   <Breadcrumbs items={crumbs} />
 
@@ -68,12 +76,26 @@ const schema = [
             </a>
           )
         }
-        <a class="btn btn-line" href={site.whatsapp}>Ask us on WhatsApp</a>
+        <a class="btn btn-line" href={whatsapp}>Ask us on WhatsApp</a>
       </div>
     </header>
 
     <div class="wrap product-body">
       <div class="prose">
+        {
+          showDrafts && (
+            <ImageSlot
+              label={`Screenshot of a real ${p.name} store beside its dashboard, 1600 × 1000 px. It would also replace the text card as the page’s main image in search.`}
+            />
+          )
+        }
+        {
+          showDrafts && productNotes[p.slug] && (
+            <DraftNote>
+              <p>{productNotes[p.slug]}</p>
+            </DraftNote>
+          )
+        }
         <section aria-labelledby="for-title">
           <h2 id="for-title">Who {p.name} is for</h2>
           <p>{p.audience}</p>
@@ -98,6 +120,22 @@ const schema = [
               ))}
             </section>
           ))
+        }
+
+        {
+          related.length > 0 && (
+            <section aria-labelledby="work-title">
+              <h2 id="work-title">Stores built on {p.name}</h2>
+              {related.some((c) => c.draft) && (
+                <div style="margin-bottom: 1.5rem">
+                  <DraftNote>
+                    <p>Case studies built on {p.name} appear here. The one below is a placeholder.</p>
+                  </DraftNote>
+                </div>
+              )}
+              <RowList items={workRows(related)} />
+            </section>
+          )
         }
 
         <section aria-labelledby="faq-title">

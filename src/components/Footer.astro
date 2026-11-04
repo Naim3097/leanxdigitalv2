@@ -4,7 +4,13 @@ import { site, fullAddress } from '../data/site';
 import { products } from '../data/products';
 import { services } from '../data/services';
 import { hasPublicFile } from '../lib/files';
+import { visibleCaseStudies } from '../data/work';
 
+interface Props {
+  /** WhatsApp link pre-filled for the page's topic. */
+  whatsapp?: string;
+}
+const { whatsapp = site.whatsapp } = Astro.props;
 const year = new Date().getFullYear();
 const showPdf = hasPublicFile(site.companyProfilePdf);
 const company = site.legalName || site.name;
@@ -53,6 +59,7 @@ const copyright = `© ${year} ${company}${reg}. Kuala Lumpur, Malaysia.`;
         <h2 id="footer-company">Company</h2>
         <ul>
           <li><a href="/about/">About</a></li>
+          {visibleCaseStudies.length > 0 && <li><a href="/work/">Work</a></li>}
           <li><a href="/contact/">Contact</a></li>
           {
             showPdf && (
@@ -67,10 +74,11 @@ const copyright = `© ${year} ${company}${reg}. Kuala Lumpur, Malaysia.`;
       <div>
         <h2>Contact</h2>
         <ul>
-          <li><a href={site.whatsapp}>WhatsApp {site.phoneDisplay}</a></li>
+          <li><a href={whatsapp}>WhatsApp {site.phoneDisplay}</a></li>
           <li><a href={`mailto:${site.email}`}>{site.email}</a></li>
           <li><a href={site.social.instagram} rel="me">Instagram</a></li>
           <li><a href={site.social.facebook} rel="me">Facebook</a></li>
+          {site.social.linkedin && <li><a href={site.social.linkedin} rel="me">LinkedIn</a></li>}
         </ul>
       </div>
     </div>

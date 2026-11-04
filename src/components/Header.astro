@@ -1,14 +1,16 @@
 ---
 import Logo from './Logo.astro';
 import { site } from '../data/site';
+import { visibleCaseStudies } from '../data/work';
 
 const path = Astro.url.pathname;
-const nav = [
+const nav: [string, string][] = [
   ['Nexova', '/products/nexova/'],
   ['Services', '/services/'],
+  ...(visibleCaseStudies.length > 0 ? ([['Work', '/work/']] as [string, string][]) : []),
   ['About', '/about/'],
   ['Contact', '/contact/'],
-] as const;
+];
 
 const current = (href: string) =>
   path === href ? 'page' : href !== '/' && path.startsWith(href) ? 'true' : undefined;

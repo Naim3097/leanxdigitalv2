@@ -1,0 +1,14 @@
+---
+// Marks where a real image will go and describes the one to supply. Draft only (lib/drafts.ts).
+interface Props {
+  label: string;
+  /** CSS aspect-ratio of the image to come. */
+  ratio?: string;
+}
+const { label, ratio = '16 / 10' } = Astro.props;
+---
+
+<div class="image-slot" style={`aspect-ratio: ${ratio}`} role="img" aria-label={`Image to supply: ${label}`}>
+  <span class="eyebrow">Image to supply</span>
+  <span>{label}</span>
+</div>

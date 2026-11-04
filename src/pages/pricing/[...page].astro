@@ -1,0 +1,95 @@
+---
+import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import DraftNote from '../../components/DraftNote.astro';
+import Facts from '../../components/Facts.astro';
+import { pageTitle } from '../../data/site';
+import { services } from '../../data/services';
+import { products } from '../../data/products';
+import { priceReferences } from '../../data/review';
+import { showDrafts } from '../../lib/drafts';
+import { webPage, breadcrumbs } from '../../lib/schema';
+
+// Draft page, built only in local preview (lib/drafts.ts). To publish it: replace every bracketed price
+// with a decided one and its month, set each service's `pricing` in data/services.ts to match, rename
+// this file to index.astro and add the page to data/pages.ts.
+export function getStaticPaths() {
+  return showDrafts ? [{ params: { page: undefined } }] : [];
+}
+
+const path = '/pricing/';
+const nexova = products[0];
+const title = pageTitle('Prices and packages');
+const description =
+  'Lean X Digital’s starting prices in ringgit, with the month they were set: creative work, paid ads, SEO, websites, the sales leak audit and Nexova.';
+const crumbs: [string, string][] = [
+  ['Home', '/'],
+  ['Prices', path],
+];
+
+const prices: [string, string][] = [
+  ...services.map((s) => [
+    s.name,
+    s.pricing ? `From ${s.pricing.from} a ${s.pricing.per}, as of ${s.pricing.asOf}` : 'From RM [amount] a [month or project]',
+  ] as [string, string]),
+  ['Sales leak audit', 'RM [amount], fixed'],
+  ['Own store launch', 'From RM [amount]'],
+  [nexova.name, 'Plans on nexova.my: [confirm: Basic RM 79 a month, Growth RM 1,500, Scale RM 3,000]'],
+];
+
+const terms: [string, string][] = [
+  ['Accounts', '[Confirm: ad accounts, domain and store stay in the client’s name]'],
+  ['Reporting', '[Confirm: a monthly report in paid orders or enquiries]'],
+  ['Minimum term', '[Decide: number of months, or none]'],
+];
+
+const references = Object.values(priceReferences);
+
+const schema = [
+  webPage({ path, title, description, updated: '2026-11-04', hasBreadcrumb: true }),
+  breadcrumbs(path, crumbs),
+];
+---
+
+<Base title={title} description={description} schema={schema} noindex>
+  <Breadcrumbs items={crumbs} />
+
+  <header class="page-head wrap">
+    <p class="eyebrow">Prices</p>
+    <h1>Prices</h1>
+    <p class="lede">
+      Starting prices in ringgit, with the month they were set. We agree the exact scope and price with you before any
+      work starts.
+    </p>
+  </header>
+
+  <div class="wrap" style="padding-bottom: 3rem">
+    <DraftNote label="Draft page: not on the live site">
+      <p>
+        Seven of the twelve Malaysian agencies in the research publish prices, and the AI answers it recorded quote RM
+        ranges. Your content guide asks for prices in RM with a date. For reference, from competitors’ published
+        prices checked on 4 November 2026:
+      </p>
+      <ul>{references.map((r) => <li>{r}</li>)}</ul>
+    </DraftNote>
+  </div>
+
+  <section class="section" aria-labelledby="prices-title">
+    <div class="wrap section-grid">
+      <div class="section-head">
+        <h2 id="prices-title">Starting prices</h2>
+        <p>As of <span class="placeholder">[month and year]</span>.</p>
+      </div>
+      <Facts facts={prices} />
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="terms-title">
+    <div class="wrap section-grid">
+      <div class="section-head">
+        <h2 id="terms-title">Always included</h2>
+      </div>
+      <Facts facts={terms} />
+    </div>
+  </section>
+</Base>
