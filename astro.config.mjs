@@ -12,4 +12,11 @@ export default defineConfig({
   },
   compressHTML: true,
   devToolbar: { enabled: false },
+  vite: {
+    build: {
+      // Vite 8 targets Safari 16.4+ by default and rewrites `min-width` media queries as
+      // `width >=`, which older browsers ignore. Keep the browser range the site had before.
+      cssTarget: ['chrome87', 'edge88', 'firefox78', 'safari14', 'ios14'],
+    },
+  },
 });

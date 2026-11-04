@@ -13,8 +13,12 @@ npm run check      # type-check
 npm run indexnow   # after a deploy: tell Bing/IndexNow engines the pages changed
 ```
 
-Needs Node 20.3 or newer. Astro 6 and 7 need Node 22.12+. After upgrading Node, run
-`npx @astrojs/upgrade` and remove the `overrides` block from package.json.
+Needs Node 22.23.4 or newer (Astro 7's minimum). On Vercel, `engines.node` in package.json overrides
+the Node.js version in Project Settings.
+
+The `overrides` block in package.json pins `fflate` to 0.7.5. satori pins 0.7.3, which has a security
+advisory (GHSA-px8p-9vwx-vf98). Remove the override once satori ships a fixed version and `npm audit`
+stays clean without it.
 
 ## Editing content
 
