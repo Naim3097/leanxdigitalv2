@@ -8,6 +8,7 @@ import Cta from '../components/Cta.astro';
 import { site, absoluteUrl } from '../data/site';
 import { organization, website } from '../lib/schema';
 import { showDrafts } from '../lib/drafts';
+import { isPreview } from '../lib/deploy';
 
 interface Props {
   title: string;
@@ -50,9 +51,11 @@ const jsonLd = {
     {!noindex && <link rel="canonical" href={canonical} />}
     <meta
       name="robots"
-      content={noindex
-        ? 'noindex, follow'
-        : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'}
+      content={isPreview
+        ? 'noindex, nofollow'
+        : noindex
+          ? 'noindex, follow'
+          : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'}
     />
     <link rel="preload" href={geistLatin} as="font" type="font/woff2" crossorigin />
 
@@ -105,7 +108,7 @@ const jsonLd = {
     {
       showDrafts && (
         <a class="draft-bar" href="/drafts/">
-          Local preview: drafts are shown here and hidden on the live site. See everything waiting for review
+          Preview: drafts are shown here and hidden on the live site. See everything waiting for review
         </a>
       )
     }

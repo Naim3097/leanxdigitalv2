@@ -10,7 +10,7 @@ import { priceReferences } from '../../data/review';
 import { showDrafts } from '../../lib/drafts';
 import { webPage, breadcrumbs } from '../../lib/schema';
 
-// Draft page, built only in local preview (lib/drafts.ts). To publish it: replace every bracketed price
+// Draft page, built only in previews (lib/drafts.ts). To publish it: replace every bracketed price
 // with a decided one and its month, set each service's `pricing` in data/services.ts to match, rename
 // this file to index.astro and add the page to data/pages.ts.
 export function getStaticPaths() {

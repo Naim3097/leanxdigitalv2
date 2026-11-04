@@ -10,7 +10,7 @@ export const priceReferences: Record<string, string> = {
     'Published website prices run from RM 3,000 to RM 6,500 at the low end, and from RM 9,997 to over RM 90,000 at specialist builders.',
 };
 
-// Draft pages, listed on /drafts/ in local preview.
+// Draft pages, listed on /drafts/ in previews.
 export const draftPages: { path: string; name: string; needs: string }[] = [
   {
     path: '/online-sellers/',

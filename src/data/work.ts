@@ -1,12 +1,12 @@
 // Case studies: real client work, published with each client's written permission.
-// Every entry marked `draft` is a mock-up that renders only in local preview (lib/drafts.ts).
+// Every entry marked `draft` is a mock-up that renders only in previews (lib/drafts.ts).
 // Replace each bracketed placeholder with a real, checkable fact, get the client's permission,
 // then set `draft: false`. Never publish estimated or rounded-up numbers.
 import { showDrafts } from '../lib/drafts';
 
 export interface CaseStudy {
   slug: string;
-  /** Mock-up with placeholders. Shown only in local preview. */
+  /** Mock-up with placeholders. Shown only in previews. */
   draft: boolean;
   client: string;
   industry: string;

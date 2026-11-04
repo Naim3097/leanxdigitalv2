@@ -8,7 +8,7 @@ import { pageTitle, whatsappLink } from '../../data/site';
 import { showDrafts } from '../../lib/drafts';
 import { webPage, breadcrumbs } from '../../lib/schema';
 
-// Draft page, built only in local preview (lib/drafts.ts). To publish it: settle the price and scope,
+// Draft page, built only in previews (lib/drafts.ts). To publish it: settle the price and scope,
 // rename this file to index.astro, remove the draft notes and add the page to data/pages.ts.
 export function getStaticPaths() {
   return showDrafts ? [{ params: { page: undefined } }] : [];

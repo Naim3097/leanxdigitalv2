@@ -109,7 +109,7 @@ export const people: Person[] = [
 export const profileReady = (m: Person) =>
   Boolean(m.photo && m.sameAs?.some((u) => u.includes('linkedin.com')));
 
-/** Profile pages are built in local preview as drafts, and in production once ready. */
+/** Profile pages are built in previews as drafts, and in production once ready. */
 export const hasProfilePage = (m: Person) => showDrafts || profileReady(m);
 
 /** WhatsApp link to the company number, pre-filled for this service. */

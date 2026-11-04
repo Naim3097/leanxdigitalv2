@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { absoluteUrl } from '../data/site';
+import { isPreview } from '../lib/deploy';
 
 const body = `# robots.txt for ${absoluteUrl('/')}
 # Search engines and AI answer engines are all welcome.
@@ -22,5 +23,11 @@ Allow: /
 Sitemap: ${absoluteUrl('/sitemap.xml')}
 `;
 
+// Staging and other preview builds stay out of search engines entirely.
+const previewBody = `# robots.txt for a preview build. The live site is ${absoluteUrl('/')}
+User-agent: *
+Disallow: /
+`;
+
 export const GET: APIRoute = () =>
-  new Response(body, { headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
+  new Response(isPreview ? previewBody : body, { headers: { 'Content-Type': 'text/plain; charset=utf-8' } });

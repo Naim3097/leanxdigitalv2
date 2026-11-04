@@ -3,7 +3,7 @@ import Base from '../../layouts/Base.astro';
 import { showDrafts } from '../../lib/drafts';
 import { draftPages, draftSections } from '../../data/review';
 
-// Local preview only: every draft page and section waiting for the owner's review.
+// Previews only: every draft page and section waiting for the owner's review.
 export function getStaticPaths() {
   return showDrafts ? [{ params: { page: undefined } }] : [];
 }
@@ -11,12 +11,12 @@ export function getStaticPaths() {
 
 <Base
   title="Drafts for review"
-  description="Draft pages and sections waiting for review. Local preview only."
+  description="Draft pages and sections waiting for review. Previews only."
   noindex
   cta={false}
 >
   <header class="page-head wrap">
-    <p class="eyebrow">Local preview only</p>
+    <p class="eyebrow">Preview only</p>
     <h1>Drafts for review</h1>
     <p class="lede">
       Nothing on this list appears on the live site. Each item says what it needs from you before it can go live.
@@ -27,7 +27,7 @@ export function getStaticPaths() {
     <div class="wrap section-grid">
       <div class="section-head">
         <h2 id="pages-title">Draft pages</h2>
-        <p>New pages, built only in local preview.</p>
+        <p>New pages, built only in previews.</p>
       </div>
       <dl class="facts">
         {
