@@ -1,0 +1,668 @@
+---
+// Nexova as a stage: an optional dark opening (name, definition, actions, the marks of the channels it
+// works across), then a light stage whose colour panel widens as it scrolls in, with real tabs for the four
+// features that grow a store. Without JavaScript every tab panel is shown in order. The two remaining
+// features sit as cards under the stage. Every feature title stays a heading, in the same order as the data.
+import Icon from './Icon.astro';
+import Label from './Label.astro';
+import MockCard, { type MockKind } from './MockCard.astro';
+import { products } from '../data/products';
+import { featureIcons } from '../lib/icons';
+import { brandMarks, type BrandKey } from '../lib/brands';
+
+interface Props {
+  /** Show the dark opening with the product name and definition. */
+  intro?: boolean;
+  /** Eyebrow above the name in the opening. */
+  eyebrow?: string;
+  titleId?: string;
+  /** Label of the second button in the opening. */
+  siteLabel?: string;
+  /** Heading for the features ("What Nexova does") and its level, to fit the page outline. */
+  featuresTitle?: string;
+  featuresId?: string;
+  featuresTag?: 'h2' | 'h3';
+  featureTag?: 'h3' | 'h4';
+}
+
+const nexova = products[0];
+const {
+  intro = true,
+  eyebrow = `Product · ${nexova.category}`,
+  titleId = 'nexova-title',
+  siteLabel = nexova.website ? `Start free at ${nexova.website.label}` : undefined,
+  featuresTitle = `What ${nexova.name} does`,
+  featuresId = 'nexova-features-title',
+  featuresTag = 'h3',
+  featureTag = 'h4',
+} = Astro.props;
+const FeaturesTag = featuresTag;
+const FeatureTag = featureTag;
+
+const engine = nexova.features.slice(0, 4);
+const rest = nexova.features.slice(4);
+const chips: Record<string, string[]> = {
+  'Auto content': ['Posters', 'Videos', 'Social posts'],
+  'Auto Meta ads': ['Facebook', 'Instagram'],
+  'Auto SEO': ['Google'],
+  'Smart inventory': ['Shopee', 'TikTok Shop'],
+};
+const visuals: Record<string, MockKind[]> = {
+  'Auto content': ['poster', 'reel', 'chat'],
+  'Auto Meta ads': ['ad', 'chart'],
+  'Auto SEO': ['search', 'chart'],
+  'Smart inventory': ['store', 'sync'],
+};
+// The channels Nexova works across, named as the page has always named them. Each shows as its brand's
+// mark in the strip, and the names stay in the page as a list for screen readers. `scale` and `nudge` are
+// optical corrections so the six marks look equally heavy on one centre line: `scale` multiplies the
+// mark's 24-unit box, `nudge` moves it down by that many units of its own grid (negative moves it up).
+const works: { name: string; mark: BrandKey; scale: number; nudge?: number }[] = [
+  { name: 'Shopee', mark: 'shopee', scale: 0.88, nudge: -0.6 },
+  { name: 'TikTok Shop', mark: 'tiktok', scale: 1.06, nudge: -0.4 },
+  { name: 'Facebook', mark: 'facebook', scale: 0.9 },
+  { name: 'Instagram', mark: 'instagram', scale: 0.92 },
+  { name: 'Google', mark: 'google', scale: 0.96 },
+  { name: 'Built on Claude, by Anthropic', mark: 'claude', scale: 1.12 },
+];
+// Symbol ids come from the opening's title id, so two openings on one page could never share an id
+const markId = (mark: BrandKey) => `${titleId}-mark-${mark}`;
+const slug = (t: string) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+---
+
+<section class="nexova" id={intro ? 'nexova' : undefined} aria-labelledby={intro ? titleId : featuresId}>
+  {
+    intro && (
+      <div class="nexova-intro section-dark" data-surface="dark">
+        <div class="container intro">
+          <Label icon="store">{eyebrow}</Label>
+          <h2 id={titleId} class="nexova-name" data-split>
+            <a href={`/products/${nexova.slug}/`}>{nexova.name}</a>
+          </h2>
+          <p>{nexova.definition}</p>
+          <div class="actions">
+            <a class="btn btn-primary" href={`/products/${nexova.slug}/`} data-magnetic>
+              About {nexova.name}
+            </a>
+            {nexova.website && siteLabel && (
+              <a class="btn btn-secondary" href={nexova.website.url} rel="noopener" data-magnetic>
+                {siteLabel}
+              </a>
+            )}
+          </div>
+        </div>
+        <Label icon="link" class="works-label">Works with</Label>
+        <ul class="visually-hidden" role="list">
+          {works.map((w) => (
+            <li>{w.name}</li>
+          ))}
+        </ul>
+        <div class="works" aria-hidden="true">
+          <svg class="works-defs" width="0" height="0" focusable="false">
+            {works.map((w) => (
+              <symbol id={markId(w.mark)} viewBox="0 0 24 24">
+                <path d={brandMarks[w.mark].path} />
+              </symbol>
+            ))}
+          </svg>
+          <div class="works-track">
+            {[0, 1].map(() => (
+              <ul class="works-set">
+                {[...works, ...works].map((w) => (
+                  <li>
+                    <svg
+                      class="works-mark"
+                      viewBox="0 0 24 24"
+                      focusable="false"
+                      style={`--s: ${w.scale}; --dy: ${w.nudge ?? 0}`}
+                    >
+                      <use href={`#${markId(w.mark)}`} />
+                    </svg>
+                  </li>
+                ))}
+              </ul>
+            ))}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  <div class:list={['nexova-stagewrap', { flip: intro, 'no-intro': !intro }]}>
+    <div class="container">
+      <FeaturesTag
+        id={featuresId}
+        class:list={['stage-heading', { 'stage-heading-lg': featuresTag === 'h2' }]}
+        data-split={featuresTag === 'h2' ? '' : undefined}
+      >
+        {featuresTitle}
+      </FeaturesTag>
+    </div>
+    <div class="stage" data-tabs>
+      <div class="stage-bg" aria-hidden="true"><span class="stage-mesh"></span></div>
+      <div class="stage-inner">
+        <div class="tablist" role="tablist" aria-label={featuresTitle}>
+          <span class="tab-blob" aria-hidden="true"></span>
+          {
+            engine.map(([title], i) => (
+              <button
+                type="button"
+                role="tab"
+                id={`tab-${slug(title)}`}
+                aria-controls={`panel-${slug(title)}`}
+                aria-selected={i === 0 ? 'true' : 'false'}
+                tabindex={i === 0 ? 0 : -1}
+              >
+                {title}
+              </button>
+            ))
+          }
+        </div>
+        {
+          engine.map(([title, text]) => (
+            <div class="tab-panel" role="tabpanel" id={`panel-${slug(title)}`} aria-labelledby={`tab-${slug(title)}`}>
+              <div class="tab-copy">
+                <span class="icon-tile">
+                  <Icon name={featureIcons[title] ?? 'spark'} />
+                </span>
+                <FeatureTag>{title}</FeatureTag>
+                <p>{text}</p>
+                {chips[title] && (
+                  <ul class="tab-chips" aria-hidden="true">
+                    {chips[title].map((c) => (
+                      <li>
+                        <Label as="span" icon="check">
+                          {c}
+                        </Label>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {nexova.website && (
+                  <a class="btn btn-primary btn-sm" href={nexova.website.url} rel="noopener">
+                    Try it on {nexova.website.label}
+                  </a>
+                )}
+              </div>
+              <div class="tab-visual" aria-hidden="true">
+                {(visuals[title] ?? []).map((k, j) => (
+                  <MockCard kind={k} class={`float f${j + 1}`} />
+                ))}
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+    {
+      rest.length > 0 && (
+        <div class="container rest">
+          {rest.map(([title, text]) => (
+            <div class="card rest-card" data-rise>
+              <span class="icon-tile">
+                <Icon name={featureIcons[title] ?? 'spark'} />
+              </span>
+              <FeatureTag>{title}</FeatureTag>
+              <p>{text}</p>
+            </div>
+          ))}
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .nexova-intro {
+    padding-block: var(--section) clamp(3rem, 2rem + 4vw, 6rem);
+  }
+
+  /* The product name is the one display size outside the type scale: 56 px at 375 px wide, 120 px at 1440 */
+  .nexova-name {
+    font-size: clamp(3.5rem, 2.0915rem + 6.0094vw, 7.5rem);
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+
+  .nexova-name a {
+    text-decoration: none;
+  }
+
+  .nexova-name a:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 3px;
+    text-underline-offset: 0.12em;
+  }
+
+  /* The channels Nexova works across, as their marks in white under a small label. Still (reduced motion,
+     print): one centred row of the six. Moving: the marks drift left in a band with faded edges (motion
+     block below). The names are in the visually hidden list after the label. */
+  :global(.works-label) {
+    display: flex;
+    justify-content: center;
+    margin-top: clamp(3rem, 2rem + 4vw, 5rem);
+  }
+
+  .works {
+    /* A mark's 24-unit box: 24 px at 375 px wide, 28 px from about 1184 px wide */
+    --mark: clamp(1.5rem, 1.38rem + 0.5vw, 1.75rem);
+    /* Space between marks while they drift: 56 px at 375 px wide, 96 px at 1440 px */
+    --works-gap: clamp(3.5rem, 2.62rem + 3.76vw, 6rem);
+    width: min(100%, 55rem);
+    margin: 1.25rem auto 0;
+  }
+
+  /* The six shapes, defined once and drawn with <use> */
+  .works-defs {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+  }
+
+  .works-set {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+  }
+
+  /* Still, the six marks show once; the copies exist only for the loop */
+  .works-set + .works-set,
+  .works-set > li:nth-child(n + 7) {
+    display: none;
+  }
+
+  .works-set > li {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    height: calc(var(--mark) * 1.25);
+    /* Still: 28 px between marks at 375 px wide, 56 px at 1440 px */
+    padding-inline: clamp(0.875rem, 0.567rem + 1.315vw, 1.75rem);
+    color: var(--on-dark);
+  }
+
+  /* Each mark is sized by its optical scale (--s) and moved by its nudge (--dy, in units of its own
+     24-unit grid), so the six look equally heavy on one centre line */
+  .works-mark {
+    width: calc(var(--mark) * var(--s, 1));
+    height: calc(var(--mark) * var(--s, 1));
+    transform: translateY(calc(var(--mark) * var(--s, 1) * var(--dy, 0) / 24));
+    fill: currentColor;
+  }
+
+  .nexova-stagewrap {
+    padding-block: clamp(3rem, 2rem + 4vw, 6rem) var(--section);
+    background: var(--page);
+  }
+
+  /* A page without the dark opening starts the stage with full section spacing */
+  .no-intro {
+    padding-top: var(--section);
+  }
+
+  /* As the page's own section title (h2), the heading is set at section size rather than as a label */
+  .stage-heading-lg.stage-heading {
+    margin-bottom: clamp(2rem, 1.5rem + 2vw, 3.5rem);
+    font-size: var(--fs-h2);
+    letter-spacing: -0.01em;
+    text-transform: none;
+    color: var(--ink);
+  }
+
+  .stage-heading {
+    margin-bottom: 1.5rem;
+    font-size: var(--fs-label);
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    text-align: center;
+  }
+
+  .stage {
+    position: relative;
+    width: calc(100% - clamp(1rem, 3vw, 3rem));
+    margin-inline: auto;
+    isolation: isolate;
+  }
+
+  .stage-bg {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    border-radius: var(--radius-l);
+    background: #fde3dc;
+    box-shadow: 0 24px 70px -20px rgb(255 107 91 / 0.18);
+  }
+
+  .stage-mesh {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 400%;
+    background: var(--mesh);
+    transform: translateX(calc(var(--tab, 0) * -18%));
+    transition: transform 0.75s var(--ease-out);
+  }
+
+  .stage-inner {
+    display: grid;
+    gap: 2rem;
+    width: min(100% - 2rem, 76rem);
+    margin-inline: auto;
+    padding-block: clamp(1.5rem, 1rem + 3vw, 4rem);
+  }
+
+  .tablist {
+    position: relative;
+    display: none;
+    justify-self: center;
+    gap: 0.25rem;
+    max-width: 100%;
+    padding: 0.375rem;
+    overflow-x: auto;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.45);
+    scrollbar-width: none;
+  }
+
+  .tabs-ready .tablist {
+    display: flex;
+  }
+
+  .tablist button {
+    position: relative;
+    z-index: 1;
+    min-height: 2.75rem;
+    padding: 0 1.125rem;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--text-2);
+    font: inherit;
+    font-size: var(--fs-small);
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: color var(--fast);
+  }
+
+  .tablist button[aria-selected='true'] {
+    color: var(--ink);
+  }
+
+  .tab-blob {
+    position: absolute;
+    left: 0;
+    top: 0.375rem;
+    bottom: 0.375rem;
+    width: 0;
+    border-radius: 999px;
+    background: var(--paper);
+    box-shadow: 0 6px 20px rgb(0 0 0 / 0.08);
+    transition: transform 0.45s var(--ease-out), width 0.45s var(--ease-out);
+  }
+
+  .tab-panel {
+    display: grid;
+    gap: 2rem;
+    padding: clamp(1.5rem, 1rem + 2.5vw, 3.75rem);
+    border-radius: clamp(1.5rem, 1rem + 2vw, 2.625rem);
+    background: rgb(255 255 255 / 0.92);
+  }
+
+  .tab-panel + .tab-panel {
+    margin-top: 1rem;
+  }
+
+  .tabs-ready .tab-panel + .tab-panel {
+    margin-top: 0;
+  }
+
+  .tab-panel[hidden] {
+    display: none;
+  }
+
+  /* With tabs, every panel sits in the same cell: the stage keeps the tallest panel's height, so nothing
+     below it moves when the tab changes. Hidden panels stay out of reach (visibility hidden). */
+  .tabs-ready .stage-inner {
+    grid-template-areas: 'tabs' 'panel';
+  }
+
+  .tabs-ready .tablist {
+    grid-area: tabs;
+  }
+
+  .tabs-ready .tab-panel {
+    grid-area: panel;
+  }
+
+  .tabs-ready .tab-panel[hidden] {
+    display: grid;
+    visibility: hidden;
+  }
+
+  .tab-panel:focus-visible {
+    outline-offset: -4px;
+  }
+
+  @media (min-width: 60rem) {
+    .tab-panel {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      align-items: center;
+      gap: 3.75rem;
+      min-height: 28rem;
+    }
+  }
+
+  .tab-copy {
+    display: grid;
+    justify-items: start;
+    gap: 1rem;
+  }
+
+  /* Feature titles share the card-title role whether they are h3 or h4 (it depends on the page) */
+  .tab-copy :is(h3, h4) {
+    font-size: var(--fs-h3);
+    line-height: 1.24;
+    letter-spacing: 0;
+  }
+
+  .tab-copy p {
+    max-width: 30rem;
+    font-size: var(--fs-large);
+    letter-spacing: 0;
+    color: var(--text-2);
+  }
+
+  .tab-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+  }
+
+  .tab-copy .btn {
+    margin-top: 0.5rem;
+  }
+
+  .tab-visual {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    min-height: 16rem;
+    padding: 1.5rem;
+    border-radius: var(--radius-m);
+    background: linear-gradient(160deg, #fff6f4, #f6e9ff);
+  }
+
+  @media (max-width: 59.99rem) {
+    .tab-visual {
+      flex-wrap: nowrap;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .tab-visual :global(.mock) {
+      flex: 0 1 auto;
+      min-width: 0;
+      zoom: 0.82;
+    }
+
+    .tab-visual :global(.mock:nth-child(n + 3)) {
+      display: none;
+    }
+  }
+
+  .rest {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  @media (min-width: 45rem) {
+    .rest {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .rest-card :is(h3, h4) {
+    margin-top: 0.75rem;
+    font-size: var(--fs-lead);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+
+  @media screen and (prefers-reduced-motion: no-preference) {
+    /* The marks drift left in a band with faded edges. Each set holds the six marks twice, so one set is
+       always wider than the band, and the track moves by exactly one set, so the loop has no visible join.
+       Hovering with a mouse holds it; "Pause animations" in the footer stops it (global.css). */
+    .works {
+      overflow: hidden;
+      -webkit-mask-image: linear-gradient(90deg, transparent, #000 15%, #000 85%, transparent);
+      mask-image: linear-gradient(90deg, transparent, #000 15%, #000 85%, transparent);
+    }
+
+    .works-track {
+      display: flex;
+      width: max-content;
+      animation: works 40s linear infinite;
+    }
+
+    .works-set {
+      flex-wrap: nowrap;
+    }
+
+    .works-set + .works-set,
+    .works-set > li:nth-child(n + 7) {
+      display: flex;
+    }
+
+    /* Longhands on purpose: the build cannot lower a padding-inline shorthand that holds var() for Safari 14.0 */
+    .works-set > li {
+      padding-inline-start: calc(var(--works-gap) / 2);
+      padding-inline-end: calc(var(--works-gap) / 2);
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .works:hover .works-track {
+        animation-play-state: paused;
+      }
+    }
+
+    @keyframes works {
+      to {
+        transform: translateX(-50%);
+      }
+    }
+
+    /* The chosen panel fades and rises in */
+    :global(.tabs-ready) .tab-panel:not([hidden]) {
+      animation: panel-in 0.55s var(--ease-out) both;
+    }
+
+    @keyframes panel-in {
+      from {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+    }
+
+    .tab-visual :global(.float) {
+      animation: bob 2.6s ease-in-out infinite alternate;
+    }
+
+    .tab-visual :global(.f2) {
+      animation-duration: 3.1s;
+      animation-delay: -1s;
+    }
+
+    .tab-visual :global(.f3) {
+      animation-duration: 2.2s;
+      animation-delay: -0.5s;
+    }
+
+    @keyframes bob {
+      from {
+        transform: translate3d(-3px, 6px, 0) rotate(-1.2deg);
+      }
+
+      to {
+        transform: translate3d(3px, -8px, 0) rotate(1.2deg);
+      }
+    }
+
+    @supports (animation-timeline: view()) {
+      /* The colour panel widens to the edges as the stage scrolls in */
+      .stage-bg {
+        animation: stage-grow linear both;
+        animation-timeline: view();
+        animation-range: entry 10% cover 45%;
+      }
+
+      @keyframes stage-grow {
+        from {
+          clip-path: inset(0 6% round var(--radius-l));
+        }
+
+        to {
+          clip-path: inset(0 0 round var(--radius-l));
+        }
+      }
+
+      /* Dark to light: the stage area starts dark, continuing the opening, then turns light */
+      .flip {
+        animation: flip cubic-bezier(0.65, 0, 0.35, 1) both;
+        animation-timeline: view();
+        animation-range: entry 2% entry 8%;
+      }
+
+      @keyframes flip {
+        from {
+          background-color: var(--dark);
+        }
+
+        to {
+          background-color: var(--page);
+        }
+      }
+    }
+  }
+
+  @media (forced-colors: active) {
+    .tablist button {
+      border: 1px solid ButtonText;
+    }
+
+    .tablist button[aria-selected='true'] {
+      forced-color-adjust: none;
+      background: Highlight;
+      color: HighlightText;
+    }
+  }
+</style>

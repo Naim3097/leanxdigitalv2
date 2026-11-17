@@ -1,21 +1,22 @@
-// Build-time image rendering. Satori turns text into vector paths using the
-// bundled Geist font, so images look the same on any build machine (no system fonts needed).
+// Build-time image rendering. Satori turns text into vector paths using the site's own
+// typeface, Neue Montreal, read from src/assets/fonts/, so images look the same on any build
+// machine (no system fonts needed). Satori cannot read WOFF2, so it gets the OTF copies of
+// the two weights the site uses: 400 for text, 500 for everything heavier.
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import satori from 'satori';
 import sharp from 'sharp';
+import { LOGO_SHAPES, LOGO_VIEWBOX, LOGO_X, LOGO_YELLOW } from './logo';
 
 const INK = '#0b0b0b';
 const PAPER = '#ffffff';
 const GREY = '#5c5c5c';
 
-const font = (weight: 400 | 500 | 600 | 700) => ({
-  name: 'Geist',
+const font = (weight: 400 | 500) => ({
+  name: 'Neue Montreal',
   weight,
   style: 'normal' as const,
-  data: readFileSync(
-    join(process.cwd(), `node_modules/@fontsource/geist/files/geist-latin-${weight}-normal.woff`),
-  ),
+  data: readFileSync(join(process.cwd(), `src/assets/fonts/neue-montreal-${weight}.otf`)),
 });
 
 let fonts: ReturnType<typeof font>[] | undefined;
@@ -26,24 +27,18 @@ const h = (type: string, style: Record<string, unknown>, ...children: (El | stri
   props: { style, children: children.length === 1 ? children[0] : children },
 });
 
-const mark = (size: number, fg = PAPER, bg = INK): El => ({
+// The official logo at a given height, its proportions unchanged: letters in ink, the x and accent yellow.
+const [, , logoW, logoH] = LOGO_VIEWBOX;
+const wordmark = (height: number, letters = INK): El => ({
   type: 'svg',
   props: {
-    width: size,
-    height: size,
-    viewBox: '0 0 24 24',
-    children: [
-      { type: 'rect', props: { width: 24, height: 24, rx: 5, fill: bg } },
-      {
-        type: 'path',
-        props: {
-          d: 'M8 8l8 8M16 8l-8 8',
-          stroke: fg,
-          'stroke-width': 2.4,
-          'stroke-linecap': 'round',
-        },
-      },
-    ],
+    width: Math.round((height * logoW) / logoH),
+    height,
+    viewBox: LOGO_VIEWBOX.join(' '),
+    children: LOGO_SHAPES.map((s) => ({
+      type: s.tag,
+      props: { ...s.attrs, fill: s.accent ? LOGO_YELLOW : letters },
+    })),
   },
 });
 
@@ -54,7 +49,7 @@ export async function ogImage(opts: {
   footLeft: string;
   footRight: string;
 }): Promise<Buffer> {
-  fonts ??= [font(400), font(500), font(600), font(700)];
+  fonts ??= [font(400), font(500)];
   const len = opts.headline.length;
   const big = len <= 12 ? 112 : len <= 20 ? 96 : 76;
 
@@ -69,28 +64,27 @@ export async function ogImage(opts: {
       padding: '64px 72px',
       background: PAPER,
       color: INK,
-      fontFamily: 'Geist',
+      fontFamily: 'Neue Montreal',
     },
     h(
       'div',
-      { display: 'flex', alignItems: 'center', gap: 16 },
-      mark(44),
-      h('div', { fontSize: 30, fontWeight: 700, letterSpacing: -1 }, 'lean.x digital'),
+      { display: 'flex', alignItems: 'center' },
+      wordmark(46),
     ),
     h(
       'div',
       { display: 'flex', flexDirection: 'column' },
       h(
         'div',
-        { fontSize: 22, fontWeight: 500, letterSpacing: 3, textTransform: 'uppercase', color: GREY },
+        { fontSize: 22, fontWeight: 500, letterSpacing: 22 * 0.06, textTransform: 'uppercase', color: GREY },
         opts.eyebrow,
       ),
       h(
         'div',
         {
           fontSize: big,
-          fontWeight: 600,
-          letterSpacing: big * -0.045,
+          fontWeight: 500,
+          letterSpacing: big * -0.02,
           lineHeight: 1,
           marginTop: 20,
           maxWidth: 1056,
@@ -122,14 +116,23 @@ export async function ogImage(opts: {
   return sharp(Buffer.from(svg)).png({ compressionLevel: 9 }).toBuffer();
 }
 
-/** Square icon: black tile, white x. `rounded` adds corner radius (off for apple-touch-icon). */
-export function iconPng(size: number, rounded = true): Promise<Buffer> {
-  const rx = rounded ? 5 : 0;
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24">
-  <rect width="24" height="24" rx="${rx}" fill="${INK}"/>
-  <path d="M8 8l8 8M16 8l-8 8" stroke="${PAPER}" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+/** The logo's yellow x, centred on a black square, as an SVG string (favicon.svg uses the same drawing). */
+export function iconSvg(size: number, rounded = true): string {
+  // The x's own bounds inside the logo: 970.54 to 1214.24 across, 116.5 to 364.17 down.
+  const [x0, x1, y0, y1] = [970.54, 1214.24, 116.5, 364.17];
+  const scale = (0.56 * 512) / (y1 - y0);
+  const tx = 256 - ((x0 + x1) / 2) * scale;
+  const ty = 256 - ((y0 + y1) / 2) * scale;
+  const rx = rounded ? 112 : 0;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="${rx}" fill="${INK}"/>
+  <polygon transform="translate(${tx.toFixed(2)} ${ty.toFixed(2)}) scale(${scale.toFixed(5)})" points="${LOGO_X.attrs.points}" fill="${LOGO_YELLOW}"/>
 </svg>`;
-  return sharp(Buffer.from(svg)).png({ compressionLevel: 9 }).toBuffer();
+}
+
+/** Square icon: the logo's yellow x on a black tile. `rounded` adds corner radius (off for apple-touch-icon). */
+export function iconPng(size: number, rounded = true): Promise<Buffer> {
+  return sharp(Buffer.from(iconSvg(size, rounded))).png({ compressionLevel: 9 }).toBuffer();
 }
 
 /** Wraps a PNG in a single-image .ico container. */

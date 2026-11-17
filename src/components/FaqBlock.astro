@@ -1,0 +1,117 @@
+---
+// Questions section: title, short note and a WhatsApp call card on the left (sticky on wide screens),
+// the accordion on the right.
+import Faq from './Faq.astro';
+import Icon from './Icon.astro';
+import { site } from '../data/site';
+
+interface Props {
+  faqs: readonly (readonly [string, string])[];
+  title: string;
+  id?: string;
+  note?: string;
+  whatsapp?: string;
+  openFirst?: boolean;
+  /** Background of the section. */
+  tone?: 'alt' | 'page' | 'white';
+}
+const { faqs, title, id = 'faq-title', note, whatsapp = site.whatsapp, openFirst = false, tone = 'alt' } = Astro.props;
+---
+
+<section class:list={['section', { 'section-alt': tone === 'alt', 'section-white': tone === 'white' }]} aria-labelledby={id}>
+  <div class="container faq-grid">
+    <div class="faq-side">
+      <h2 id={id} data-split>{title}</h2>
+      {note && <p class="muted">{note}</p>}
+      <slot name="note" />
+      <a class="call-card" href={whatsapp}>
+        <span class="call-mark"><Icon name="chat" /></span>
+        <span class="call-text">
+          <span class="eyebrow">WhatsApp <span class="nowrap">{site.phoneDisplay}</span></span>
+          <strong>Ask us on WhatsApp</strong>
+        </span>
+      </a>
+    </div>
+    <Faq faqs={faqs} openFirst={openFirst} />
+  </div>
+</section>
+
+<style>
+  .faq-grid {
+    display: grid;
+    gap: 2.5rem;
+  }
+
+  @media (min-width: 64rem) {
+    .faq-grid {
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+      gap: 6.25rem;
+      align-items: start;
+    }
+
+    .faq-side {
+      position: sticky;
+      top: 2rem;
+    }
+  }
+
+  .faq-side {
+    display: grid;
+    justify-items: start;
+    gap: 1.25rem;
+  }
+
+  .faq-side .muted {
+    max-width: 30rem;
+    font-size: var(--fs-large);
+    letter-spacing: 0;
+  }
+
+  /* The card is as wide as its text; the line underlines on hover */
+  .call-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    max-width: 100%;
+    margin-top: 1.25rem;
+    padding: 0.75rem 1.5rem 0.75rem 0.875rem;
+    border-radius: var(--radius-m);
+    background: var(--paper);
+    text-decoration: none;
+    box-shadow: var(--shadow-chip);
+  }
+
+  .call-mark {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 3.75rem;
+    height: 3.75rem;
+    border-radius: var(--radius-s);
+    background: var(--page-alt);
+    color: var(--ink);
+  }
+
+  .call-mark :global(svg) {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .call-text {
+    display: grid;
+    gap: 0.25rem;
+    min-width: 0;
+  }
+
+  .call-text strong {
+    font-size: var(--fs-large);
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .call-card:hover strong {
+    text-decoration: underline;
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 0.2em;
+  }
+</style>

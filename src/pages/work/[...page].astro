@@ -1,5 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
+import Label from '../../components/Label.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import RowList from '../../components/RowList.astro';
 import DraftNote from '../../components/DraftNote.astro';
@@ -31,37 +32,76 @@ const schema = [
 ---
 
 <Base title={title} description={description} schema={schema} noindex={liveCaseStudies.length === 0}>
-  <Breadcrumbs items={crumbs} />
-
-  <header class="page-head wrap">
-    <p class="eyebrow">Work</p>
-    <h1>Client work</h1>
-    <p class="lede">
-      What we did for clients and what came of it, with numbers and dates. Each case study is published with the
-      client’s permission.
-    </p>
+  <header class="page-head">
+    <div class="glow" aria-hidden="true"><span></span><span></span><span></span></div>
+    <div class="container">
+      <Breadcrumbs items={crumbs} />
+      <Label icon="briefcase">Work</Label>
+      <h1>Client work</h1>
+      <p class="lede">
+        What we did for clients and what came of it, with numbers and dates. Each case study is published with the
+        client’s permission.
+      </p>
+    </div>
   </header>
 
-  <section class="section" aria-labelledby="list-title">
-    <div class="wrap section-grid">
-      <div class="section-head">
-        <h2 id="list-title">Case studies</h2>
+  <section class="section cases" aria-labelledby="list-title">
+    <div class="container">
+      <div class="intro">
+        <h2 id="list-title" data-split>Case studies</h2>
       </div>
-      <div>
-        {
-          liveCaseStudies.length === 0 && (
-            <div style="margin-bottom: 1.5rem">
-              <DraftNote label="Draft section">
-                <p>
-                  This page goes live with the first real case study a client has approved. Until then it shows only in
-                  previews such as staging, and so does the menu link to it.
-                </p>
-              </DraftNote>
-            </div>
-          )
-        }
+      {
+        liveCaseStudies.length === 0 && (
+          <div class="cases-note">
+            <DraftNote label="Draft section">
+              <p>
+                This page goes live with the first real case study a client has approved. Until then it shows only in
+                previews such as staging, and so does the menu link to it.
+              </p>
+            </DraftNote>
+          </div>
+        )
+      }
+      <div class="cases-panel" data-rise>
         <RowList items={workRows(visibleCaseStudies)} />
       </div>
     </div>
   </section>
 </Base>
+
+<style>
+  .cases-note {
+    max-width: var(--measure-4);
+    margin-inline: auto;
+  }
+
+  .cases-note + .cases-panel {
+    margin-top: 1.5rem;
+  }
+
+  /* The list sits on one white panel, like a card holding its rows */
+  .cases-panel {
+    padding: 0.5rem clamp(1.25rem, 0.5rem + 2.5vw, 3rem);
+    border-radius: var(--radius-xl);
+    background: var(--paper);
+    box-shadow: var(--shadow-card);
+  }
+
+  .cases-panel :global(.rows) {
+    border-top: 0;
+  }
+
+  .cases-panel :global(.rows li:last-child) {
+    border-bottom: 0;
+  }
+
+  .cases-panel :global(.rows a) {
+    padding-block: clamp(1.5rem, 1rem + 1.5vw, 2.5rem);
+  }
+
+  @media (max-width: 47.99rem) {
+    .cases-panel {
+      border-radius: var(--radius-m);
+    }
+  }
+</style>

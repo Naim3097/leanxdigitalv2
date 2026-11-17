@@ -1,16 +1,56 @@
 ---
+// Facts as a definition list: a ledger of rows, or a bento grid of small cards. Same markup either way,
+// so search engines and AI tools read the same term/value pairs. In the bento, long values take two
+// columns, and the last cells of any row that would end short widen so the grid never has holes
+// (three or four columns on wide screens, two on tablets).
 interface Props {
   facts: readonly (readonly [string, string])[];
+  variant?: 'ledger' | 'bento';
+  /** Columns of the bento on wide screens. */
+  columns?: 3 | 4;
 }
-const { facts } = Astro.props;
+const { facts, variant = 'ledger', columns = 4 } = Astro.props;
+const bento = variant === 'bento';
+
+const fill = (cols: number, spans: number[]) => {
+  const out = spans.map((s) => Math.min(s, cols));
+  let row: number[] = [];
+  let used = 0;
+  const close = () => {
+    for (let free = cols - used, k = row.length - 1; free > 0 && row.length; free--, k = k > 0 ? k - 1 : row.length - 1) {
+      out[row[k]]++;
+    }
+    row = [];
+    used = 0;
+  };
+  spans.forEach((_, i) => {
+    if (used + out[i] > cols) close();
+    row.push(i);
+    used += out[i];
+    if (used === cols) {
+      row = [];
+      used = 0;
+    }
+  });
+  if (row.length) close();
+  return out;
+};
+
+// Long values, and values that can't break (an email or a web address), take two cells, so they fit whole.
+const wide = facts.map(([, v]) => bento && (v.length > 42 || /\S{20,}/.test(v)));
+const s4 = fill(columns, wide.map((w) => (w ? 2 : 1)));
+// Phone numbers (for example "+60 10-764 8227") are kept on one line wherever they appear in a value.
+const phone = /(\+?\d[\d -]{6,}\d)/;
+const parts = (v: string) => v.split(phone);
+const s2 = fill(2, facts.map(() => 1));
 ---
 
-<dl class="facts">
+<dl class:list={['facts', { 'facts-bento': bento }]} style={bento && columns !== 4 ? `--cols: ${columns}` : undefined}>
   {
-    facts.map(([term, value]) => (
-      <div>
+    facts.map(([term, value], i) => (
+      <div class:list={{ wide: wide[i] }} style={bento ? `--s4: ${s4[i]}; --s2: ${s2[i]}` : undefined}>
         <dt>{term}</dt>
-        <dd>{value}</dd>
+        <dd>{parts(value).map((p, k) => (k % 2 ? <span class="nowrap">{p}</span> : p))}</dd>
       </div>
     ))
   }

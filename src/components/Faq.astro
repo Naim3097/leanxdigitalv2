@@ -1,18 +1,26 @@
 ---
-// Questions are visible on the page. The FAQPage JSON-LD is built from the same list.
+// Questions as disclosures: the question is always visible and the answer opens with a tap, a click or
+// Enter. Both are in the HTML. The FAQPage JSON-LD is built from the same list (lib/schema.ts).
 interface Props {
   faqs: readonly (readonly [string, string])[];
+  /** Open the first answer by default. */
+  openFirst?: boolean;
 }
-const { faqs } = Astro.props;
+const { faqs, openFirst = false } = Astro.props;
+// Phone numbers in an answer stay on one line.
+const phone = /(\+?\d[\d -]{6,}\d)/;
 ---
 
 <div class="faq">
   {
-    faqs.map(([q, a]) => (
-      <div>
-        <h3>{q}</h3>
-        <p>{a}</p>
-      </div>
+    faqs.map(([q, a], i) => (
+      <details open={openFirst && i === 0}>
+        <summary>
+          <h3>{q}</h3>
+          <span class="faq-icon" aria-hidden="true" />
+        </summary>
+        <p>{a.split(phone).map((t, k) => (k % 2 ? <span class="nowrap">{t}</span> : t))}</p>
+      </details>
     ))
   }
 </div>

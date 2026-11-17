@@ -1,10 +1,22 @@
 ---
-import Logo from './Logo.astro';
+// Site chrome: a top bar that scrolls away, and a floating navigation pill fixed to the bottom of the
+// screen with the live scroll position and the menu. The menu is a <details> element, so it opens and
+// closes without JavaScript; scripts/site.ts adds Escape, tap-outside, focus handling and animation.
+import Wordmark from './Wordmark.astro';
+import Icon from './Icon.astro';
 import { site } from '../data/site';
+import { services } from '../data/services';
 import { visibleCaseStudies } from '../data/work';
 
+interface Props {
+  /** WhatsApp link pre-filled for the page's topic. */
+  whatsapp?: string;
+}
+const { whatsapp = site.whatsapp } = Astro.props;
+
 const path = Astro.url.pathname;
-const nav: [string, string][] = [
+const links: [string, string][] = [
+  ['Home', '/'],
   ['Nexova', '/products/nexova/'],
   ['Services', '/services/'],
   ...(visibleCaseStudies.length > 0 ? ([['Work', '/work/']] as [string, string][]) : []),
@@ -16,24 +28,78 @@ const current = (href: string) =>
   path === href ? 'page' : href !== '/' && path.startsWith(href) ? 'true' : undefined;
 ---
 
-<header class="site-header">
-  <div class="wrap">
+<header class="topbar">
+  <div class="container">
     <a class="brand" href="/" aria-label={`${site.name} home`}>
-      <Logo />
-      <span class="brand-text">lean.x digital</span>
+      <Wordmark />
     </a>
-    <nav class="nav" aria-label="Main">
-      <ul>
+    <a class="btn btn-primary btn-sm" href="/contact/" data-magnetic>Contact us</a>
+  </div>
+</header>
+
+<div class="menu-backdrop" aria-hidden="true"></div>
+
+<nav class="navpill" aria-label="Main">
+  <a class="navpill-home" href="/" aria-label={`${site.name} home`}>
+    <Wordmark />
+  </a>
+  <span class="navpill-progress" aria-hidden="true">0%</span>
+  <span class="navpill-divider" aria-hidden="true"></span>
+  <details class="navpill-menu">
+    <summary class="navpill-toggle">
+      <span class="burger" aria-hidden="true"></span>
+      <span class="when-closed">Menu</span>
+      <span class="when-open">Close</span>
+    </summary>
+    <div class="menu-panel">
+      <p class="menu-title" style="--d: 0">Menu</p>
+      <ul class="menu-links" style="--d: 1">
         {
-          nav.map(([label, href]) => (
+          links.map(([label, href]) => (
             <li>
-              <a href={href} aria-current={current(href)}>
+              <a href={href} aria-current={current(href)} data-roll>
                 {label}
+                {href === '/services/' && (
+                  <span class="menu-sub-mark" aria-hidden="true">
+                    +
+                  </span>
+                )}
               </a>
+              {href === '/services/' && (
+                <ul class="menu-sub">
+                  {services.map((s) => (
+                    <li>
+                      <a href={`/services/${s.slug}/`} aria-current={current(`/services/${s.slug}/`)}>
+                        {s.name}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </li>
           ))
         }
       </ul>
-    </nav>
-  </div>
-</header>
+      <a class="btn btn-primary btn-fill menu-cta" style="--d: 2" href={whatsapp}>
+        <Icon name="chat" />
+        WhatsApp us
+      </a>
+      <div class="menu-meta" style="--d: 3">
+        <div>
+          <p class="menu-label">Social</p>
+          <ul>
+            <li><a href={site.social.instagram} rel="me">Instagram</a></li>
+            <li><a href={site.social.facebook} rel="me">Facebook</a></li>
+            {site.social.linkedin && <li><a href={site.social.linkedin} rel="me">LinkedIn</a></li>}
+          </ul>
+        </div>
+        <div>
+          <p class="menu-label">Email</p>
+          <a href={`mailto:${site.email}`}>{site.email}</a>
+          <p class="menu-label" style="margin-top: 0.75rem">Phone and WhatsApp</p>
+          <a class="nowrap" href={`tel:${site.phone}`}>{site.phoneDisplay}</a>
+        </div>
+      </div>
+    </div>
+  </details>
+</nav>

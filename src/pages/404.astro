@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import Label from '../components/Label.astro';
 import { site } from '../data/site';
 ---
 
@@ -8,16 +9,79 @@ import { site } from '../data/site';
   description="This page does not exist on the Lean X Digital website."
   noindex
 >
-  <section class="notfound wrap">
-    <p class="eyebrow">404</p>
-    <h1 style="margin-top: 1.25rem">Page not found.</h1>
-    <p class="lede" style="margin-top: 1.5rem">
-      This page doesn’t exist. It may have moved when we rebuilt the site.
-    </p>
-    <div class="actions" style="margin-top: 2rem">
-      <a class="btn btn-solid" href="/">Home</a>
-      <a class="btn btn-line" href="/products/">Products</a>
-      <a class="btn btn-line" href="/contact/">Contact</a>
+  <section class="page-head notfound">
+    <div class="glow" aria-hidden="true"><span></span><span></span><span></span></div>
+    <span class="big" aria-hidden="true">404</span>
+    <div class="container">
+      <Label icon="search">404</Label>
+      <h1>Page not found.</h1>
+      <p class="lede">
+        This page doesn’t exist. It may have moved when we rebuilt the site.
+      </p>
+      <div class="actions">
+        <a class="btn btn-primary" href="/" data-magnetic>Home</a>
+        <a class="btn btn-secondary" href="/products/" data-magnetic>Products</a>
+        <a class="btn btn-secondary" href="/contact/" data-magnetic>Contact</a>
+      </div>
     </div>
   </section>
 </Base>
+
+<style>
+  /* A centred hero like the page heads, tall enough to fill the first screen */
+  .notfound {
+    display: grid;
+    align-items: center;
+    min-height: min(100vh, 56rem);
+  }
+
+  @supports (min-height: 100svh) {
+    .notfound {
+      min-height: min(100svh, 56rem);
+    }
+  }
+
+  .notfound h1 {
+    font-size: clamp(2.5rem, 1.2rem + 4.6vw, 5rem);
+    line-height: 1.04;
+    letter-spacing: -0.035em;
+  }
+
+  /* Oversized numerals behind the text, fading into the page */
+  .big {
+    position: absolute;
+    left: 50%;
+    bottom: -0.16em;
+    font-size: clamp(11rem, 6rem + 26vw, 30rem);
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.06em;
+    white-space: nowrap;
+    background: linear-gradient(180deg, rgb(255 255 255 / 0.95), rgb(255 255 255 / 0.15) 75%, rgb(255 255 255 / 0));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    transform: translateX(-50%);
+    pointer-events: none;
+    user-select: none;
+  }
+
+  @media screen and (prefers-reduced-motion: no-preference) {
+    .big {
+      animation: big-in 1.4s 0.15s var(--ease-out) both;
+    }
+
+    @keyframes big-in {
+      from {
+        opacity: 0;
+        transform: translate(-50%, 0.12em);
+      }
+    }
+  }
+
+  @media (forced-colors: active) {
+    .big {
+      display: none;
+    }
+  }
+</style>

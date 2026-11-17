@@ -5,6 +5,8 @@ import DraftNote from '../../components/DraftNote.astro';
 import Facts from '../../components/Facts.astro';
 import RowList from '../../components/RowList.astro';
 import ImageSlot from '../../components/ImageSlot.astro';
+import Icon from '../../components/Icon.astro';
+import Label from '../../components/Label.astro';
 import { site, fullAddress, pageTitle } from '../../data/site';
 import { services } from '../../data/services';
 import { showDrafts } from '../../lib/drafts';
@@ -45,22 +47,30 @@ const schema = [
 ---
 
 <Base title={title} description={description} schema={schema} noindex>
-  <Breadcrumbs items={crumbs} />
-
-  <header class="page-head wrap">
-    <p class="eyebrow">Kuala Lumpur</p>
-    <h1>Lean X Digital in Bandar Sri Damansara</h1>
-    <p class="lede">
-      Our office is at 8trium, Bandar Sri Damansara. Call, WhatsApp or email to talk about ads, your website or a store
-      of your own, in English or Bahasa Malaysia.
-    </p>
-    <div class="actions">
-      <a class="btn btn-solid" href={site.whatsapp}>WhatsApp {site.phoneDisplay}</a>
-      <a class="btn btn-line" href={site.mapUrl} rel="noopener">Open in Google Maps</a>
+  <header class="page-head">
+    <div class="glow" aria-hidden="true"><span></span><span></span><span></span></div>
+    <div class="container">
+      <Breadcrumbs items={crumbs} />
+      <Label icon="pin">Kuala Lumpur</Label>
+      <h1>Lean X Digital in Bandar Sri Damansara</h1>
+      <p class="lede">
+        Our office is at 8trium, Bandar Sri Damansara. Call, WhatsApp or email to talk about ads, your website or a store
+        of your own, in English or Bahasa Malaysia.
+      </p>
+      <div class="actions">
+        <a class="btn btn-primary" href={site.whatsapp} data-magnetic>
+          <Icon name="chat" />
+          WhatsApp {site.phoneDisplay}
+        </a>
+        <a class="btn btn-secondary" href={site.mapUrl} rel="noopener" data-magnetic>
+          <Icon name="pin" />
+          Open in Google Maps
+        </a>
+      </div>
     </div>
   </header>
 
-  <div class="wrap" style="padding-bottom: 3rem">
+  <div class="narrow draft-wrap">
     <DraftNote label="Draft page: not on the live site">
       <p>Before it goes live, this page needs:</p>
       <ul>
@@ -73,41 +83,245 @@ const schema = [
     </DraftNote>
   </div>
 
-  <section class="section" aria-labelledby="office-title">
-    <div class="wrap section-grid">
-      <div class="section-head">
-        <h2 id="office-title">The office</h2>
+  <section class="section office" aria-labelledby="office-title">
+    <div class="container duo">
+      <div class="office-head">
+        <Label icon="building">Office details</Label>
+        <h2 id="office-title" data-split>The office</h2>
+        <div class="locator" aria-hidden="true">
+          <span class="ring"></span>
+          <span class="ring"></span>
+          <span class="ring"></span>
+          <span class="pin"><Icon name="pin" /></span>
+          <span class="locator-tag">8trium, Tower 1 · {site.address.area}</span>
+        </div>
+        <a class="link-arrow" href={site.mapUrl} rel="noopener">Open in Google Maps</a>
       </div>
-      <div>
-        <Facts facts={office} />
-        <div style="margin-top: 1.5rem">
+      <div class="office-body">
+        <div class="office-facts" data-rise>
+          <Facts facts={office} variant="bento" />
+        </div>
+        <div class="office-photo" data-rise>
           <ImageSlot label="Photo of the office or the 8trium building entrance" ratio="16 / 9" />
         </div>
       </div>
     </div>
   </section>
 
-  <section class="section" aria-labelledby="services-title">
-    <div class="wrap section-grid">
-      <div class="section-head">
-        <h2 id="services-title">What we do</h2>
+  <section class="section section-dark services-band" data-surface="dark" aria-labelledby="services-title">
+    <div class="container">
+      <div class="intro">
+        <Label icon="layers">Services</Label>
+        <h2 id="services-title" data-split>What we do</h2>
         <p>For businesses in Bandar Sri Damansara and across Malaysia.</p>
       </div>
-      <RowList items={serviceRows(services)} />
+      <div data-rise>
+        <RowList items={serviceRows(services)} />
+      </div>
     </div>
   </section>
 
-  <section class="section" aria-labelledby="client-title">
-    <div class="wrap section-grid">
-      <div class="section-head">
-        <h2 id="client-title">A client near you</h2>
+  <section class="section section-white client" aria-labelledby="client-title">
+    <div class="narrow">
+      <div class="intro">
+        <Label icon="briefcase">Client story</Label>
+        <h2 id="client-title" data-split>A client near you</h2>
       </div>
-      <p>
-        <span class="placeholder"
-          >[A short story about a client in or near Bandar Sri Damansara: who they are, what we did and the result,
-          with their permission.]</span
-        >
-      </p>
+      <div class="client-card" data-rise>
+        <span class="icon-tile"><Icon name="users" /></span>
+        <p>
+          <span class="placeholder"
+            >[A short story about a client in or near Bandar Sri Damansara: who they are, what we did and the result,
+            with their permission.]</span
+          >
+        </p>
+      </div>
     </div>
   </section>
 </Base>
+
+<style>
+  /* The office: title, a location sketch and the map link on the left; details and the photo on the right */
+  .office-head {
+    display: grid;
+    justify-items: start;
+    gap: 1.25rem;
+  }
+
+  /* The details need more room than the title, so the right column is wider than in other two-column sections */
+  @media (min-width: 64rem) {
+    .office .duo {
+      grid-template-columns: minmax(0, 0.65fr) minmax(0, 1.35fr);
+      column-gap: clamp(3rem, 1rem + 3vw, 5rem);
+    }
+  }
+
+  .office-head h2 {
+    font-size: var(--fs-h2);
+  }
+
+  .office-head .link-arrow {
+    color: var(--ink);
+  }
+
+  .locator {
+    display: none;
+  }
+
+  @media (min-width: 64rem) {
+    .locator {
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      margin-top: 1.25rem;
+      overflow: hidden;
+      border-radius: var(--radius-l);
+      background:
+        linear-gradient(rgb(255 255 255 / 0.55) 1px, transparent 1px) 0 0 / 2.5rem 2.5rem,
+        linear-gradient(90deg, rgb(255 255 255 / 0.55) 1px, transparent 1px) 0 0 / 2.5rem 2.5rem,
+        radial-gradient(60% 70% at 30% 30%, #cfe9ff, transparent 70%),
+        radial-gradient(60% 70% at 75% 70%, #f4d4ff, transparent 70%),
+        linear-gradient(160deg, #eef1ff, #fbeefe);
+    }
+  }
+
+  .ring {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 7rem;
+    height: 7rem;
+    border: 1px solid rgb(91 124 240 / 0.35);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .ring:nth-child(2) {
+    width: 12rem;
+    height: 12rem;
+    border-color: rgb(91 124 240 / 0.22);
+  }
+
+  .ring:nth-child(3) {
+    width: 18rem;
+    height: 18rem;
+    border-color: rgb(91 124 240 / 0.12);
+  }
+
+  .pin {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--paper);
+    box-shadow: 0 14px 30px -10px rgb(0 0 0 / 0.45);
+  }
+
+  .pin :global(svg) {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .locator-tag {
+    position: absolute;
+    left: 50%;
+    top: calc(50% + 2.75rem);
+    padding: 0.375rem 0.875rem;
+    border-radius: 999px;
+    background: var(--paper);
+    color: var(--ink);
+    font-size: var(--fs-caption);
+    font-weight: 500;
+    white-space: nowrap;
+    box-shadow: var(--shadow-chip);
+    transform: translateX(-50%);
+  }
+
+  .office-body {
+    display: grid;
+    gap: 1rem;
+  }
+
+  /* Six details in two columns: the address across the top, languages across the bottom */
+  @media (min-width: 36rem) {
+    .office-facts :global(.facts-bento) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .office-facts :global(.facts-bento .wide) {
+      grid-column: auto;
+    }
+
+    .office-facts :global(.facts-bento div:first-child),
+    .office-facts :global(.facts-bento div:last-child) {
+      grid-column: 1 / -1;
+    }
+  }
+
+  .office-photo :global(.image-slot) {
+    border-radius: var(--radius-l);
+  }
+
+  /* What we do: the service rows on the dark band (numbers and categories need the light-on-dark grey) */
+  .services-band :global(.rows .num),
+  .services-band :global(.rows .name span) {
+    color: var(--on-dark-3);
+  }
+
+  .services-band :global(.rows a:focus-visible) {
+    outline-color: var(--on-dark);
+  }
+
+  /* A client near you: the story waiting to be written, as a card */
+  .client-card {
+    display: grid;
+    justify-items: center;
+    gap: 1.5rem;
+    padding: clamp(1.75rem, 1rem + 3vw, 3.5rem);
+    border-radius: var(--radius-xl);
+    background: var(--page);
+    text-align: center;
+  }
+
+  .client-card p {
+    max-width: 38rem;
+    color: var(--text);
+    font-size: var(--fs-lead);
+    line-height: 1.45;
+  }
+
+  @media screen and (prefers-reduced-motion: no-preference) {
+    .ring {
+      animation: ring-pulse 3.2s var(--ease-out) infinite;
+    }
+
+    .ring:nth-child(2) {
+      animation-delay: 0.35s;
+    }
+
+    .ring:nth-child(3) {
+      animation-delay: 0.7s;
+    }
+
+    @keyframes ring-pulse {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.85);
+      }
+
+      30% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1.12);
+      }
+    }
+  }
+</style>

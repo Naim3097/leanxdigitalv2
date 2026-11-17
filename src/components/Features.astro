@@ -1,21 +1,31 @@
 ---
-// A grid of short titled items, three across on wide screens.
+// Short titled items as cards with an optional line icon, three across on wide screens.
+import Icon, { type IconName } from './Icon.astro';
+
 interface Props {
   items: readonly (readonly [string, string])[];
   /** Heading level for item titles, to fit the page outline. */
   level?: 'h3' | 'h4';
+  /** Icons matched by item title. */
+  icons?: Record<string, IconName>;
+  columns?: 2 | 3;
 }
-const { items, level = 'h3' } = Astro.props;
+const { items, level = 'h3', icons = {}, columns = 3 } = Astro.props;
 const Tag = level;
 ---
 
-<div class="cols">
+<ul class:list={['card-grid', columns === 2 ? 'card-grid-2' : 'card-grid-3', 'feature-cards']}>
   {
     items.map(([title, text]) => (
-      <div>
+      <li class="card" data-rise>
+        {icons[title] && (
+          <span class="icon-tile">
+            <Icon name={icons[title]} />
+          </span>
+        )}
         <Tag>{title}</Tag>
         <p>{text}</p>
-      </div>
+      </li>
     ))
   }
-</div>
+</ul>

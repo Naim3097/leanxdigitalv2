@@ -2,6 +2,7 @@
 import Base from '../../layouts/Base.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import Facts from '../../components/Facts.astro';
+import Label from '../../components/Label.astro';
 import DraftNote from '../../components/DraftNote.astro';
 import ImageSlot from '../../components/ImageSlot.astro';
 import { formatDate, pageTitle } from '../../data/site';
@@ -37,65 +38,236 @@ const schema = [
 ---
 
 <Base title={title} description={c.summary} schema={schema} noindex={c.draft}>
-  <Breadcrumbs items={crumbs} />
-
   <article>
-    <header class="page-head wrap">
-      <p class="eyebrow">Case study · {c.industry}</p>
-      <h1>{c.client}</h1>
-      <p class="lede">{c.summary}</p>
+    <header class="page-head">
+      <div class="glow" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div class="container">
+        <Breadcrumbs items={crumbs} />
+        <Label icon="briefcase">Case study · {c.industry}</Label>
+        <h1>{c.client}</h1>
+        <p class="lede">{c.summary}</p>
+      </div>
     </header>
 
-    <div class="wrap product-body">
-      <div class="prose">
-        {
-          c.draft && (
-            <DraftNote label="Draft case study: placeholders only">
-              <p>
-                Nothing on this page is real yet. Every bracketed line needs a checkable fact from you, and the client’s
-                written permission, before it goes live. Still needed:
-              </p>
-              {c.todo && <ul>{c.todo.map((t) => <li>{t}</li>)}</ul>}
-            </DraftNote>
-          )
-        }
+    {
+      c.draft && (
+        <div class="narrow draft-wrap">
+          <DraftNote label="Draft case study: placeholders only">
+            <p>
+              Nothing on this page is real yet. Every bracketed line needs a checkable fact from you, and the client’s
+              written permission, before it goes live. Still needed:
+            </p>
+            {c.todo && <ul>{c.todo.map((t) => <li>{t}</li>)}</ul>}
+          </DraftNote>
+        </div>
+      )
+    }
 
-        <section aria-labelledby="problem-title">
-          <h2 id="problem-title">The problem</h2>
-          <p>{c.problem}</p>
+    <div class="section story">
+      <div class="container">
+        <section class="duo" aria-labelledby="problem-title">
+          <div>
+            <h2 id="problem-title" data-split>The problem</h2>
+          </div>
+          <p class="statement">{c.problem}</p>
         </section>
 
-        <section aria-labelledby="work-title">
-          <h2 id="work-title">What we did</h2>
-          <ol class="steps">{c.work.map((w) => <li>{w}</li>)}</ol>
+        <section class="duo" aria-labelledby="work-title">
+          <div>
+            <h2 id="work-title" data-split>What we did</h2>
+          </div>
+          <ol class="process">{c.work.map((w) => <li><span>{w}</span></li>)}</ol>
         </section>
-
-        <section aria-labelledby="results-title">
-          <h2 id="results-title">Results</h2>
-          <Facts facts={c.results} />
-        </section>
-
-        {
-          c.quote && (
-            <blockquote class="quote">
-              <p>{c.quote.text}</p>
-              <footer>
-                {c.quote.name}, {c.quote.role}
-              </footer>
-            </blockquote>
-          )
-        }
-
-        {c.draft && <ImageSlot label="One screenshot of the work: the store, an ad or a results dashboard, shared with the client’s permission" />}
       </div>
-
-      <aside class="product-aside" aria-labelledby="facts-title">
-        <h2 id="facts-title">Key facts</h2>
-        <Facts facts={facts} />
-        <p class="updated">
-          Updated <time datetime={c.updated}>{formatDate(c.updated)}</time>
-        </p>
-      </aside>
     </div>
+
+    <section class="section section-dark results" data-surface="dark" aria-labelledby="results-title">
+      <div class="container">
+        <div class="intro">
+          <h2 id="results-title" data-split>Results</h2>
+        </div>
+        <div class="results-grid" data-rise>
+          <Facts facts={c.results} variant="bento" columns={3} />
+        </div>
+
+        {
+          (c.quote || c.draft) && (
+            <div class:list={['proof', { 'proof-pair': Boolean(c.quote && c.draft) }]}>
+              {c.quote && (
+                <blockquote class="quote" data-rise>
+                  <span class="quote-mark" aria-hidden="true">
+                    “
+                  </span>
+                  <p>{c.quote.text}</p>
+                  <footer>
+                    {c.quote.name}, {c.quote.role}
+                  </footer>
+                </blockquote>
+              )}
+              {c.draft && (
+                <div class="proof-slot" data-rise>
+                  <ImageSlot label="One screenshot of the work: the store, an ad or a results dashboard, shared with the client’s permission" />
+                </div>
+              )}
+            </div>
+          )
+        }
+      </div>
+    </section>
+
+    <aside class="section section-white key" aria-labelledby="facts-title">
+      <div class="container">
+        <div class="intro">
+          <h2 id="facts-title" data-split>Key facts</h2>
+          <Label icon="clock">
+            Updated <time datetime={c.updated}>{formatDate(c.updated)}</time>
+          </Label>
+        </div>
+        <div data-rise>
+          <Facts facts={facts} variant="bento" />
+        </div>
+      </div>
+    </aside>
   </article>
 </Base>
+
+<style>
+  /* The problem and what we did: the title on the left (sticky), the story on the right */
+  .story .duo h2 {
+    font-size: var(--fs-h2);
+  }
+
+  .story .statement {
+    font-size: var(--fs-h3);
+    font-weight: 500;
+    line-height: 1.3;
+    letter-spacing: -0.018em;
+    color: var(--ink);
+  }
+
+  @media (min-width: 64rem) {
+    .story .statement {
+      padding-top: 0.5rem;
+    }
+  }
+
+  /* Results: a dark band with large result cards, then the client's words and the screenshot */
+  .results-grid :global(.facts-bento div) {
+    min-height: 10rem;
+    padding: clamp(1.5rem, 1rem + 1.2vw, 2.25rem);
+    border: 1px solid var(--dark-line);
+    border-radius: var(--radius-l);
+    background: linear-gradient(160deg, rgb(255 255 255 / 0.08), rgb(255 255 255 / 0.02));
+  }
+
+  .results-grid :global(.facts-bento dt) {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    font-size: var(--fs-small);
+    color: var(--on-dark-2);
+  }
+
+  /* The same outline chart icon as the rest of the site, drawn as a mask in the text colour */
+  .results-grid :global(.facts-bento dt::before) {
+    content: '';
+    flex: none;
+    width: 1.125rem;
+    height: 1.125rem;
+    background: var(--on-dark);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%23000' stroke-width='1.5' stroke-linecap='round'%3E%3Cpath d='M3.75 16.25h12.5M6 13.5V9.5M10 13.5V6M14 13.5v-5.5'/%3E%3C/svg%3E") center / contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%23000' stroke-width='1.5' stroke-linecap='round'%3E%3Cpath d='M3.75 16.25h12.5M6 13.5V9.5M10 13.5V6M14 13.5v-5.5'/%3E%3C/svg%3E") center / contain no-repeat;
+  }
+
+  .results-grid :global(.facts-bento dd) {
+    font-size: var(--fs-h3);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: var(--on-dark);
+  }
+
+  @media (min-width: 64rem) {
+    .results-grid :global(.facts-bento div) {
+      min-height: 16rem;
+    }
+  }
+
+  .proof {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+  }
+
+  @media (min-width: 64rem) {
+    .proof-pair {
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+      align-items: stretch;
+    }
+  }
+
+  .proof:not(.proof-pair) > * {
+    width: 100%;
+    max-width: var(--measure-4);
+    margin-inline: auto;
+  }
+
+  .quote {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: clamp(1.75rem, 1rem + 2.5vw, 3.5rem);
+    border-radius: var(--radius-xl);
+  }
+
+  /* A large opening mark in the heading spectrum (decorative) */
+  .quote-mark {
+    display: block;
+    align-self: flex-start;
+    height: 2.75rem;
+    font-size: 7rem;
+    font-weight: 500;
+    line-height: 0.85;
+    background: linear-gradient(120deg, var(--spectrum-1), var(--spectrum-2) 35%, var(--spectrum-3) 70%, var(--spectrum-4));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    user-select: none;
+  }
+
+  .quote p {
+    font-size: var(--fs-h3);
+    font-weight: 500;
+    line-height: 1.3;
+    letter-spacing: -0.02em;
+  }
+
+  .quote footer {
+    margin-top: auto;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .proof-slot :global(.image-slot) {
+    border-radius: var(--radius-xl);
+  }
+
+  /* Beside the quote, the slot fills the row: both sizes are set, so its aspect ratio gives way */
+  @media (min-width: 64rem) {
+    .proof-pair .proof-slot :global(.image-slot) {
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  .proof-slot :global(.image-slot .eyebrow) {
+    color: var(--text-3);
+  }
+
+  @media (max-width: 47.99rem) {
+    .quote,
+    .proof-slot :global(.image-slot) {
+      border-radius: var(--radius-m);
+    }
+  }
+
+</style>

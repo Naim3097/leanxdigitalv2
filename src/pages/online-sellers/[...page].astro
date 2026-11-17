@@ -3,9 +3,11 @@ import Base from '../../layouts/Base.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import DraftNote from '../../components/DraftNote.astro';
 import Facts from '../../components/Facts.astro';
-import Faq from '../../components/Faq.astro';
+import FaqBlock from '../../components/FaqBlock.astro';
 import RowList from '../../components/RowList.astro';
+import MockCard from '../../components/MockCard.astro';
 import Icon from '../../components/Icon.astro';
+import Label from '../../components/Label.astro';
 import { pageTitle, whatsappLink } from '../../data/site';
 import { products } from '../../data/products';
 import { visibleCaseStudies } from '../../data/work';
@@ -71,26 +73,31 @@ const schema = [
 ---
 
 <Base title={title} description={description} schema={schema} noindex whatsapp={whatsapp}>
-  <Breadcrumbs items={crumbs} />
-
-  <header class="page-head wrap">
-    <p class="eyebrow">For online sellers</p>
-    <h1>Keep Shopee and TikTok Shop. Add a store you own.</h1>
-    <p class="lede">
-      For established Malaysian sellers. We build a store you own from your existing listings, set up checkout
-      through a registered payment provider and run the ads that bring buyers to it. Then we report what counts: paid
-      orders.
-    </p>
-    <div class="actions">
-      <a class="btn btn-solid" href={whatsapp}>Talk to us about your store</a>
-      <a class="btn btn-line" href={`/products/${nexova.slug}/`}>
-        See {nexova.name}
-        <Icon name="arrow" />
-      </a>
+  <header class="page-head">
+    <div class="glow" aria-hidden="true"><span></span><span></span><span></span></div>
+    <div class="container">
+      <Breadcrumbs items={crumbs} />
+      <Label icon="store">For online sellers</Label>
+      <h1>Keep Shopee and TikTok Shop. Add a store you own.</h1>
+      <p class="lede">
+        For established Malaysian sellers. We build a store you own from your existing listings, set up checkout
+        through a registered payment provider and run the ads that bring buyers to it. Then we report what counts: paid
+        orders.
+      </p>
+      <div class="actions">
+        <a class="btn btn-primary" href={whatsapp} data-magnetic>
+          <Icon name="chat" />
+          Talk to us about your store
+        </a>
+        <a class="btn btn-secondary" href={`/products/${nexova.slug}/`} data-magnetic>See {nexova.name}</a>
+      </div>
+      <div class="head-sync" aria-hidden="true">
+        <MockCard kind="sync" />
+      </div>
     </div>
   </header>
 
-  <div class="wrap" style="padding-bottom: 3rem">
+  <div class="narrow draft-wrap">
     <DraftNote label="Draft page: not on the live site">
       <p>
         The strategy report puts this offer at the centre of the positioning: own-store growth for established
@@ -106,87 +113,361 @@ const schema = [
     </DraftNote>
   </div>
 
-  <section class="section" aria-labelledby="why-title">
-    <div class="wrap section-grid">
-      <div class="section-head">
-        <h2 id="why-title">Why add a store of your own</h2>
+  <section class="section why" aria-labelledby="why-title">
+    <div class="container">
+      <div class="intro">
+        <h2 id="why-title" data-split>Why add a store of your own</h2>
       </div>
-      <div>
-        <p>
-          On a marketplace, every buyer reaches you through the platform’s search, next to competing sellers, under
-          fees and rules the platform sets.
-        </p>
-        <p>
-          A store of your own is an address you control. Buyers who come back can order there directly, and your own
-          ads and messages bring them back without paying the marketplace again for the same customer.
-        </p>
-        <p>
-          <span class="placeholder">[Optional, once checked: the 2025–26 marketplace fee changes, with their sources.]</span>
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <section class="section" aria-labelledby="how-title">
-    <div class="wrap section-grid">
-      <div class="section-head">
-        <h2 id="how-title">How it works</h2>
-      </div>
-      <ol class="steps">{steps.map((s) => <li>{s}</li>)}</ol>
-    </div>
-  </section>
-
-  <section class="section" aria-labelledby="yours-title">
-    <div class="wrap section-grid">
-      <div class="section-head">
-        <h2 id="yours-title">What stays yours</h2>
-      </div>
-      <Facts facts={yours} />
-    </div>
-  </section>
-
-  <section class="section" aria-labelledby="price-title">
-    <div class="wrap section-grid">
-      <div class="section-head">
-        <h2 id="price-title">Price</h2>
-      </div>
-      <div>
-        <p>
-          Store launch from <span class="placeholder">RM [amount]</span>. The monthly service from
-          <span class="placeholder">RM [amount]</span> a month, plus ad spend. Prices as of
-          <span class="placeholder">[month and year]</span>.
-        </p>
-        <div style="margin-top: 1rem">
-          <DraftNote>
-            <p>
-              For reference, {nexova.name}’s pricing page lists managed marketing plans at RM 1,500 and RM 3,000 a month
-              (read on 4 November 2026). Decide how this offer relates to those plans.
-            </p>
-          </DraftNote>
+      <div class="compare">
+        <div class="card compare-card" data-rise>
+          <div class="compare-visual market" aria-hidden="true">
+            <span class="compare-tag">Marketplace</span>
+            <div class="compare-row">
+              <MockCard kind="store" />
+              <MockCard kind="store" />
+              <MockCard kind="store" />
+            </div>
+          </div>
+          <p>
+            On a marketplace, every buyer reaches you through the platform’s search, next to competing sellers, under
+            fees and rules the platform sets.
+          </p>
         </div>
+        <div class="card card-dark on-dark compare-card" data-surface="dark" data-rise>
+          <div class="compare-visual own" aria-hidden="true">
+            <span class="compare-tag">Your store</span>
+            <div class="compare-row">
+              <MockCard kind="store" />
+              <MockCard kind="chat" />
+            </div>
+          </div>
+          <p>
+            A store of your own is an address you control. Buyers who come back can order there directly, and your own
+            ads and messages bring them back without paying the marketplace again for the same customer.
+          </p>
+        </div>
+      </div>
+      <p class="why-note">
+        <span class="placeholder">[Optional, once checked: the 2025–26 marketplace fee changes, with their sources.]</span>
+      </p>
+    </div>
+  </section>
+
+  <section class="section section-white how" aria-labelledby="how-title">
+    <div class="container duo">
+      <div class="how-head">
+        <h2 id="how-title" data-split>How it works</h2>
+        <div class="how-visual" aria-hidden="true">
+          <MockCard kind="store" class="hv hv1" />
+          <MockCard kind="ad" class="hv hv2" />
+          <MockCard kind="chat" class="hv hv3" />
+          <MockCard kind="chart" class="hv hv4" />
+        </div>
+      </div>
+      <ol class="process">{steps.map((s) => <li data-rise><p>{s}</p></li>)}</ol>
+    </div>
+  </section>
+
+  <section class="section section-dark yours" data-surface="dark" aria-labelledby="yours-title">
+    <div class="container">
+      <div class="intro">
+        <Label icon="shield">Ownership</Label>
+        <h2 id="yours-title" data-split>What stays yours</h2>
+      </div>
+      <div class="yours-grid" data-rise>
+        <Facts facts={yours} variant="bento" />
+      </div>
+    </div>
+  </section>
+
+  <section class="section price" aria-labelledby="price-title">
+    <div class="container">
+      <div class="intro">
+        <h2 id="price-title" data-split>Price</h2>
+      </div>
+      <div class="card-grid card-grid-2 price-grid">
+        <div class="card price-card" data-rise>
+          <span class="icon-tile"><Icon name="store" /></span>
+          <p class="price-line">Store launch from <span class="placeholder">RM [amount]</span>.</p>
+        </div>
+        <div class="card price-card" data-rise>
+          <span class="icon-tile"><Icon name="sync" /></span>
+          <p class="price-line">
+            The monthly service from <span class="placeholder">RM [amount]</span> a month, plus ad spend.
+          </p>
+        </div>
+      </div>
+      <p class="price-date">Prices as of <span class="placeholder">[month and year]</span>.</p>
+      <div class="price-note">
+        <DraftNote>
+          <p>
+            For reference, {nexova.name}’s pricing page lists managed marketing plans at RM 1,500 and RM 3,000 a month
+            (read on 4 November 2026). Decide how this offer relates to those plans.
+          </p>
+        </DraftNote>
       </div>
     </div>
   </section>
 
   {
     related.length > 0 && (
-      <section class="section" aria-labelledby="work-title">
-        <div class="wrap section-grid">
-          <div class="section-head">
-            <h2 id="work-title">Results</h2>
+      <section class="section section-white" aria-labelledby="work-title">
+        <div class="container">
+          <div class="intro">
+            <Label icon="briefcase">Case studies</Label>
+            <h2 id="work-title" data-split>Results</h2>
           </div>
-          <RowList items={workRows(related)} />
+          <div class="rows-wrap" data-rise>
+            <RowList items={workRows(related)} />
+          </div>
         </div>
       </section>
     )
   }
 
-  <section class="section" aria-labelledby="faq-title">
-    <div class="wrap section-grid">
-      <div class="section-head">
-        <h2 id="faq-title">Questions</h2>
-      </div>
-      <Faq faqs={faqs} />
-    </div>
-  </section>
+  <FaqBlock faqs={faqs} title="Questions" id="faq-title" whatsapp={whatsapp} openFirst />
 </Base>
+
+<style>
+  /* Page head: the three channels this offer joins up, as a small floating chip */
+  .head-sync {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+  }
+
+  .head-sync :global(.mock) {
+    box-shadow: var(--shadow-chip);
+  }
+
+  @media (max-width: 30rem) {
+    .head-sync :global(.mock) {
+      zoom: 0.86;
+    }
+  }
+
+  /* Why: marketplace and own store side by side */
+  .compare {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+  }
+
+  @media (min-width: 52rem) {
+    .compare {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .compare-card {
+    min-width: 0;
+    gap: 1.75rem;
+  }
+
+  .compare-card p {
+    font-size: var(--fs-large);
+  }
+
+  .compare-visual {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: clamp(13rem, 10rem + 8vw, 17rem);
+    overflow: hidden;
+    border-radius: var(--radius-m);
+  }
+
+  .compare-visual.market {
+    background: linear-gradient(160deg, #f1f2f5, #e9ebf0);
+  }
+
+  .compare-visual.own {
+    background: linear-gradient(160deg, var(--card-1), var(--card-2b));
+  }
+
+  .compare-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+
+  .compare-row :global(.mock) {
+    flex: none;
+    zoom: 0.78;
+  }
+
+  .market .compare-row :global(.mock) {
+    box-shadow: 0 12px 24px -16px rgb(0 0 0 / 0.25);
+  }
+
+  .own .compare-row :global(.mock:first-child) {
+    zoom: 0.92;
+    transform: rotate(-3deg);
+  }
+
+  .own .compare-row :global(.mock-chat) {
+    margin-left: -2rem;
+    transform: translateY(1.75rem) rotate(4deg);
+  }
+
+  .compare-tag {
+    position: absolute;
+    left: 1rem;
+    top: 1rem;
+    z-index: 1;
+    padding: 0.375rem 0.75rem;
+    border-radius: 999px;
+    background: var(--paper);
+    color: var(--ink);
+    font-size: var(--fs-caption);
+    font-weight: 500;
+    box-shadow: var(--shadow-chip);
+  }
+
+  .why-note {
+    margin-top: 1.5rem;
+    color: var(--text-2);
+    font-size: var(--fs-small);
+    text-align: center;
+  }
+
+  /* How it works: a sticky title with interface sketches, the steps on the right */
+  .how .duo {
+    row-gap: 2.5rem;
+  }
+
+  .how-head h2 {
+    font-size: var(--fs-h2);
+  }
+
+  .how-visual {
+    display: none;
+  }
+
+  @media (min-width: 64rem) {
+    .how-visual {
+      position: relative;
+      display: block;
+      height: 22rem;
+      margin-top: 2.5rem;
+      border-radius: var(--radius-l);
+      background: linear-gradient(160deg, #eef1ff, #fbeefe);
+      overflow: hidden;
+    }
+
+    .how-visual :global(.hv) {
+      position: absolute;
+      zoom: 0.82;
+    }
+
+    .how-visual :global(.hv1) {
+      left: 8%;
+      top: 12%;
+      transform: rotate(-4deg);
+    }
+
+    .how-visual :global(.hv2) {
+      right: 8%;
+      top: 7%;
+      transform: rotate(3deg);
+    }
+
+    .how-visual :global(.hv3) {
+      left: 16%;
+      bottom: 6%;
+      transform: rotate(3deg);
+    }
+
+    .how-visual :global(.hv4) {
+      right: 12%;
+      bottom: 10%;
+      transform: rotate(-3deg);
+    }
+  }
+
+  .how .process li {
+    padding-bottom: 2.5rem;
+  }
+
+  .how .process li:last-child {
+    padding-bottom: 0;
+  }
+
+  .how .process p {
+    color: var(--text);
+  }
+
+  /* What stays yours: three cards on the dark band */
+  .yours-grid :global(.facts-bento div) {
+    min-height: 9.5rem;
+    padding: 1.5rem;
+    border: 1px solid var(--dark-line);
+    background: rgb(255 255 255 / 0.05);
+  }
+
+  .yours-grid :global(.facts-bento dt) {
+    color: var(--on-dark-3);
+  }
+
+  .yours-grid :global(.facts-bento dd) {
+    color: var(--on-dark);
+    font-size: var(--fs-lead);
+    line-height: 1.3;
+  }
+
+  @media (min-width: 36rem) and (max-width: 63.99rem) {
+    .yours-grid :global(.facts-bento div:last-child) {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .yours-grid :global(.facts-bento) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .yours-grid :global(.facts-bento .wide) {
+      grid-column: auto;
+    }
+
+    .yours-grid :global(.facts-bento div) {
+      min-height: 15rem;
+      padding: 2rem;
+    }
+  }
+
+  /* Price: one card per price, the date under them */
+  .price-card {
+    justify-content: space-between;
+    gap: 2rem;
+    min-height: 11rem;
+  }
+
+  @media (min-width: 45rem) {
+    .price-card {
+      min-height: 15rem;
+    }
+  }
+
+  .price-card .price-line {
+    color: var(--ink);
+    font-size: var(--fs-h3);
+    font-weight: 500;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+  }
+
+  .price-date {
+    margin-top: 1.25rem;
+    color: var(--text-2);
+    font-size: var(--fs-small);
+    text-align: center;
+  }
+
+  .price-note {
+    max-width: var(--measure-4);
+    margin: 2.5rem auto 0;
+  }
+</style>

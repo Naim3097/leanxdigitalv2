@@ -2,10 +2,13 @@
 import Base from '../../layouts/Base.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import Facts from '../../components/Facts.astro';
-import Faq from '../../components/Faq.astro';
+import FaqBlock from '../../components/FaqBlock.astro';
 import RowList from '../../components/RowList.astro';
-import Icon from '../../components/Icon.astro';
+import Icon, { type IconName } from '../../components/Icon.astro';
+import Label from '../../components/Label.astro';
 import Features from '../../components/Features.astro';
+import NexovaStage from '../../components/NexovaStage.astro';
+import MockCard from '../../components/MockCard.astro';
 import DraftNote from '../../components/DraftNote.astro';
 import ImageSlot from '../../components/ImageSlot.astro';
 import { site, formatDate, pageTitle, whatsappLink } from '../../data/site';
@@ -13,6 +16,7 @@ import { products, type Product } from '../../data/products';
 import { services } from '../../data/services';
 import { webPage, breadcrumbs, softwareApp, faqPage, softwareId } from '../../lib/schema';
 import { productRows, serviceRows, workRows } from '../../lib/rows';
+import { featureIcons } from '../../lib/icons';
 import { lcFirst } from '../../lib/text';
 import { showDrafts } from '../../lib/drafts';
 import { visibleCaseStudies } from '../../data/work';
@@ -50,6 +54,19 @@ const schema = [
   ...softwareApp(p),
   faqPage(path, p.faqs),
 ];
+
+// NexovaStage draws the first product (Nexova) with its tabs; any other product gets plain feature cards.
+const staged = p.slug === products[0].slug;
+// "Who it's for" is set as a statement whose words ink in as it scrolls into view.
+const forWords = p.audience.split(' ');
+// Decorative labels around the statement, taken from the audience line itself.
+const stickers: Record<string, [string, IconName][]> = {
+  nexova: [
+    ['Shopee sellers', 'bag'],
+    ['TikTok Shop sellers', 'play'],
+    ['A store of your own', 'store'],
+  ],
+};
 ---
 
 <Base
@@ -60,118 +77,822 @@ const schema = [
   schema={schema}
   whatsapp={whatsapp}
 >
-  <Breadcrumbs items={crumbs} />
-
   <article>
-    <header class="page-head wrap">
-      <p class="eyebrow">{p.category}</p>
-      <h1>{p.name}</h1>
-      <p class="lede">{p.definition}</p>
-      <div class="actions">
-        {
-          primary && (
-            <a class="btn btn-solid" href={primary.url} rel="noopener">
-              {p.website ? `Visit ${p.website.label}` : p.buy?.label}
-              <Icon name="external" />
-            </a>
-          )
-        }
-        <a class="btn btn-line" href={whatsapp}>Ask us on WhatsApp</a>
+    <header class="page-head product-head">
+      <div class="glow" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div class="container">
+        <Breadcrumbs items={crumbs} />
+        <Label icon="store">{p.category}</Label>
+        <h1 class="sweep">{p.name}</h1>
+        <p class="lede">{p.definition}</p>
+        <div class="actions">
+          {
+            primary && (
+              <a class="btn btn-primary" href={primary.url} rel="noopener" data-magnetic>
+                {p.website ? `Visit ${p.website.label}` : p.buy?.label}
+              </a>
+            )
+          }
+          <a class="btn btn-secondary" href={whatsapp} data-magnetic>
+            <Icon name="chat" />
+            Ask us on WhatsApp
+          </a>
+        </div>
+
+        <div class="showcase" data-surface="dark">
+          <div class="glow" aria-hidden="true"><span></span><span></span><span></span></div>
+          <div class="window">
+            <div class="window-bar" aria-hidden="true"><span></span><span></span><span></span><i></i></div>
+            {
+              showDrafts ? (
+                <div class="window-slot">
+                  <ImageSlot
+                    label={`Screenshot of a real ${p.name} store beside its dashboard, 1600 × 1000 px. It would also replace the text card as the page’s main image in search.`}
+                  />
+                </div>
+              ) : (
+                <div class="window-page" aria-hidden="true">
+                  <div class="wp-nav">
+                    <span class="wp-logo" />
+                    <span class="wb w12" />
+                    <span class="wp-links">
+                      <span class="wb" />
+                      <span class="wb" />
+                      <span class="wb" />
+                    </span>
+                    <span class="wp-cart" />
+                  </div>
+                  <div class="wp-hero">
+                    <div class="wp-copy">
+                      <span class="wb wb-strong w80" />
+                      <span class="wb wb-strong w60" />
+                      <span class="wb w90" />
+                      <span class="wb w70" />
+                      <span class="wp-btn">Shop now</span>
+                    </div>
+                    <div class="wp-art" />
+                  </div>
+                  <div class="wp-grid">
+                    {[1, 2, 3, 4].map((n) => (
+                      <div class="wp-item">
+                        <span class={`wp-thumb t${n}`} />
+                        <span class="wb wb-strong w70" />
+                        <span class="wb w40" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )
+            }
+          </div>
+          {
+            staged && (
+              <div class="showcase-mocks" aria-hidden="true">
+                <MockCard kind="poster" class="sm m1" />
+                <MockCard kind="ad" class="sm m2" />
+                <MockCard kind="chart" class="sm m3" />
+                <MockCard kind="search" class="sm m4" />
+              </div>
+            )
+          }
+          {staged && <MockCard kind="sync" class="showcase-sync" />}
+        </div>
       </div>
     </header>
 
-    <div class="wrap product-body">
-      <div class="prose">
+    {
+      showDrafts && productNotes[p.slug] && (
+        <div class="container draft-wrap">
+          <DraftNote>
+            <p>{productNotes[p.slug]}</p>
+          </DraftNote>
+        </div>
+      )
+    }
+
+    <section class="section section-s section-white statement" aria-labelledby="for-title">
+      <div class="container statement-inner">
+        <Label as="h2" id="for-title" icon="users">Who {p.name} is for</Label>
+        <p class="statement-text" style={`--n: ${forWords.length}`}>
+          {
+            forWords.map((w, i) => (
+              <>
+                <span class="w" style={`--i: ${i}`}>
+                  {w}
+                </span>{' '}
+              </>
+            ))
+          }
+        </p>
         {
-          showDrafts && (
-            <ImageSlot
-              label={`Screenshot of a real ${p.name} store beside its dashboard, 1600 × 1000 px. It would also replace the text card as the page’s main image in search.`}
-            />
-          )
+          (stickers[p.slug] ?? []).map(([s, icon], i) => (
+            <Label as="span" icon={icon} class={`sticker glass-pill k${i + 1}`} aria-hidden="true">
+              {s}
+            </Label>
+          ))
         }
-        {
-          showDrafts && productNotes[p.slug] && (
-            <DraftNote>
-              <p>{productNotes[p.slug]}</p>
-            </DraftNote>
-          )
-        }
-        <section aria-labelledby="for-title">
-          <h2 id="for-title">Who {p.name} is for</h2>
-          <p>{p.audience}</p>
-        </section>
+      </div>
+    </section>
 
-        <section aria-labelledby="features-title">
-          <h2 id="features-title">What {p.name} does</h2>
-          <Features items={p.features} />
+    {
+      staged ? (
+        <div class="features">
+          <NexovaStage
+            intro={false}
+            featuresTitle={`What ${p.name} does`}
+            featuresId="features-title"
+            featuresTag="h2"
+            featureTag="h3"
+          />
+        </div>
+      ) : (
+        <section class="section" aria-labelledby="features-title">
+          <div class="container">
+            <div class="intro">
+              <h2 id="features-title" data-split>
+                What {p.name} does
+              </h2>
+            </div>
+            <Features items={p.features} icons={featureIcons} />
+          </div>
         </section>
+      )
+    }
 
-        <section aria-labelledby="steps-title">
-          <h2 id="steps-title">{p.stepsTitle}</h2>
-          <ol class="steps">{p.steps.map((s) => <li>{s}</li>)}</ol>
-        </section>
+    <section class="section section-white" aria-labelledby="steps-title">
+      <div class="container start">
+        <div class="start-head">
+          <Label icon="route">Getting started</Label>
+          <h2 id="steps-title" data-split>{p.stepsTitle}</h2>
+          {
+            primary && (
+              <a class="btn btn-primary" href={primary.url} rel="noopener" data-magnetic>
+                {p.website ? `Go to ${p.website.label}` : p.buy?.label}
+              </a>
+            )
+          }
+        </div>
+        <ol class="process start-steps">
+          {
+            p.steps.map((s) => (
+              <li data-rise>
+                <p>{s}</p>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+    </section>
 
+    <div class="section explain">
+      <div class="container explain-list">
         {
           p.sections.map((s, i) => (
-            <section aria-labelledby={`s${i}-title`}>
-              <h2 id={`s${i}-title`}>{s.title}</h2>
-              {s.body.map((para) => (
-                <p>{para}</p>
-              ))}
+            <section class="duo duo-card" aria-labelledby={`s${i}-title`} data-rise>
+              <div class="duo-head">
+                <span class="duo-num" aria-hidden="true">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <h2 id={`s${i}-title`} data-split>
+                  {s.title}
+                </h2>
+              </div>
+              <div class="duo-body">
+                {s.body.map((para) => (
+                  <p>{para}</p>
+                ))}
+              </div>
             </section>
           ))
         }
+      </div>
+    </div>
 
-        {
-          related.length > 0 && (
-            <section aria-labelledby="work-title">
-              <h2 id="work-title">Stores built on {p.name}</h2>
+    {
+      related.length > 0 && (
+        <section class="section section-white" aria-labelledby="work-title">
+          <div class="container">
+            <div class="intro">
+              <Label icon="briefcase">Client work</Label>
+              <h2 id="work-title" data-split>
+                Stores built on {p.name}
+              </h2>
+            </div>
+            <div class="work">
               {related.some((c) => c.draft) && (
-                <div style="margin-bottom: 1.5rem">
-                  <DraftNote>
-                    <p>Case studies built on {p.name} appear here. The one below is a placeholder.</p>
-                  </DraftNote>
-                </div>
+                <DraftNote>
+                  <p>Case studies built on {p.name} appear here. The one below is a placeholder.</p>
+                </DraftNote>
               )}
               <RowList items={workRows(related)} />
-            </section>
-          )
-        }
-
-        <section aria-labelledby="faq-title">
-          <h2 id="faq-title">Questions about {p.name}</h2>
-          <Faq faqs={p.faqs} />
+            </div>
+          </div>
         </section>
-      </div>
+      )
+    }
 
-      <aside class="product-aside" aria-labelledby="facts-title">
-        <h2 id="facts-title">Key facts</h2>
-        <Facts facts={[...p.facts, ['Made by', site.name]]} />
-        <p class="updated">
-          Updated <time datetime={p.updated}>{formatDate(p.updated)}</time>
-        </p>
-      </aside>
-    </div>
+    <FaqBlock faqs={p.faqs} title={`Questions about ${p.name}`} id="faq-title" whatsapp={whatsapp} openFirst />
+
+    <section class="section section-white key-facts" aria-labelledby="facts-title">
+      <div class="container">
+        <div class="intro">
+          <h2 id="facts-title" data-split>Key facts</h2>
+          <Label icon="clock">
+            Updated <time datetime={p.updated}>{formatDate(p.updated)}</time>
+          </Label>
+        </div>
+        <Facts facts={[...p.facts, ['Made by', site.name]]} variant="bento" />
+      </div>
+    </section>
   </article>
 
-  <section class="section" aria-labelledby="others-title">
-    <div class="wrap section-grid">
+  <section class="section section-dark others" data-surface="dark" aria-labelledby="others-title">
+    <div class="container">
       {
         others.length ? (
-          <div class="section-head">
-            <h2 id="others-title">Other products</h2>
+          <div class="intro">
+            <h2 id="others-title" data-split>
+              Other products
+            </h2>
             <p>
               Also made by {site.name}. We offer services too: <a href="/services/">see the services</a>.
             </p>
           </div>
         ) : (
-          <div class="section-head">
-            <h2 id="others-title">Rather have it done for you?</h2>
+          <div class="intro">
+            <Label icon="users">Done for you</Label>
+            <h2 id="others-title" data-split>
+              Rather have it done for you?
+            </h2>
             <p>The same tools, run by our team.</p>
           </div>
         )
       }
-      <RowList items={others.length ? productRows(others) : serviceRows(services)} />
+      <div class="rows-wrap" data-rise>
+        <RowList items={others.length ? productRows(others) : serviceRows(services)} />
+      </div>
     </div>
   </section>
 </Base>
+
+<style>
+  /* Page head: the product name at hero size, then a dark showcase with the store in a window */
+  .product-head h1 {
+    font-size: clamp(2.5rem, 1rem + 5.4vw, 5.5rem);
+    line-height: 1.04;
+    letter-spacing: -0.035em;
+  }
+
+  .showcase {
+    position: relative;
+    justify-self: stretch;
+    display: grid;
+    justify-items: center;
+    margin-top: clamp(1.5rem, 1rem + 2.5vw, 3.5rem);
+    padding: clamp(1rem, 0.25rem + 4vw, 5rem) clamp(0.75rem, 0.25rem + 3vw, 4rem) clamp(1.5rem, 1rem + 3vw, 4.5rem);
+    /* clip-path, not overflow, so the window's scroll-linked lift keeps following the page */
+    clip-path: inset(0 round var(--radius-xl));
+    border-radius: var(--radius-xl);
+    background: var(--dark);
+    isolation: isolate;
+  }
+
+  .showcase > .glow {
+    z-index: -1;
+  }
+
+  /* On black the glow uses the saturated end of the spectrum, so it reads as light rather than haze */
+  .showcase > .glow span {
+    opacity: 0.42;
+  }
+
+  .showcase > .glow span:nth-child(1) {
+    background: radial-gradient(closest-side, var(--spectrum-2), transparent);
+  }
+
+  .showcase > .glow span:nth-child(2) {
+    background: radial-gradient(closest-side, var(--spectrum-3), transparent);
+  }
+
+  .showcase > .glow span:nth-child(3) {
+    background: radial-gradient(closest-side, var(--spectrum-4), transparent);
+  }
+
+  .window {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 52rem);
+    overflow: hidden;
+    border-radius: var(--radius-m);
+    background: var(--paper);
+    box-shadow: 0 50px 90px -40px rgb(0 0 0 / 0.7);
+    text-align: left;
+  }
+
+  .window-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    height: 2.25rem;
+    padding: 0 0.875rem;
+    border-bottom: 1px solid var(--line);
+    background: var(--page-alt);
+  }
+
+  .window-bar span {
+    width: 0.5625rem;
+    height: 0.5625rem;
+    border-radius: 50%;
+    background: var(--line);
+  }
+
+  .window-bar i {
+    width: min(15rem, 40%);
+    height: 1.125rem;
+    margin-inline: auto;
+    border-radius: 999px;
+    background: var(--paper);
+  }
+
+  .window-slot {
+    padding: 0.75rem;
+  }
+
+  .window-slot :global(.image-slot) {
+    border-radius: var(--radius-s);
+  }
+
+  /* A store page sketched in bars, standing in for a screenshot until one is supplied */
+  .window-page {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    gap: clamp(0.75rem, 0.5rem + 1vw, 1.25rem);
+    aspect-ratio: 16 / 10;
+    padding: clamp(0.75rem, 0.5rem + 1.2vw, 1.5rem);
+    font-size: clamp(0.5625rem, 0.45rem + 0.35vw, 0.75rem);
+  }
+
+  .wb {
+    display: block;
+    height: 0.5em;
+    border-radius: 999px;
+    background: var(--line);
+  }
+
+  .wb-strong {
+    height: 0.9em;
+    background: #d9d9d9;
+  }
+
+  .w12 {
+    width: 12%;
+  }
+
+  .w40 {
+    width: 40%;
+  }
+
+  .w60 {
+    width: 60%;
+  }
+
+  .w70 {
+    width: 70%;
+  }
+
+  .w80 {
+    width: 80%;
+  }
+
+  .w90 {
+    width: 90%;
+  }
+
+  .wp-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.75em;
+  }
+
+  .wp-logo {
+    flex: none;
+    width: 1.6em;
+    height: 1.6em;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--spectrum-1), var(--spectrum-2));
+  }
+
+  .wp-links {
+    display: flex;
+    gap: 1em;
+    width: 30%;
+    margin-left: auto;
+  }
+
+  .wp-links .wb {
+    flex: 1;
+  }
+
+  .wp-cart {
+    flex: none;
+    width: 1.6em;
+    height: 1.6em;
+    border-radius: 0.4em;
+    background: var(--ink);
+  }
+
+  .wp-hero {
+    display: grid;
+    grid-template-columns: 1fr 1.15fr;
+    align-items: center;
+    gap: 1.5em;
+    padding: 1.5em;
+    border-radius: 1em;
+    background: var(--page-alt);
+  }
+
+  .wp-copy {
+    display: grid;
+    gap: 0.7em;
+  }
+
+  .wp-copy .wb-strong {
+    height: 1.4em;
+  }
+
+  .wp-btn {
+    justify-self: start;
+    margin-top: 0.5em;
+    padding: 0.45em 1em;
+    border-radius: 999px;
+    background: var(--ink);
+    color: var(--paper);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .wp-art {
+    align-self: stretch;
+    min-height: 6em;
+    border-radius: 0.8em;
+    background: linear-gradient(140deg, var(--card-1), var(--spectrum-1) 60%, var(--select-bg));
+  }
+
+  .wp-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.9em;
+  }
+
+  .wp-item {
+    display: grid;
+    gap: 0.5em;
+  }
+
+  .wp-thumb {
+    aspect-ratio: 4 / 3;
+    border-radius: 0.7em;
+  }
+
+  .t1 {
+    background: linear-gradient(140deg, var(--spectrum-3), var(--spectrum-4));
+  }
+
+  .t2 {
+    background: linear-gradient(140deg, var(--spectrum-1), var(--spectrum-2));
+  }
+
+  .t3 {
+    background: linear-gradient(140deg, var(--card-4b), var(--spectrum-1));
+  }
+
+  .t4 {
+    background: linear-gradient(140deg, var(--spectrum-4), var(--select-bg));
+  }
+
+  /* The switch: stock synced across the marketplaces and the store, just under the window */
+  .showcase :global(.showcase-sync) {
+    position: relative;
+    z-index: 3;
+    margin-top: -1.5rem;
+    padding: 0.625rem;
+    font-size: 0.8125rem;
+    box-shadow: 0 24px 50px -16px rgb(0 0 0 / 0.5);
+  }
+
+  .showcase-mocks {
+    display: none;
+  }
+
+  @media (min-width: 64rem) {
+    /* Leave side room for the floating cards, so they only overlap the window's edges */
+    .window {
+      width: min(100% - 16rem, 52rem);
+    }
+
+    .showcase-mocks {
+      display: block;
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .showcase-mocks :global(.sm) {
+      position: absolute;
+    }
+
+    .showcase-mocks :global(.m1) {
+      left: 5%;
+      top: 13%;
+      rotate: -5deg;
+    }
+
+    .showcase-mocks :global(.m2) {
+      left: 7%;
+      bottom: 13%;
+      rotate: 4deg;
+    }
+
+    .showcase-mocks :global(.m3) {
+      right: 6%;
+      top: 15%;
+      rotate: 5deg;
+    }
+
+    .showcase-mocks :global(.m4) {
+      right: 7%;
+      bottom: 17%;
+      rotate: -3deg;
+    }
+  }
+
+  @media (max-width: 47.99rem) {
+    .showcase {
+      clip-path: inset(0 round var(--radius-m));
+      border-radius: var(--radius-m);
+    }
+
+    .window {
+      border-radius: var(--radius-s);
+    }
+
+    .window-bar {
+      height: 1.75rem;
+    }
+
+    .showcase :global(.showcase-sync) {
+      margin-top: -1rem;
+      font-size: 0.6875rem;
+    }
+  }
+
+  /* Who it's for: a statement, with glass pills that pop on as it scrolls in. A faint colour tint behind it
+     gives the glass something to blur. */
+  .statement {
+    background:
+      radial-gradient(40% 50% at 18% 45%, rgb(143 230 244 / 0.18), transparent 70%),
+      radial-gradient(40% 50% at 82% 55%, rgb(153 62 255 / 0.12), transparent 70%),
+      var(--paper);
+  }
+
+  .statement-inner {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    gap: 2rem;
+    padding-block: clamp(2rem, 1rem + 2vw, 3rem);
+    text-align: center;
+  }
+
+  .statement-text {
+    position: relative;
+    z-index: 1;
+    max-width: 30ch;
+    font-size: var(--fs-statement);
+    font-weight: 500;
+    line-height: 1.3;
+    letter-spacing: -0.018em;
+    color: var(--ink);
+  }
+
+  /* The stickers are glass pills placed around the statement */
+  .statement-inner :global(.sticker) {
+    position: absolute;
+    white-space: nowrap;
+  }
+
+  .statement-inner :global(.k1) {
+    left: 4%;
+    top: 6%;
+  }
+
+  .statement-inner :global(.k2) {
+    right: 2%;
+    top: 46%;
+  }
+
+  .statement-inner :global(.k3) {
+    left: 12%;
+    bottom: 4%;
+  }
+
+  /* Below 1360 px the pills sit in the panel's corners, clear of the statement */
+  @media (max-width: 84.99rem) {
+    .statement-inner {
+      padding-block: 4rem;
+    }
+
+    .statement-inner :global(.k1) {
+      left: 0;
+      top: 0;
+    }
+
+    .statement-inner :global(.k2) {
+      top: auto;
+      right: 0;
+      bottom: 0;
+    }
+
+    .statement-inner :global(.k3) {
+      display: none;
+    }
+  }
+
+  /* How to start: title and button on the left (sticky), the numbered steps on the right */
+  .start {
+    display: grid;
+    gap: clamp(2.5rem, 5vw, 4rem);
+  }
+
+  .start-head {
+    display: grid;
+    justify-items: start;
+    gap: 1.25rem;
+  }
+
+  .start-head .btn {
+    margin-top: 0.75rem;
+  }
+
+  .start-steps li {
+    padding-bottom: clamp(2rem, 1.5rem + 1.5vw, 3rem);
+  }
+
+  .start-steps li:last-child {
+    padding-bottom: 0;
+  }
+
+  .start-steps li > p {
+    max-width: 34rem;
+    color: var(--ink);
+  }
+
+  @media (min-width: 64rem) {
+    .start {
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+      gap: 6.25rem;
+      align-items: start;
+    }
+
+    .start-head {
+      position: sticky;
+      top: 2rem;
+    }
+  }
+
+  /* Explainers: each one a card, number and title on the left, the text on the right */
+  /* Client work (previews only) */
+  .work {
+    display: grid;
+    gap: 1.5rem;
+    max-width: var(--measure-4);
+    margin-inline: auto;
+  }
+
+
+  /* Other products or services, on the page's one dark band */
+  .others :global(.rows .num),
+  .others :global(.rows .name span) {
+    color: var(--on-dark-3);
+  }
+
+  .others .intro a {
+    color: var(--on-dark);
+  }
+
+  @media screen and (prefers-reduced-motion: no-preference) {
+    /* Showcase: the cards come in once, then bob gently */
+    .showcase-mocks :global(.sm) {
+      animation:
+        pv-in 0.9s var(--ease-out) both,
+        pv-bob 3s 0.9s ease-in-out infinite alternate;
+    }
+
+    .showcase-mocks :global(.m1) {
+      --fx: -2rem;
+      animation-delay: 0.35s, 1.25s;
+    }
+
+    .showcase-mocks :global(.m2) {
+      --fx: -2rem;
+      animation-delay: 0.5s, 1.4s;
+      animation-duration: 0.9s, 3.4s;
+    }
+
+    .showcase-mocks :global(.m3) {
+      --fx: 2rem;
+      animation-delay: 0.45s, 1.1s;
+      animation-duration: 0.9s, 2.7s;
+    }
+
+    .showcase-mocks :global(.m4) {
+      --fx: 2rem;
+      animation-delay: 0.6s, 1.6s;
+      animation-duration: 0.9s, 3.2s;
+    }
+
+    @keyframes pv-in {
+      from {
+        opacity: 0;
+        transform: translate3d(var(--fx, 0), 1.5rem, 0) scale(0.9);
+      }
+    }
+
+    @keyframes pv-bob {
+      from {
+        translate: 0 0;
+      }
+
+      to {
+        translate: 0 -12px;
+      }
+    }
+
+    @supports (animation-timeline: view()) {
+      /* The window lifts into place as the showcase scrolls up */
+      .window {
+        animation: pv-lift linear both;
+        animation-timeline: view();
+        animation-range: entry 0% cover 40%;
+      }
+
+      @keyframes pv-lift {
+        from {
+          transform: translateY(2.5rem) scale(0.96);
+        }
+      }
+
+      /* Statement words ink in, the pills pop on */
+      .statement-inner {
+        view-timeline-name: --who;
+      }
+
+      .statement-text .w {
+        animation: who-ink linear both;
+        animation-timeline: --who;
+        animation-range: cover calc(14% + 32% * var(--i) / var(--n)) cover calc(20% + 32% * var(--i) / var(--n));
+      }
+
+      @keyframes who-ink {
+        from {
+          opacity: 0.14;
+        }
+
+        to {
+          opacity: 1;
+        }
+      }
+
+      .statement-inner :global(.sticker) {
+        animation: who-pop linear both;
+        animation-timeline: --who;
+      }
+
+      .statement-inner :global(.k1) {
+        animation-range: cover 26% cover 32%;
+      }
+
+      .statement-inner :global(.k2) {
+        animation-range: cover 36% cover 42%;
+      }
+
+      .statement-inner :global(.k3) {
+        animation-range: cover 46% cover 52%;
+      }
+
+      @keyframes who-pop {
+        from {
+          opacity: 0;
+          transform: translateY(1rem);
+          animation-timing-function: var(--ease-out);
+        }
+
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+    }
+  }
+</style>

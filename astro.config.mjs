@@ -7,7 +7,8 @@ export default defineConfig({
   trailingSlash: 'always',
   build: {
     format: 'directory',
-    // CSS is small, so inline it and skip a render-blocking request.
+    // Inline the CSS: no render-blocking request on a first visit. Measured Nov 2026 on a throttled
+    // phone: main text painted at about 1.0 s inline versus 1.3 s with linked stylesheets.
     inlineStylesheets: 'always',
   },
   compressHTML: true,

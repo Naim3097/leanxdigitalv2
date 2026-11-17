@@ -3,6 +3,8 @@ import Base from '../../../layouts/Base.astro';
 import Breadcrumbs from '../../../components/Breadcrumbs.astro';
 import DraftNote from '../../../components/DraftNote.astro';
 import Facts from '../../../components/Facts.astro';
+import Icon from '../../../components/Icon.astro';
+import Label from '../../../components/Label.astro';
 import { pageTitle, whatsappLink } from '../../../data/site';
 import { showDrafts } from '../../../lib/drafts';
 import { webPage, breadcrumbs } from '../../../lib/schema';
@@ -76,103 +78,442 @@ const schema = [
   webPage({ path, title, description, updated: '2026-11-04', hasBreadcrumb: true }),
   breadcrumbs(path, crumbs),
 ];
+
+// Each leak title starts with its number ("1. Tracking: …"). The page shows the number large and the
+// rest as the title; the heading text stays exactly the same. The jump list uses the part before the colon.
+const split = (t: string) => {
+  const m = t.match(/^(\d+)\.\s+(.*)$/);
+  return m ? { num: `${m[1]}.`, rest: m[2] } : { num: '', rest: t };
+};
+const shortName = (t: string) => split(t).rest.split(':')[0];
 ---
 
 <Base title={title} description={description} schema={schema} noindex whatsapp={whatsapp}>
-  <Breadcrumbs items={crumbs} />
-
-  <article>
-    <header class="page-head wrap">
-      <p class="eyebrow">Guide</p>
-      <h1>Website traffic but no sales?</h1>
-      <p class="lede">
-        If people visit but don’t buy, the sale is leaking somewhere between the click and the payment. These are the
-        five places it usually leaks, how to spot each one and what to fix first.
-      </p>
-      <p class="updated" style="margin-top: 1.5rem">
-        By <span class="placeholder">[author]</span> · Updated <span class="placeholder">[date]</span>
-      </p>
+  <article class="guide">
+    <header class="page-head">
+      <div class="glow" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div class="container">
+        <Breadcrumbs items={crumbs} />
+        <Label icon="book">Guide</Label>
+        <h1>Website traffic but no sales?</h1>
+        <p class="lede">
+          If people visit but don’t buy, the sale is leaking somewhere between the click and the payment. These are the
+          five places it usually leaks, how to spot each one and what to fix first.
+        </p>
+        <p class="updated byline">
+          By <span class="placeholder">[author]</span> · Updated <span class="placeholder">[date]</span>
+        </p>
+      </div>
     </header>
 
-    <div class="wrap" style="padding-bottom: 3rem">
+    <div class="narrow draft-wrap">
       <DraftNote label="Draft guide: not on the live site">
         <p>Pillar guide 1 from the strategy report. Before it goes live:</p>
         <ul>
           <li>Name the author: one of the two strategists, with a link to their profile page</li>
           <li>Check the title against keyword data; it aims at searches like “website traffic but no sales”</li>
           <li>
-            Decide whether to add a small calculator for the example below. It needs a few lines of JavaScript on this
-            page, and the site ships none today.
+            Decide whether to add a small calculator for the example below. It needs a few lines of JavaScript, which
+            can go in the site’s existing script (src/scripts/site.ts).
           </li>
           <li>Read it through once and change anything you wouldn’t say to a client</li>
         </ul>
       </DraftNote>
     </div>
 
-    <section class="section" aria-labelledby="cost-title">
-      <div class="wrap section-grid">
-        <div class="section-head">
-          <h2 id="cost-title">Work out what the leak costs</h2>
+    <section class="section cost" aria-labelledby="cost-title">
+      <div class="container">
+        <div class="intro">
+          <Label icon="chart">Worked example</Label>
+          <h2 id="cost-title" data-split>Work out what the leak costs</h2>
           <p>Example numbers, not a benchmark.</p>
         </div>
-        <div>
-          <p>
-            Sales from a website come down to three numbers: visitors, the share of them who buy, and the average order.
-            Multiply them together.
-          </p>
-          <div style="margin-top: 1.5rem">
-            <Facts facts={example} />
-          </div>
-          <p style="margin-top: 1.5rem">
+        <p class="cost-text">
+          Sales from a website come down to three numbers: visitors, the share of them who buy, and the average order.
+          Multiply them together.
+        </p>
+        <div class="sum" data-rise>
+          <Facts facts={example} variant="bento" />
+        </div>
+        <p class="sum-note" data-rise>
+          <span class="icon-tile"><Icon name="chart" /></span>
+          <span>
             Raise the share who buy from 1% to 1.5% and the same 5,000 visitors bring RM 6,000. That extra RM 2,000
             comes without spending more on ads.
-          </p>
-        </div>
+          </span>
+        </p>
       </div>
     </section>
 
-    {
-      leaks.map((l, i) => (
-        <section class="section" aria-labelledby={`leak-${i}`}>
-          <div class="wrap section-grid">
-            <div class="section-head">
-              <h2 id={`leak-${i}`}>{l.title}</h2>
-            </div>
-            <dl class="facts">
-              <div>
-                <dt>What it looks like</dt>
-                <dd>{l.looks}</dd>
-              </div>
-              <div>
-                <dt>How to check</dt>
-                <dd>{l.check}</dd>
-              </div>
-              <div>
-                <dt>What to fix</dt>
-                <dd>{l.fix}</dd>
-              </div>
-            </dl>
-          </div>
-        </section>
-      ))
-    }
+    <div class="section section-white leaks">
+      <div class="container">
+        <nav class="leak-nav" aria-labelledby="leak-nav-title">
+          <p class="eyebrow" id="leak-nav-title">The five leaks</p>
+          <ol class="leak-links">
+            {
+              leaks.map((l, i) => (
+                <li>
+                  <a href={`#leak-${i}`}>
+                    <span class="leak-link-n">{String(i + 1).padStart(2, '0')}</span>
+                    <span class="leak-link-name">{shortName(l.title)}</span>
+                  </a>
+                </li>
+              ))
+            }
+          </ol>
+        </nav>
 
-    <section class="section" aria-labelledby="help-title">
-      <div class="wrap section-grid">
-        <div class="section-head">
-          <h2 id="help-title">Not sure where your leak is?</h2>
-        </div>
-        <div>
-          <p>
-            Our sales leak audit checks all five for a fixed price and shows you what each leak costs in ringgit, most
-            valuable first.
-          </p>
-          <div class="actions" style="margin-top: 1.5rem">
-            <a class="btn btn-solid" href="/sales-leak-audit/">About the audit</a>
-            <a class="btn btn-line" href={whatsapp}>Ask us on WhatsApp</a>
+        {
+          leaks.map((l, i) => (
+            <section class="duo leak" aria-labelledby={`leak-${i}`}>
+              <div class="leak-head">
+                <h2 id={`leak-${i}`} data-split>
+                  <span class="leak-num">{split(l.title).num}</span> {split(l.title).rest}
+                </h2>
+              </div>
+              <dl class="leak-parts">
+                <div class="part" data-rise>
+                  <dt>What it looks like</dt>
+                  <dd>{l.looks}</dd>
+                </div>
+                <div class="part" data-rise>
+                  <dt>How to check</dt>
+                  <dd>{l.check}</dd>
+                </div>
+                <div class="part part-fix" data-rise>
+                  <dt>What to fix</dt>
+                  <dd>{l.fix}</dd>
+                </div>
+              </dl>
+            </section>
+          ))
+        }
+      </div>
+    </div>
+
+    <section class="section help" aria-labelledby="help-title">
+      <div class="container">
+        <div class="card card-dark on-dark help-card" data-surface="dark" data-rise>
+          <div class="help-path" aria-hidden="true">
+            {[1, 2, 3, 4, 5].map((n) => <span>{String(n).padStart(2, '0')}</span>)}
+          </div>
+          <div class="help-copy">
+            <h2 id="help-title" data-split>Not sure where your leak is?</h2>
+            <p>
+              Our sales leak audit checks all five for a fixed price and shows you what each leak costs in ringgit, most
+              valuable first.
+            </p>
+          </div>
+          <div class="actions">
+            <a class="btn btn-primary" href="/sales-leak-audit/" data-magnetic>About the audit</a>
+            <a class="btn btn-secondary" href={whatsapp} data-magnetic>
+              <Icon name="chat" />
+              Ask us on WhatsApp
+            </a>
           </div>
         </div>
       </div>
     </section>
   </article>
 </Base>
+
+<style>
+  /* Byline under the lede */
+  .byline {
+    margin-top: 0.25rem;
+    color: var(--text-2);
+  }
+
+  /* Work out what the leak costs: the sum as cards, multiplied left to right */
+  .cost-text {
+    max-width: var(--measure-2);
+    margin-inline: auto;
+    color: var(--text-2);
+    font-size: var(--fs-large);
+    letter-spacing: 0;
+    text-align: center;
+  }
+
+  .sum {
+    margin-top: clamp(2.5rem, 2rem + 2vw, 3.5rem);
+  }
+
+  .sum :global(.facts-bento) {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2.5rem;
+  }
+
+  .sum :global(.facts-bento div) {
+    position: relative;
+    justify-content: space-between;
+    gap: 1.5rem;
+    min-height: 0;
+    padding: 1.5rem 1.75rem;
+    border-radius: var(--radius-l);
+  }
+
+  .sum :global(.facts-bento dt) {
+    font-size: var(--fs-small);
+  }
+
+  .sum :global(.facts-bento dd) {
+    font-size: var(--fs-h2);
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+
+  /* Operators between the cards, drawn by CSS and kept out of the text */
+  .sum :global(.facts-bento div:not(:last-child)::after) {
+    content: '×';
+    content: '×' / '';
+    position: absolute;
+    left: 50%;
+    top: 100%;
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    color: var(--text-3);
+    font-size: 1.75rem;
+    font-weight: 400;
+    transform: translateX(-50%);
+  }
+
+  .sum :global(.facts-bento div:nth-child(3)::after) {
+    content: '=';
+    content: '=' / '';
+  }
+
+  .sum :global(.facts-bento div:last-child) {
+    background: var(--ink);
+  }
+
+  .sum :global(.facts-bento div:last-child dt) {
+    color: var(--on-dark-3);
+  }
+
+  .sum :global(.facts-bento div:last-child dd) {
+    color: var(--on-dark);
+  }
+
+  @media (min-width: 48rem) {
+    .sum :global(.facts-bento) {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 2.75rem;
+    }
+
+    .sum :global(.facts-bento div) {
+      min-height: 12rem;
+      padding: 1.75rem;
+    }
+
+    .sum :global(.facts-bento div:not(:last-child)::after) {
+      left: 100%;
+      top: 50%;
+      width: 2.75rem;
+      transform: translateY(-50%);
+    }
+  }
+
+  .sum-note {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    max-width: var(--measure-3);
+    margin: 1.5rem auto 0;
+    padding: 1.25rem 1.5rem;
+    border-radius: var(--radius-m);
+    background: var(--accent-soft);
+    color: var(--accent-ink);
+    font-size: var(--fs-large);
+  }
+
+  .sum-note .icon-tile {
+    background: var(--paper);
+    color: var(--accent-ink);
+  }
+
+  /* The five leaks: a jump list, then one section per leak */
+  .leak-nav {
+    margin-bottom: clamp(3.5rem, 2rem + 5vw, 7rem);
+  }
+
+  .leak-nav .eyebrow {
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+
+  .leak-links {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  @media (min-width: 48rem) {
+    .leak-links {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 0.75rem;
+    }
+  }
+
+  .leak-links a {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 3.75rem;
+    padding: 0.75rem 1.25rem;
+    border-radius: var(--radius-m);
+    background: var(--page);
+    color: var(--ink);
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color var(--fast), color var(--fast);
+  }
+
+  .leak-link-n {
+    color: var(--text-3);
+    font-size: var(--fs-caption);
+    font-variant-numeric: tabular-nums;
+    transition: color var(--fast);
+  }
+
+  .leak-links a:hover {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .leak-links a:hover .leak-link-n {
+    color: rgb(255 255 255 / 0.7);
+  }
+
+  .leak-head h2 {
+    font-size: var(--fs-h3);
+    line-height: 1.2;
+  }
+
+  .leak-num {
+    display: block;
+    margin-bottom: 0.75rem;
+    color: var(--text-3);
+    font-size: clamp(3rem, 2rem + 4vw, 5.5rem);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .leak-parts {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .part {
+    padding: 1.5rem 1.75rem;
+    border-radius: var(--radius-m);
+    background: var(--page);
+  }
+
+  .part dt {
+    margin-bottom: 0.625rem;
+    color: var(--text-3);
+    font-size: var(--fs-label);
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .part dd {
+    color: var(--text);
+    font-size: var(--fs-large);
+    line-height: 1.5;
+  }
+
+  .part-fix {
+    background: var(--accent-soft);
+  }
+
+  .part-fix dt {
+    color: var(--accent-ink);
+  }
+
+  /* Not sure where your leak is? */
+  .help-card {
+    display: grid;
+    gap: 1.75rem;
+    padding: clamp(2rem, 1.25rem + 3.5vw, 4.5rem);
+    border-radius: var(--radius-xl);
+  }
+
+  .help-card h2 {
+    color: var(--on-dark);
+    font-size: var(--fs-h2);
+  }
+
+  .help-copy {
+    display: grid;
+    gap: 1rem;
+    max-width: 40rem;
+  }
+
+  .help-copy p {
+    color: var(--on-dark-2);
+    font-size: var(--fs-large);
+  }
+
+  .help-card .actions {
+    margin: 0;
+    padding: 0;
+  }
+
+  .help-card :focus-visible {
+    outline-color: var(--on-dark);
+  }
+
+  .help-path {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    max-width: 22rem;
+  }
+
+  .help-path::before {
+    content: '';
+    position: absolute;
+    left: 1rem;
+    right: 1rem;
+    top: 50%;
+    height: 1px;
+    background: linear-gradient(90deg, var(--spectrum-1), var(--spectrum-2), var(--spectrum-3), var(--spectrum-4));
+  }
+
+  .help-path span {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border: 1px solid rgb(255 255 255 / 0.22);
+    border-radius: 50%;
+    background: var(--dark);
+    color: var(--on-dark-2);
+    font-size: 0.6875rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (min-width: 64rem) {
+    .help-card {
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: end;
+      column-gap: 4rem;
+    }
+
+    .help-path {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (max-width: 30rem) {
+    .help-card .actions {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+</style>

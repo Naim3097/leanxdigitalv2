@@ -1,0 +1,18 @@
+---
+// The short line above a heading, and the hero's rotating messages: an outline icon that says what the
+// line is about, then the text in a light weight. No pill or background, so it reads as part of the type.
+// Styles live in global.css (.label) because the same look also styles a few h2 elements.
+import Icon, { type IconName } from './Icon.astro';
+
+interface Props {
+  icon: IconName;
+  /** The element to render. Most labels are paragraphs; a few act as the section's heading. */
+  as?: 'p' | 'span' | 'h2';
+  class?: string;
+  id?: string;
+  'aria-hidden'?: 'true';
+}
+const { icon, as: Tag = 'p', class: className, ...rest } = Astro.props;
+---
+
+<Tag class:list={['label', className]} {...rest}><Icon name={icon} class="label-icon" /><span class="label-text"><slot /></span></Tag>

@@ -1,12 +1,18 @@
 # leanxdigital.io
 
-The Lean X Digital website. Astro, static output, no client-side JavaScript.
+The Lean X Digital website. Astro, static output. Two small deferred scripts add motion and menu behaviour:
+src/scripts/site.ts on every page (about 9 KB gzipped, most of it the Lenis momentum-scrolling library) and
+src/scripts/hero.ts on the homepage (under 2 KB: the background video and the hero fade). Every page works and
+reads fully without them.
+
+How the site looks and moves, and where to change colours and type for the branding phase: [DESIGN-GUIDE.md](DESIGN-GUIDE.md).
 
 ## Commands
 
 ```bash
 npm install
 npm run dev        # local dev server at http://localhost:4321
+npm run dev:clean  # the same, with every draft hidden (no draft bar, notes or pages), as visitors see it
 npm run build      # production build into dist/
 npm run preview    # serve dist/ locally
 npm run check      # type-check
@@ -50,3 +56,6 @@ The canonical host is `https://www.leanxdigital.io`, and the bare domain redirec
 
 The company profile PDF is linked only if `public/LEANX-DIGITAL-Company-Profile.pdf` exists. Copy the
 file there to keep the old download link working.
+
+Before launch: the Neue Montreal font files in `src/assets/fonts/` are marked "Demo / Trial". Buy a
+commercial licence from Pangram Pangram and swap in the licensed files (DESIGN-GUIDE.md, Typography).

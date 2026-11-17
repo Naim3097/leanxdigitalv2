@@ -1,6 +1,6 @@
 ---
-// Numbered rows linking to product or service pages. Build items with productRows() / serviceRows().
-import Icon from './Icon.astro';
+// Numbered rows linking to product, service or case study pages. Build items with productRows(),
+// serviceRows() or workRows(). The whole row is the link; styles (and the hover) live in global.css (.rows).
 import type { Row } from '../lib/rows';
 
 interface Props {
@@ -9,7 +9,7 @@ interface Props {
 const { items } = Astro.props;
 ---
 
-<ol class="plist">
+<ol class="rows">
   {
     items.map((r, i) => (
       <li>
@@ -20,7 +20,6 @@ const { items } = Astro.props;
             <span>{r.label}</span>
           </span>
           <span class="text">{r.text}</span>
-          <Icon name="arrow" class="arrow" />
         </a>
       </li>
     ))

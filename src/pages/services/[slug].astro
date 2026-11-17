@@ -2,17 +2,20 @@
 import Base from '../../layouts/Base.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import Facts from '../../components/Facts.astro';
-import Faq from '../../components/Faq.astro';
+import FaqBlock from '../../components/FaqBlock.astro';
 import RowList from '../../components/RowList.astro';
-import Icon from '../../components/Icon.astro';
+import Icon, { type IconName } from '../../components/Icon.astro';
+import Label from '../../components/Label.astro';
+import MockCard, { type MockKind } from '../../components/MockCard.astro';
 import DraftNote from '../../components/DraftNote.astro';
 import { site, formatDate, pageTitle } from '../../data/site';
 import { services, whatsappUrl, type Service } from '../../data/services';
 import { products } from '../../data/products';
 import { webPage, breadcrumbs, serviceNodes, faqPage, serviceId } from '../../lib/schema';
 import { serviceRows, workRows } from '../../lib/rows';
-import { lcFirst } from '../../lib/text';
+import { lcFirst, countWord } from '../../lib/text';
 import { showDrafts } from '../../lib/drafts';
+import { serviceIcons } from '../../lib/icons';
 import { visibleCaseStudies } from '../../data/work';
 import { priceReferences } from '../../data/review';
 
@@ -48,6 +51,90 @@ const schema = [
   ...serviceNodes(s),
   faqPage(path, s.faqs),
 ];
+
+/* ---------- Presentation only: nothing below adds content ---------- */
+
+// Each service keeps the colour pair it has on the services page.
+const hue = (services.findIndex((o) => o.slug === s.slug) % 4) + 1;
+const colour = `--c1: var(--card-${hue}); --c2: var(--card-${hue}b)`;
+
+// Interface sketches standing in for work samples (decorative, the same set as the services page).
+const sketches: Record<string, MockKind[]> = {
+  'creative-agency': ['poster', 'reel', 'ad'],
+  'paid-advertising': ['ad', 'chart', 'search'],
+  seo: ['search', 'chart', 'store'],
+  'web-development': ['store', 'crm', 'chat'],
+};
+const sketch = sketches[s.slug] ?? [];
+
+// The audience line inks in word by word as it scrolls into view.
+const audienceWords = s.audience.split(' ');
+
+// "Four steps", counted from the data.
+const stepWord = countWord(s.steps.length);
+const stepCount = stepWord.charAt(0).toUpperCase() + stepWord.slice(1);
+
+// A line icon for each item in the includes list, matched by name.
+const includeIcons: Record<string, IconName> = {
+  'Ad posters': 'megaphone',
+  'Short-form video': 'play',
+  'Social media content': 'chat',
+  'Brand identity': 'spark',
+  'Landing pages': 'layout',
+  'Photography and retouching': 'content',
+  'Campaign setup': 'check',
+  'Keyword research': 'search',
+  Targeting: 'users',
+  'Ad copy and creative': 'pen',
+  'Bidding and budget': 'target',
+  'Landing pages and funnel': 'layout',
+  'Analytics and tracking': 'chart',
+  Rankings: 'chart',
+  'On-page issues': 'pen',
+  Traffic: 'users',
+  'Search Console and GA4': 'check',
+  'SEO strategy': 'target',
+  Websites: 'store',
+  'CRM systems': 'users',
+  Apps: 'code',
+  'Booking and lead capture': 'clock',
+  Tracking: 'chart',
+};
+const includeSketch: Record<string, MockKind> = {
+  'Campaign setup': 'ad',
+  'Analytics and tracking': 'chart',
+  'Ad posters': 'poster',
+  'Short-form video': 'reel',
+  'Keyword research': 'search',
+  Rankings: 'search',
+  Traffic: 'chart',
+  Websites: 'store',
+  'CRM systems': 'crm',
+  'Booking and lead capture': 'chat',
+  Tracking: 'chart',
+};
+
+// Includes as a grid with no gaps: three across on wide screens, two on tablets. When the count does
+// not fill the last row, the first and/or last cards widen (a bento layout) and show a sketch.
+const count = s.includes.length;
+const rest3 = count % 3;
+const wide3 = (i: number) => (rest3 === 1 && (i === 0 || i === count - 1)) || (rest3 === 2 && i === 0);
+const wide2 = (i: number) => count % 2 === 1 && i === count - 1;
+
+// Key facts as a bento grid (Facts.astro fills the last row).
+const facts: [string, string][] = [...s.facts, ['Run by', site.name]];
+
+// Background tones alternate down the page, whichever optional sections a service has.
+const hasProof = Boolean(s.pricing || showDrafts || related.length > 0);
+const blocks = [
+  'includes',
+  'steps',
+  ...(s.sections.length ? ['explainers'] : []),
+  ...(hasProof ? ['proof'] : []),
+  ...(s.automated ? ['auto'] : []),
+];
+const tone = (block: string) => (blocks.indexOf(block) % 2 === 1 ? 'section-white' : '');
+const autoSketch: MockKind[] = s.slug === 'creative-agency' ? ['poster', 'reel'] : s.slug === 'seo' ? ['search', 'chart'] : ['ad', 'chart'];
 ---
 
 <Base
@@ -58,154 +145,651 @@ const schema = [
   schema={schema}
   whatsapp={whatsappUrl(s)}
 >
-  <Breadcrumbs items={crumbs} />
-
-  <article>
-    <header class="page-head wrap">
-      <p class="eyebrow">Service · {s.category}</p>
-      <h1>{s.name}</h1>
-      <p class="lede">{s.definition}</p>
-      <div class="actions">
-        <a class="btn btn-solid" href={whatsappUrl(s)}>WhatsApp us</a>
-        <a class="btn btn-line" href={`tel:${site.phone}`}>Call {site.phoneDisplay}</a>
+  <article style={colour}>
+    <header class="page-head">
+      <div class="glow" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div class="container">
+        <Breadcrumbs items={crumbs} />
+        <Label icon={serviceIcons[s.slug] ?? 'layers'}>Service · {s.category}</Label>
+        <h1>{s.name}</h1>
+        <p class="lede">{s.definition}</p>
+        <div class="actions head-actions">
+          <a class="btn btn-primary" href={whatsappUrl(s)} data-magnetic>
+            <Icon name="chat" />
+            WhatsApp us
+          </a>
+          <a class="btn btn-secondary" href={`tel:${site.phone}`} data-magnetic>
+            <Icon name="phone" />
+            Call {site.phoneDisplay}
+          </a>
+        </div>
       </div>
     </header>
 
-    <div class="wrap product-body">
-      <div class="prose">
-        <section aria-labelledby="for-title">
-          <h2 id="for-title">Who it’s for</h2>
-          <p>{s.audience}</p>
-        </section>
-
-        <section aria-labelledby="includes-title">
-          <h2 id="includes-title">{s.includesTitle}</h2>
-          <Facts facts={s.includes} />
-        </section>
-
-        <section aria-labelledby="steps-title">
-          <h2 id="steps-title">{s.stepsTitle}</h2>
-          <ol class="steps">{s.steps.map((step) => <li>{step}</li>)}</ol>
-        </section>
-
-        {
-          s.sections.map((sec, i) => (
-            <section aria-labelledby={`s${i}-title`}>
-              <h2 id={`s${i}-title`}>{sec.title}</h2>
-              {sec.body.map((para) => (
-                <p>{para}</p>
-              ))}
-            </section>
-          ))
-        }
-
-        {
-          (s.pricing || showDrafts) && (
-            <section aria-labelledby="price-title">
-              <h2 id="price-title">Prices</h2>
-              {s.pricing ? (
-                <p>
-                  From {s.pricing.from} a {s.pricing.per}, as of {s.pricing.asOf}. We agree the exact scope and price with
-                  you before any work starts.
-                </p>
-              ) : (
+    <section class="section-s for" aria-labelledby="for-title">
+      <div class="container">
+        <div class="for-panel" data-rise>
+          <div class="for-sketches" aria-hidden="true">
+            {sketch.map((k, j) => <MockCard kind={k} class={`sk sk${j + 1}`} />)}
+          </div>
+          <Label as="h2" id="for-title" icon="users" class="for-label">Who it’s for</Label>
+          <p class="for-text" style={`--n: ${audienceWords.length}`}>
+            {
+              audienceWords.map((w, i) => (
                 <>
-                  <p>
-                    From <span class="placeholder">RM [amount]</span> a <span class="placeholder">[month or project]</span>,
-                    as of <span class="placeholder">[month and year]</span>.{' '}
-                    <span class="placeholder">[What the starting price covers.]</span>
-                  </p>
-                  <div style="margin-top: 1rem">
-                    <DraftNote>
-                      <p>
-                        A starting price answers the first question most buyers ask, and gives search and AI answers a fact
-                        to quote. Your content guide asks for prices in RM with a date. If you publish one, the FAQ answer
-                        about cost changes too.
-                      </p>
-                      {priceReferences[s.slug] && (
-                        <p>
-                          For reference: {priceReferences[s.slug]} (competitors’ published prices, checked 4 November
-                          2026)
-                        </p>
-                      )}
-                    </DraftNote>
-                  </div>
+                  <span class="w" style={`--i: ${i}`}>
+                    {w}
+                  </span>{' '}
                 </>
-              )}
-            </section>
-          )
-        }
+              ))
+            }
+          </p>
+        </div>
+      </div>
+    </section>
 
-        {
-          related.length > 0 && (
-            <section aria-labelledby="work-title">
-              <h2 id="work-title">Results for clients</h2>
-              {related.some((c) => c.draft) && (
-                <div style="margin-bottom: 1.5rem">
-                  <DraftNote>
-                    <p>
-                      Case studies tagged with this service appear here. The ones below are placeholders until you supply
-                      real results and the client agrees.
-                    </p>
-                  </DraftNote>
+    <section class:list={['section', tone('includes')]} aria-labelledby="includes-title">
+      <div class="container">
+        <div class="intro">
+          <h2 id="includes-title" data-split>{s.includesTitle}</h2>
+        </div>
+        <ul class="card-grid card-grid-3 includes">
+          {
+            s.includes.map(([name, text], i) => (
+              <li class:list={['card', 'include', { 'wide-3': wide3(i), 'wide-2': wide2(i) }]} data-rise>
+                <span class="icon-tile">
+                  <Icon name={includeIcons[name] ?? serviceIcons[s.slug] ?? 'spark'} />
+                </span>
+                <strong>{name}</strong>
+                <p>{text}</p>
+                {(wide3(i) || wide2(i)) && includeSketch[name] && (
+                  <div class="include-sketch" aria-hidden="true">
+                    <MockCard kind={includeSketch[name]} />
+                  </div>
+                )}
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </section>
+
+    <section class:list={['section', tone('steps')]} aria-labelledby="steps-title">
+      <div class="container duo how">
+        <div class="how-head">
+          <Label icon="route">{stepCount} steps</Label>
+          <h2 id="steps-title" data-split>{s.stepsTitle}</h2>
+          <a class="btn btn-primary" href={whatsappUrl(s)} data-magnetic>
+            <Icon name="chat" />
+            WhatsApp us
+          </a>
+        </div>
+        <ol class="process">
+          {
+            s.steps.map((step) => (
+              <li data-rise>
+                <p>{step}</p>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+    </section>
+
+    {
+      s.sections.length > 0 && (
+        <div class:list={['section', 'explainers', tone('explainers')]}>
+          <div class="container explain-list">
+            {s.sections.map((sec, i) => (
+              <section class="duo duo-card" aria-labelledby={`s${i}-title`} data-rise>
+                <div class="duo-head">
+                  <span class="duo-num" aria-hidden="true">
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <h2 id={`s${i}-title`} data-split>
+                    {sec.title}
+                  </h2>
                 </div>
-              )}
-              <RowList items={workRows(related)} />
-              {quote && (
-                <blockquote class="quote" style="margin-top: 2rem">
-                  <p>{quote.text}</p>
-                  <footer>
-                    {quote.name}, {quote.role}
-                  </footer>
-                </blockquote>
-              )}
-            </section>
-          )
-        }
+                <div class="duo-body">
+                  {sec.body.map((para) => (
+                    <p>{para}</p>
+                  ))}
+                </div>
+              </section>
+            ))}
+          </div>
+        </div>
+      )
+    }
 
-        {
-          s.automated && (
-            <section aria-labelledby="auto-title" class="lead-card">
-              <p class="eyebrow">Prefer it automated?</p>
-              <h2 id="auto-title">
-                {nexova.name} {s.automated.feature}
-              </h2>
-              <p>{s.automated.text}</p>
-              <div class="actions" style="margin-top: 1.25rem">
-                <a class="btn btn-line" href={`/products/${nexova.slug}/`}>
-                  See {nexova.name}
-                  <Icon name="arrow" />
-                </a>
+    {
+      hasProof && (
+        <div class:list={['section', 'proof', tone('proof')]}>
+          <div class="container">
+            {(s.pricing || showDrafts) && (
+              <section class="duo" aria-labelledby="price-title">
+                <h2 id="price-title" data-split>
+                  Prices
+                </h2>
+                <div class="card proof-card price-card" data-rise>
+                  <p class="eyebrow">Starting price</p>
+                  {s.pricing ? (
+                    <p class="price-line">
+                      From {s.pricing.from} a {s.pricing.per}, as of {s.pricing.asOf}. We agree the exact scope and price
+                      with you before any work starts.
+                    </p>
+                  ) : (
+                    <>
+                      <p class="price-line">
+                        From <span class="placeholder">RM [amount]</span> a <span class="placeholder">[month or project]</span>,
+                        as of <span class="placeholder">[month and year]</span>.{' '}
+                        <span class="placeholder">[What the starting price covers.]</span>
+                      </p>
+                      <div class="proof-note">
+                        <DraftNote>
+                          <p>
+                            A starting price answers the first question most buyers ask, and gives search and AI answers
+                            a fact to quote. Your content guide asks for prices in RM with a date. If you publish one, the
+                            FAQ answer about cost changes too.
+                          </p>
+                          {priceReferences[s.slug] && (
+                            <p>
+                              For reference: {priceReferences[s.slug]} (competitors’ published prices, checked 4 November
+                              2026)
+                            </p>
+                          )}
+                        </DraftNote>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </section>
+            )}
+
+            {related.length > 0 && (
+              <section class="duo" aria-labelledby="work-title">
+                <h2 id="work-title" data-split>
+                  Results for clients
+                </h2>
+                <div class="card proof-card results-card" data-rise>
+                  {related.some((c) => c.draft) && (
+                    <div class="results-note">
+                      <DraftNote>
+                        <p>
+                          Case studies tagged with this service appear here. The ones below are placeholders until you
+                          supply real results and the client agrees.
+                        </p>
+                      </DraftNote>
+                    </div>
+                  )}
+                  <RowList items={workRows(related)} />
+                  {quote && (
+                    <blockquote class="quote">
+                      <p>{quote.text}</p>
+                      <footer>
+                        {quote.name}, {quote.role}
+                      </footer>
+                    </blockquote>
+                  )}
+                </div>
+              </section>
+            )}
+          </div>
+        </div>
+      )
+    }
+
+    {
+      s.automated && (
+        <div class:list={['section', 'section-s', tone('auto')]}>
+          <div class="container">
+            <section class="mesh-card auto-card" aria-labelledby="auto-title" data-rise>
+              <div class="auto-copy">
+                <Label icon="spark">Prefer it automated?</Label>
+                <h2 id="auto-title" data-split>
+                  {nexova.name} {s.automated.feature}
+                </h2>
+                <p>{s.automated.text}</p>
+                <div class="actions">
+                  <a class="btn btn-primary" href={`/products/${nexova.slug}/`} data-magnetic>
+                    See {nexova.name}
+                  </a>
+                </div>
+              </div>
+              <div class="auto-visual" aria-hidden="true">
+                {autoSketch.map((k, j) => (
+                  <MockCard kind={k} class={`av av${j + 1}`} />
+                ))}
+                <MockCard kind="sync" class="av av3" />
               </div>
             </section>
-          )
-        }
+          </div>
+        </div>
+      )
+    }
 
-        <section aria-labelledby="faq-title">
-          <h2 id="faq-title">Questions about {lcFirst(s.name)}</h2>
-          <Faq faqs={s.faqs} />
-        </section>
+    <FaqBlock
+      faqs={s.faqs}
+      title={`Questions about ${lcFirst(s.name)}`}
+      id="faq-title"
+      whatsapp={whatsappUrl(s)}
+      openFirst
+    />
+
+    <aside class="section section-white key-facts" aria-labelledby="facts-title">
+      <div class="container">
+        <div class="intro">
+          <h2 id="facts-title" data-split>Key facts</h2>
+          <Label icon="clock">
+            Updated <time datetime={s.updated}>{formatDate(s.updated)}</time>
+          </Label>
+        </div>
+        <div class="facts-fill">
+          <Facts facts={facts} variant="bento" />
+        </div>
       </div>
-
-      <aside class="product-aside" aria-labelledby="facts-title">
-        <h2 id="facts-title">Key facts</h2>
-        <Facts facts={[...s.facts, ['Run by', site.name]]} />
-        <p class="updated">
-          Updated <time datetime={s.updated}>{formatDate(s.updated)}</time>
-        </p>
-      </aside>
-    </div>
+    </aside>
   </article>
 
-  <section class="section" aria-labelledby="others-title">
-    <div class="wrap section-grid">
-      <div class="section-head">
-        <h2 id="others-title">Other services</h2>
+  <section class="section section-dark others" data-surface="dark" aria-labelledby="others-title">
+    <div class="container">
+      <div class="intro">
+        <h2 id="others-title" data-split>Other services</h2>
         <p>
           Also from {site.name}. Selling online? <a href={`/products/${nexova.slug}/`}>See {nexova.name}</a>.
         </p>
       </div>
-      <RowList items={serviceRows(others)} />
+      <div class="rows-wrap" data-rise>
+        <RowList items={serviceRows(others)} />
+      </div>
     </div>
   </section>
 </Base>
+
+<style>
+  /* ---------- Page head ---------- */
+  /* ---------- Who it's for: a colour panel with the audience as a statement ---------- */
+  /* Joins the next page-coloured section without a double gap */
+  .for {
+    padding-bottom: 0;
+    background: var(--page);
+  }
+
+  /* Clipped with clip-path, not overflow: an overflow container would freeze the scroll-linked ink below */
+  .for-panel {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    gap: clamp(1.5rem, 1rem + 1.5vw, 2.5rem);
+    clip-path: inset(0 round var(--radius-xl));
+    padding: clamp(3rem, 1.5rem + 6vw, 8rem) clamp(1.5rem, 1rem + 3vw, 4rem);
+    border-radius: var(--radius-xl);
+    background: linear-gradient(160deg, var(--c1), var(--c2));
+    color: var(--on-dark);
+    text-align: center;
+    isolation: isolate;
+  }
+
+  /* A soft light falls across the panel, like the service cards' inner glass */
+  .for-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: radial-gradient(70% 90% at 50% 0%, rgb(255 255 255 / 0.16), transparent 70%);
+    pointer-events: none;
+  }
+
+  /* On the colour panel the label turns white */
+  .for-panel :global(.for-label),
+  .for-panel :global(.for-label .label-icon) {
+    color: var(--on-dark);
+  }
+
+  .for-text {
+    position: relative;
+    z-index: 1;
+    max-width: 28ch;
+    color: var(--on-dark);
+    font-size: var(--fs-statement);
+    font-weight: 500;
+    line-height: 1.3;
+    letter-spacing: -0.018em;
+    text-wrap: balance;
+  }
+
+  .for-sketches {
+    display: none;
+  }
+
+  /* Sketches only where there is room beside the statement (it is about 28 characters wide) */
+  @media (min-width: 80rem) {
+    .for-sketches {
+      display: block;
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .for-sketches :global(.sk) {
+      position: absolute;
+    }
+
+    .for-sketches :global(.sk1) {
+      left: 3.5%;
+      top: 13%;
+      transform: rotate(-6deg);
+    }
+
+    .for-sketches :global(.sk2) {
+      right: 4%;
+      top: 9%;
+      transform: rotate(5deg);
+    }
+
+    .for-sketches :global(.sk3) {
+      left: 5.5%;
+      bottom: -4.5rem;
+      transform: rotate(4deg);
+    }
+  }
+
+  /* ---------- Includes: icon cards ---------- */
+  .include {
+    gap: 0.625rem;
+    overflow: hidden;
+  }
+
+  .include .icon-tile {
+    margin-bottom: clamp(1rem, 0.5rem + 2vw, 2.5rem);
+    transition: background-color var(--mid), color var(--mid);
+  }
+
+  .include strong {
+    color: var(--ink);
+    font-size: var(--fs-lead);
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+  }
+
+  @media (min-width: 45rem) {
+    .include {
+      min-height: 15rem;
+    }
+  }
+
+  .include p {
+    max-width: 34ch;
+  }
+
+  @media (hover: hover) {
+    .include:hover .icon-tile {
+      background: linear-gradient(160deg, var(--c1), var(--c2));
+      color: var(--on-dark);
+    }
+  }
+
+  .include-sketch {
+    display: none;
+  }
+
+  /* Tablets: two across, an odd last card takes the full row */
+  @media (min-width: 45rem) and (max-width: 63.99rem) {
+    .include.wide-2 {
+      grid-column: span 2;
+    }
+
+    .include.wide-2 .include-sketch {
+      display: block;
+    }
+  }
+
+  /* Wide screens: three across, wider cards make up the last row */
+  @media (min-width: 64rem) {
+    .include.wide-3 {
+      grid-column: span 2;
+    }
+
+    .include.wide-3 .include-sketch {
+      display: block;
+    }
+
+    .include {
+      min-height: 17rem;
+    }
+  }
+
+  .include :is(.icon-tile, strong, p) {
+    position: relative;
+    z-index: 1;
+  }
+
+  .include-sketch {
+    position: absolute;
+    right: clamp(1.5rem, 1rem + 2vw, 3rem);
+    top: 50%;
+    z-index: 0;
+    transform: translateY(-38%) rotate(4deg);
+  }
+
+  /* ---------- How it works: sticky title and button, numbered steps ---------- */
+  .how-head {
+    display: grid;
+    justify-items: start;
+    gap: 1.25rem;
+  }
+
+  .how-head .btn {
+    margin-top: 0.75rem;
+  }
+
+  .how .how-head h2 {
+    font-size: var(--fs-h2);
+  }
+
+  .how .process li {
+    padding-bottom: clamp(2rem, 1.5rem + 1.5vw, 3rem);
+  }
+
+  .how .process li:last-child {
+    padding-bottom: 0;
+  }
+
+  .how .process p {
+    color: var(--ink);
+    font-size: var(--fs-large);
+  }
+
+  @media (min-width: 64rem) {
+    .how .process {
+      padding-top: 0.5rem;
+    }
+  }
+
+  /* ---------- Proof: a sticky title beside a card ---------- */
+  .proof .duo + .duo {
+    border-top: 0;
+    padding-top: 0;
+  }
+
+  .proof-card {
+    gap: 1.25rem;
+  }
+
+  .price-line {
+    color: var(--ink);
+    font-size: var(--fs-lead);
+    line-height: 1.4;
+  }
+
+  .card > .price-line {
+    color: var(--ink);
+  }
+
+  .proof-note,
+  .results-note {
+    align-self: stretch;
+  }
+
+  .results-card {
+    align-items: stretch;
+  }
+
+  /* Rows sit in a narrower column here: name above text, at every width */
+  .results-card :global(.rows a) {
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+    grid-template-areas:
+      'num name'
+      'num text';
+    align-items: start;
+    column-gap: 1rem;
+    padding-block: 1.5rem;
+  }
+
+  .results-card :global(.rows .name) {
+    flex-direction: row;
+    gap: 0.25rem 0.75rem;
+  }
+
+  .results-card .quote {
+    padding: clamp(1.25rem, 1rem + 1vw, 2rem);
+    border-radius: var(--radius-m);
+    background: var(--surface);
+  }
+
+  /* ---------- Prefer it automated? ---------- */
+  /* clip-path in place of the card's overflow, so the heading's scroll-linked reveal keeps running */
+  .auto-card {
+    align-items: center;
+    overflow: visible;
+    clip-path: inset(0 round var(--radius-xl));
+    padding: clamp(2rem, 1rem + 4vw, 5rem);
+  }
+
+  .auto-copy {
+    display: grid;
+    justify-items: start;
+    gap: 1.25rem;
+  }
+
+  .auto-copy h2 {
+    font-size: var(--fs-h2);
+  }
+
+  .auto-copy .actions {
+    margin-top: 0.75rem;
+  }
+
+  .auto-visual {
+    display: none;
+  }
+
+  @media (min-width: 60rem) {
+    .auto-card {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 3rem;
+      min-height: 30rem;
+    }
+
+    .auto-visual {
+      position: relative;
+      display: block;
+      align-self: stretch;
+      justify-self: stretch;
+      min-height: 22rem;
+    }
+
+    .auto-visual :global(.av) {
+      position: absolute;
+    }
+
+    .auto-visual :global(.av1) {
+      left: 8%;
+      top: 6%;
+      transform: rotate(-5deg);
+    }
+
+    .auto-visual :global(.av2) {
+      right: 4%;
+      top: 18%;
+      transform: rotate(4deg);
+    }
+
+    .auto-visual :global(.av3) {
+      left: 18%;
+      bottom: 6%;
+      transform: rotate(-2deg);
+    }
+  }
+
+  /* ---------- Other services: rows on a dark band ---------- */
+  .others :global(.rows .num),
+  .others :global(.rows .name span) {
+    color: var(--on-dark-3);
+  }
+
+  /* ---------- Motion ---------- */
+  @media screen and (prefers-reduced-motion: no-preference) {
+    @media (min-width: 60rem) {
+      .for-sketches :global(.sk) {
+        animation: sk-bob 3.2s ease-in-out infinite alternate;
+      }
+
+      .for-sketches :global(.sk2) {
+        animation-duration: 3.8s;
+        animation-delay: -1.4s;
+      }
+
+      .for-sketches :global(.sk3) {
+        animation-duration: 2.8s;
+        animation-delay: -0.7s;
+      }
+
+      .auto-visual :global(.av) {
+        animation: sk-bob 3s ease-in-out infinite alternate;
+      }
+
+      .auto-visual :global(.av2) {
+        animation-duration: 3.6s;
+        animation-delay: -1.2s;
+      }
+
+      .auto-visual :global(.av3) {
+        animation-duration: 2.7s;
+        animation-delay: -0.6s;
+      }
+
+      @keyframes sk-bob {
+        from {
+          translate: -3px 6px;
+        }
+
+        to {
+          translate: 3px -8px;
+        }
+      }
+    }
+
+    /* Words ink in as the statement crosses the screen */
+    @supports (animation-timeline: view()) {
+      .for-text {
+        view-timeline-name: --for;
+      }
+
+      .for-text .w {
+        opacity: 0.28;
+        animation: word-ink linear both;
+        animation-timeline: --for;
+        animation-range: cover calc(8% + 28% * var(--i) / var(--n)) cover calc(14% + 28% * var(--i) / var(--n));
+      }
+
+      @keyframes word-ink {
+        to {
+          opacity: 1;
+        }
+      }
+    }
+  }
+</style>

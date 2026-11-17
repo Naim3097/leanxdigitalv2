@@ -1,12 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-  <style>
-    rect { fill: #0b0b0b }
-    path { stroke: #ffffff }
-    @media (prefers-color-scheme: dark) {
-      rect { fill: #ffffff }
-      path { stroke: #0b0b0b }
-    }
-  </style>
-  <rect width="24" height="24" rx="5"/>
-  <path d="M8 8l8 8M16 8l-8 8" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="112" fill="#0b0b0b"/>
+  <polygon transform="translate(-1008.63 -22.23) scale(1.15767)" points="1208.89 116.5 1145.68 116.5 1092.41 191.99 1039.13 116.5 976.16 116.5 1060.79 236.42 970.54 364.17 1033.76 364.17 1092.39 281.1 1151.27 364.17 1214.24 364.17 1123.99 236.42 1208.89 116.5" fill="#ffce33"/>
 </svg>

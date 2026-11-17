@@ -4,7 +4,7 @@
 
 export const site = {
   name: 'Lean X Digital',
-  alternateNames: ['lean.x digital', 'LeanX Digital'],
+  alternateNames: ['leanx digital', 'LeanX Digital', 'lean.x digital'],
   // Registered company name, e.g. 'Lean X Digital Sdn. Bhd.'
   legalName: '' as string,
   // SSM registration number, e.g. '202301012345 (1234567-X)'

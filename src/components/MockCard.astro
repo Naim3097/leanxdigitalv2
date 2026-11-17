@@ -1,0 +1,385 @@
+---
+// Small decorative interface cards drawn in HTML and CSS, standing in for product imagery until real
+// screenshots exist. They carry no data, prices or results (grey bars stand in for text), and are
+// always hidden from assistive technology.
+import Icon from './Icon.astro';
+
+export type MockKind = 'poster' | 'reel' | 'search' | 'store' | 'chat' | 'crm' | 'chart' | 'sync' | 'ad';
+
+interface Props {
+  kind: MockKind;
+  class?: string;
+  style?: string;
+}
+const { kind, class: className, style } = Astro.props;
+---
+
+<div class:list={['mock', `mock-${kind}`, className]} style={style} aria-hidden="true">
+  {
+    kind === 'poster' && (
+      <>
+        <div class="mock-art" />
+        <div class="mock-row">
+          <span class="mock-tag" data-label="Ad poster"></span>
+          <span class="bar w40" />
+        </div>
+        <span class="bar w80" />
+      </>
+    )
+  }
+  {
+    kind === 'reel' && (
+      <>
+        <div class="mock-play">
+          <Icon name="play" />
+        </div>
+        <div class="mock-progress">
+          <span />
+        </div>
+        <span class="mock-caption" data-label="Reel"></span>
+      </>
+    )
+  }
+  {
+    kind === 'search' && (
+      <>
+        <div class="mock-row">
+          <span class="dot" />
+          <span class="bar w50" />
+        </div>
+        <span class="bar strong w80" />
+        <span class="bar w100" />
+        <span class="bar w70" />
+        <span class="mock-caption" data-label="Search result"></span>
+      </>
+    )
+  }
+  {
+    kind === 'store' && (
+      <>
+        <div class="mock-art mock-art-sm" />
+        <span class="bar strong w70" />
+        <span class="bar w50" />
+        <span class="mock-button" data-label="Add to cart"></span>
+      </>
+    )
+  }
+  {
+    kind === 'chat' && (
+      <>
+        <div class="mock-row">
+          <span class="avatar" />
+          <span class="bar strong w40" />
+        </div>
+        <div class="bubble in">
+          <span class="bar w90" />
+          <span class="bar w60" />
+        </div>
+        <div class="bubble out">
+          <span class="bar w80" />
+        </div>
+        <span class="mock-caption" data-label="WhatsApp chat"></span>
+      </>
+    )
+  }
+  {
+    kind === 'crm' && (
+      <>
+        <span class="mock-caption" data-label="Leads"></span>
+        <div class="mock-cols">
+          <div>
+            <span class="chip" />
+            <span class="chip" />
+            <span class="chip" />
+          </div>
+          <div>
+            <span class="chip" />
+            <span class="chip" />
+          </div>
+          <div>
+            <span class="chip on" />
+          </div>
+        </div>
+      </>
+    )
+  }
+  {
+    kind === 'chart' && (
+      <>
+        <span class="mock-caption" data-label="Traffic to sales"></span>
+        <div class="mock-bars">
+          <span style="--h: 30%" />
+          <span style="--h: 45%" />
+          <span style="--h: 40%" />
+          <span style="--h: 62%" />
+          <span style="--h: 70%" />
+          <span style="--h: 88%" />
+        </div>
+      </>
+    )
+  }
+  {
+    kind === 'sync' && (
+      <div class="mock-sync">
+        <span data-label="Shopee"></span>
+        <Icon name="sync" />
+        <span class="own" data-label="Your store"></span>
+        <Icon name="sync" />
+        <span data-label="TikTok Shop"></span>
+      </div>
+    )
+  }
+  {
+    kind === 'ad' && (
+      <>
+        <div class="mock-row">
+          <span class="avatar" />
+          <span class="bar strong w40" />
+          <span class="mock-tag" data-label="Sponsored"></span>
+        </div>
+        <div class="mock-art" />
+        <div class="mock-row">
+          <span class="bar w60" />
+          <span class="mock-button" data-label="Shop now"></span>
+        </div>
+      </>
+    )
+  }
+</div>
+
+<style>
+  /* Captions are drawn from data-label, so the sketches look the same but add no words to the page */
+  [data-label]::before {
+    content: attr(data-label);
+  }
+
+  .mock {
+    display: grid;
+    align-content: start;
+    gap: 0.5rem;
+    width: 12.5rem;
+    padding: 0.875rem;
+    border: 1px solid #f0f0f0;
+    border-radius: 18px;
+    background: #fdfdfd;
+    color: var(--ink);
+    box-shadow: 0 24px 40px -18px rgb(0 0 0 / 0.18);
+    font-size: 0.6875rem;
+    line-height: 1.2;
+  }
+
+  .mock-row {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .bar {
+    display: block;
+    height: 0.4rem;
+    border-radius: 999px;
+    background: #ececec;
+  }
+
+  .bar.strong {
+    height: 0.5rem;
+    background: #d9d9d9;
+  }
+
+  .w40 { width: 40%; }
+  .w50 { width: 50%; }
+  .w60 { width: 60%; }
+  .w70 { width: 70%; }
+  .w80 { width: 80%; }
+  .w90 { width: 90%; }
+  .w100 { width: 100%; }
+
+  .dot,
+  .avatar {
+    flex: none;
+    width: 0.875rem;
+    height: 0.875rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--spectrum-1), var(--spectrum-2));
+  }
+
+  .avatar {
+    width: 1.25rem;
+    height: 1.25rem;
+    background: linear-gradient(135deg, var(--spectrum-3), var(--spectrum-4));
+  }
+
+  .mock-art {
+    height: 6.5rem;
+    border-radius: 12px;
+    background: linear-gradient(140deg, var(--card-1), var(--spectrum-1) 55%, #ffd6c9);
+  }
+
+  .mock-art-sm {
+    height: 5rem;
+    background: linear-gradient(140deg, #ffd6c9, var(--spectrum-4) 70%);
+  }
+
+  .mock-tag,
+  .mock-button {
+    flex: none;
+    padding: 0.2rem 0.45rem;
+    border-radius: 999px;
+    background: var(--page-alt);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .mock-button {
+    justify-self: start;
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .mock-caption {
+    color: var(--text-3);
+    font-weight: 500;
+  }
+
+  /* Reel: a dark portrait card */
+  .mock-reel {
+    width: 8.5rem;
+    min-height: 13rem;
+    align-content: end;
+    border-color: transparent;
+    background: linear-gradient(170deg, #262a3d, #0c0d14);
+    color: var(--paper);
+  }
+
+  .mock-reel .mock-caption {
+    color: rgb(255 255 255 / 0.7);
+  }
+
+  .mock-play {
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    margin: 0 auto 2.5rem;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.16);
+  }
+
+  .mock-play :global(svg) {
+    width: 1rem;
+    height: 1rem;
+    fill: currentColor;
+  }
+
+  .mock-progress {
+    height: 0.2rem;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.2);
+  }
+
+  .mock-progress span {
+    display: block;
+    width: 45%;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--paper);
+  }
+
+  /* Chat */
+  .bubble {
+    display: grid;
+    gap: 0.3rem;
+    width: 80%;
+    padding: 0.5rem;
+    border-radius: 12px 12px 12px 4px;
+    background: var(--page-alt);
+  }
+
+  .bubble.out {
+    justify-self: end;
+    border-radius: 12px 12px 4px 12px;
+    background: #dcf5d7;
+  }
+
+  .bubble.out .bar {
+    background: #b9e4b1;
+  }
+
+  /* CRM board */
+  .mock-cols {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.35rem;
+  }
+
+  .mock-cols > div {
+    display: grid;
+    align-content: start;
+    gap: 0.3rem;
+    min-height: 5rem;
+    padding: 0.3rem;
+    border-radius: 8px;
+    background: var(--page-alt);
+  }
+
+  .chip {
+    height: 1.1rem;
+    border-radius: 5px;
+    background: var(--paper);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.06);
+  }
+
+  .chip.on {
+    background: linear-gradient(90deg, #dcf5d7, #f0ffef);
+  }
+
+  /* Chart */
+  .mock-bars {
+    display: flex;
+    align-items: end;
+    gap: 0.35rem;
+    height: 5.5rem;
+    padding-top: 0.25rem;
+  }
+
+  .mock-bars span {
+    flex: 1;
+    height: var(--h);
+    border-radius: 6px 6px 3px 3px;
+    background: linear-gradient(180deg, var(--spectrum-2), var(--spectrum-1));
+  }
+
+  /* Stock sync */
+  .mock-sync {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    white-space: nowrap;
+  }
+
+  .mock-sync span {
+    padding: 0.35rem 0.45rem;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    color: var(--text-2);
+  }
+
+  .mock-sync .own {
+    border-color: var(--ink);
+    background: var(--ink);
+    color: var(--paper);
+    font-weight: 500;
+  }
+
+  .mock-sync :global(svg) {
+    flex: none;
+    width: 0.8rem;
+    height: 0.8rem;
+    color: var(--text-3);
+  }
+
+  .mock-sync-wrap,
+  .mock.mock-sync {
+    width: auto;
+  }
+</style>

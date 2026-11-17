@@ -2,11 +2,15 @@
 import Base from '../layouts/Base.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import DraftNote from '../components/DraftNote.astro';
+import Icon from '../components/Icon.astro';
+import Label from '../components/Label.astro';
+import MockCard from '../components/MockCard.astro';
 import { site, fullAddress } from '../data/site';
 import { services, whatsappUrl } from '../data/services';
 import { updatedFor } from '../data/pages';
 import { webPage, breadcrumbs } from '../lib/schema';
 import { hasPublicFile } from '../lib/files';
+import { serviceIcons } from '../lib/icons';
 import { showDrafts } from '../lib/drafts';
 
 const path = '/contact/';
@@ -20,6 +24,8 @@ const showPdf = hasPublicFile(site.companyProfilePdf);
 const hours = site.openingHours.map(
   (h) => `${h.days.length > 1 ? `${h.days[0]} to ${h.days.at(-1)}` : h.days[0]}, ${h.opens} to ${h.closes}`,
 );
+// The email address may break after the @ on narrow cards, never in the middle of a word.
+const [emailUser, emailDomain] = site.email.split('@');
 
 const schema = [
   webPage({
@@ -35,91 +41,119 @@ const schema = [
 ---
 
 <Base title={title} description={description} schema={schema} cta={false}>
-  <Breadcrumbs items={crumbs} />
-
-  <header class="page-head wrap">
-    <p class="eyebrow">Contact</p>
-    <h1>Contact Lean X Digital</h1>
-    <p class="lede">
-      WhatsApp is usually the quickest way to reach us. We reply in English or Bahasa Malaysia.
-    </p>
+  <header class="page-head contact-head">
+    <div class="glow" aria-hidden="true"><span></span><span></span><span></span></div>
+    <div class="container">
+      <Breadcrumbs items={crumbs} />
+      <Label icon="chat">Contact</Label>
+      <h1>Contact Lean X Digital</h1>
+      <p class="lede">
+        WhatsApp is usually the quickest way to reach us. We reply in English or Bahasa Malaysia.
+      </p>
+    </div>
   </header>
 
-  <section class="wrap" aria-label="Ways to contact us" style="padding-bottom: var(--space)">
-    <div class="methods">
-      <a href={site.whatsapp}>
-        <span class="eyebrow">WhatsApp</span>
-        <strong>{site.phoneDisplay}</strong>
-        <span class="muted">Message us with your business name and website or shop link.</span>
-      </a>
-      <a href={`tel:${site.phone}`}>
-        <span class="eyebrow">Phone</span>
-        <strong>{site.phoneDisplay}</strong>
-        <span class="muted">Same number as WhatsApp.</span>
-      </a>
-      <a href={`mailto:${site.email}`}>
-        <span class="eyebrow">Email</span>
-        <strong>{site.email}</strong>
-        <span class="muted">For proposals, documents and anything long.</span>
-      </a>
-      <a href={site.mapUrl} rel="noopener">
-        <span class="eyebrow">Office</span>
-        <strong>8trium, Bandar Sri Damansara</strong>
-        <span class="muted">{fullAddress}. Open in Google Maps.</span>
-      </a>
+  <section class="ways" aria-label="Ways to contact us">
+    <div class="container">
+      <div class="methods contact-methods">
+        <a class="method-primary" href={site.whatsapp} data-surface="dark">
+          <span class="icon-tile"><Icon name="chat" /></span>
+          <span class="eyebrow">WhatsApp</span>
+          <strong>{site.phoneDisplay}</strong>
+          <span class="muted">Message us with your business name and website or shop link.</span>
+          <span class="method-art" aria-hidden="true"><MockCard kind="chat" /></span>
+        </a>
+        <a href={`tel:${site.phone}`}>
+          <span class="icon-tile"><Icon name="phone" /></span>
+          <span class="eyebrow">Phone</span>
+          <strong>{site.phoneDisplay}</strong>
+          <span class="muted">Same number as WhatsApp.</span>
+        </a>
+        <a href={`mailto:${site.email}`}>
+          <span class="icon-tile"><Icon name="mail" /></span>
+          <span class="eyebrow">Email</span>
+          <strong>{emailUser}@<wbr />{emailDomain}</strong>
+          <span class="muted">For proposals, documents and anything long.</span>
+        </a>
+        <a href={site.mapUrl} rel="noopener">
+          <span class="icon-tile"><Icon name="pin" /></span>
+          <span class="eyebrow">Office</span>
+          <strong>8trium, Bandar Sri Damansara</strong>
+          <span class="muted">{fullAddress}. Open in Google Maps.</span>
+        </a>
+      </div>
+      {hours.length > 0 && <p class="muted hours">Office hours: {hours.join('. ')}.</p>}
+      {
+        showDrafts && hours.length === 0 && (
+          <div class="hours-draft">
+            <DraftNote>
+              <p>
+                Office hours go here once you confirm them, for example “Monday to Friday, 09:00 to 18:00”. Google
+                recommends them in the structured data for local businesses. Add them to <code>openingHours</code> in
+                <code>src/data/site.ts</code>.
+              </p>
+            </DraftNote>
+          </div>
+        )
+      }
     </div>
-    {hours.length > 0 && <p class="muted" style="margin-top: 1.25rem">Office hours: {hours.join('. ')}.</p>}
-    {
-      showDrafts && hours.length === 0 && (
-        <div style="margin-top: 1.25rem">
-          <DraftNote>
-            <p>
-              Office hours go here once you confirm them, for example “Monday to Friday, 09:00 to 18:00”. Google
-              recommends them in the structured data for local businesses. Add them to <code>openingHours</code> in
-              <code>src/data/site.ts</code>.
-            </p>
-          </DraftNote>
+  </section>
+
+  <section class="section section-white" aria-labelledby="first-title">
+    <div class="container">
+      <div class="duo">
+        <h2 id="first-title" data-split>What to send us</h2>
+        <div class="send">
+          <p>
+            Your business name, a link to your website or shop, and the one thing you most want to fix.
+            That is enough for us to come back with questions or a time to talk.
+          </p>
+          {
+            showPdf && (
+              <p>
+                Want to know more about us first? <a href={site.companyProfilePdf}>Download our company profile (PDF)</a>.
+              </p>
+            )
+          }
+          <div class="send-card" aria-hidden="true" data-rise>
+            <span class="send-head">
+              <span class="icon-tile"><Icon name="chat" /></span>
+              <span class="send-title">Your first message</span>
+            </span>
+            <ul>
+              <li><Icon name="check" />Your business name</li>
+              <li><Icon name="check" />A link to your website or shop</li>
+              <li><Icon name="check" />The one thing you most want to fix</li>
+            </ul>
+          </div>
         </div>
-      )
-    }
-  </section>
-
-  <section class="section" aria-labelledby="first-title">
-    <div class="wrap section-grid">
-      <div class="section-head">
-        <h2 id="first-title">What to send us</h2>
-      </div>
-      <div>
-        <p>
-          Your business name, a link to your website or shop, and the one thing you most want to fix.
-          That is enough for us to come back with questions or a time to talk.
-        </p>
-        {
-          showPdf && (
-            <p>
-              Want to know more about us first? <a href={site.companyProfilePdf}>Download our company profile (PDF)</a>.
-            </p>
-          )
-        }
       </div>
     </div>
   </section>
 
-  <section class="section" aria-labelledby="ads-title">
-    <div class="wrap section-grid">
-      <div class="section-head">
-        <h2 id="ads-title">Ask about a service</h2>
+  <section class="section asks-sec" aria-labelledby="ads-title">
+    <div class="container">
+      <div class="intro">
+        <h2 id="ads-title" data-split>Ask about a service</h2>
         <p>Each link opens WhatsApp with a message ready to send.</p>
       </div>
-      <dl class="facts">
+      <dl class="asks" data-rise>
         {
           services.map((s) => (
             <div>
               <dt>
-                <a href={`/services/${s.slug}/`}>{s.name}</a>
+                <span class="icon-tile" aria-hidden="true">
+                  <Icon name={serviceIcons[s.slug] ?? 'spark'} />
+                </span>
+                <a class="link-arrow" href={`/services/${s.slug}/`}>
+                  {s.name}
+                </a>
               </dt>
               <dd>
-                <a href={whatsappUrl(s)}>WhatsApp us about {s.short}</a>
+                <a class="btn btn-secondary ask-wa" href={whatsappUrl(s)}>
+                  <Icon name="chat" />
+                  WhatsApp us about {s.short}
+                </a>
               </dd>
             </div>
           ))
@@ -128,19 +162,319 @@ const schema = [
     </div>
   </section>
 
-  <section class="section" aria-labelledby="help-title">
-    <div class="wrap section-grid">
-      <div class="section-head">
-        <h2 id="help-title">Help with Nexova</h2>
-      </div>
-      <div>
-        <p>
-          Nexova has its own support line: WhatsApp <a
-            href="https://wa.me/60107648227?text=Hi%20Nexova%2C%20I%27d%20like%20help%20setting%20up%20my%20store."
-            >+60 10-764 8227</a
-          >.
-        </p>
+  <section class="section help-sec" aria-labelledby="help-title">
+    <div class="container">
+      <div class="mesh-card help" data-rise>
+        <div class="help-copy">
+          <span class="icon-tile help-icon" aria-hidden="true"><Icon name="spark" /></span>
+          <h2 id="help-title" data-split>Help with Nexova</h2>
+          <p>
+            Nexova has its own support line: WhatsApp <a
+              href="https://wa.me/60107648227?text=Hi%20Nexova%2C%20I%27d%20like%20help%20setting%20up%20my%20store."
+              >+60 10-764 8227</a
+            >.
+          </p>
+          <div class="actions">
+            <a
+              class="btn btn-primary"
+              href="https://wa.me/60107648227?text=Hi%20Nexova%2C%20I%27d%20like%20help%20setting%20up%20my%20store."
+              data-magnetic
+            >
+              <Icon name="chat" />
+              WhatsApp Nexova support
+            </a>
+          </div>
+        </div>
+        <div class="help-art" aria-hidden="true">
+          <span class="ha ha-1"><MockCard kind="store" /></span>
+          <span class="ha ha-2"><MockCard kind="sync" /></span>
+        </div>
       </div>
     </div>
   </section>
 </Base>
+
+<style>
+  /* The method cards start close under the page head, so the first screen shows how to reach us */
+  .contact-head {
+    padding-bottom: clamp(3rem, 2rem + 3vw, 5rem);
+  }
+
+  .ways {
+    padding-block: clamp(2rem, 1.5rem + 2vw, 3.5rem) var(--section-s);
+    background: var(--page);
+  }
+
+  /* Method cards: WhatsApp leads; on wide screens they zigzag (wide, narrow / wide, narrow) */
+  .contact-methods > a {
+    position: relative;
+    overflow: hidden;
+    min-height: 16.5rem;
+  }
+
+  .contact-methods strong {
+    font-size: clamp(1.375rem, 1rem + 1.1vw, 1.875rem);
+  }
+
+  .contact-methods .muted {
+    max-width: 30rem;
+  }
+
+  .contact-methods > .method-primary .icon-tile {
+    background: rgb(255 255 255 / 0.1);
+    color: var(--on-dark);
+  }
+
+  .method-art {
+    display: none;
+  }
+
+  @media (min-width: 45rem) {
+    .contact-methods > .method-primary {
+      grid-column: 1 / -1;
+      padding-right: 19rem;
+    }
+
+    .contact-methods > a:last-child {
+      grid-column: 1 / -1;
+    }
+
+    .method-art {
+      display: block;
+      position: absolute;
+      right: clamp(3.5rem, 2rem + 4vw, 6rem);
+      bottom: -2.25rem;
+      transform: rotate(-5deg);
+    }
+
+    .method-art :global(.mock) {
+      width: 14rem;
+      box-shadow: 0 30px 60px -20px rgb(0 0 0 / 0.6);
+    }
+  }
+
+  @media (min-width: 70rem) {
+    .contact-methods {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .contact-methods > .method-primary,
+    .contact-methods > a:nth-child(3) {
+      grid-column: span 2;
+    }
+
+    .contact-methods > a:last-child {
+      grid-column: auto;
+    }
+  }
+
+  .hours,
+  .hours-draft {
+    max-width: var(--measure-4);
+    margin: 1.5rem auto 0;
+  }
+
+  .hours {
+    text-align: center;
+  }
+
+  /* What to send us: the paragraph and a checklist card */
+  .send {
+    display: grid;
+    gap: clamp(1.75rem, 1.25rem + 1.5vw, 2.5rem);
+  }
+
+  .send > p + p {
+    margin-top: 0;
+  }
+
+  .send-card {
+    display: grid;
+    gap: 1.25rem;
+    max-width: 30rem;
+    padding: clamp(1.25rem, 1rem + 1vw, 1.75rem);
+    border-radius: var(--radius-m);
+    background: var(--page);
+    box-shadow: var(--shadow-card);
+  }
+
+  .send-head {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .send-head .icon-tile {
+    width: 2.5rem;
+    height: 2.5rem;
+    background: #dcf5d7;
+  }
+
+  .send-title {
+    font-size: var(--fs-small);
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .send-card ul {
+    display: grid;
+    gap: 0.625rem;
+  }
+
+  .send-card li {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-s);
+    background: var(--paper);
+    font-size: var(--fs-small);
+    color: var(--text);
+  }
+
+  .send-card li :global(svg) {
+    flex: none;
+    width: 1.25rem;
+    height: 1.25rem;
+    padding: 0.2rem;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--paper);
+    stroke-width: 2.4;
+  }
+
+  /* Ask about a service: one row per service, the WhatsApp link on the right */
+  .asks {
+    max-width: 72rem;
+    margin-inline: auto;
+    border-top: 1px solid var(--line);
+  }
+
+  .asks > div {
+    display: grid;
+    gap: 1rem;
+    padding-block: 1.5rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  @media (min-width: 48rem) {
+    .asks > div {
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 2rem;
+      padding-block: 1.75rem;
+    }
+  }
+
+  .asks dt {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-width: 0;
+  }
+
+  .asks dt .link-arrow {
+    font-size: var(--fs-lead);
+    letter-spacing: -0.015em;
+    color: var(--ink);
+  }
+
+  .ask-wa :global(svg) {
+    color: #1f8f4e;
+  }
+
+  @media (max-width: 47.99rem) {
+    .asks dd {
+      padding-left: 4rem;
+    }
+  }
+
+  @media (max-width: 30rem) {
+    .asks dd {
+      padding-left: 0;
+    }
+
+    .ask-wa {
+      width: 100%;
+      min-height: 2.75rem;
+      padding: 0.625rem 1rem;
+      font-size: var(--fs-small);
+      white-space: normal;
+    }
+  }
+
+  /* Help with Nexova: the colourful closing card */
+  .help-sec {
+    padding-top: 0;
+    padding-bottom: var(--section-s);
+  }
+
+  .help {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: center;
+    min-height: 22rem;
+  }
+
+  .help-copy {
+    display: grid;
+    justify-items: start;
+    gap: 1rem;
+  }
+
+  .help-icon {
+    margin-bottom: 0.5rem;
+    background: rgb(255 255 255 / 0.7);
+  }
+
+  .help-copy a:not(.btn) {
+    color: var(--ink);
+    font-weight: 500;
+    text-decoration-thickness: 1.5px;
+    white-space: nowrap;
+  }
+
+  .help-copy .actions {
+    margin-top: 0.75rem;
+  }
+
+  .help-art {
+    display: none;
+  }
+
+  @media (min-width: 60rem) {
+    .help {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr);
+    }
+
+    .help-art {
+      position: relative;
+      display: block;
+      justify-self: stretch;
+      height: 100%;
+      min-height: 16rem;
+    }
+
+    .ha {
+      position: absolute;
+    }
+
+    .ha-1 {
+      left: 18%;
+      top: 0;
+      transform: rotate(-4deg);
+    }
+
+    .ha-2 {
+      right: 4%;
+      bottom: 8%;
+      transform: rotate(3deg);
+    }
+  }
+
+  @media (max-width: 30rem) {
+    .help-copy .actions,
+    .help-copy .btn {
+      width: 100%;
+    }
+  }
+</style>

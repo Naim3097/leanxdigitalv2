@@ -1,12 +1,40 @@
 ---
 import Base from '../../layouts/Base.astro';
+import Label from '../../components/Label.astro';
 import { showDrafts } from '../../lib/drafts';
 import { draftPages, draftSections } from '../../data/review';
+import { countWord } from '../../lib/text';
 
 // Previews only: every draft page and section waiting for the owner's review.
 export function getStaticPaths() {
   return showDrafts ? [{ params: { page: undefined } }] : [];
 }
+
+const counted = (n: number, one: string, many: string) => {
+  const word = countWord(n);
+  return `${word.charAt(0).toUpperCase()}${word.slice(1)} ${n === 1 ? one : many}`;
+};
+
+const lists = [
+  {
+    id: 'pages-title',
+    title: 'Draft pages',
+    note: 'New pages, built only in previews.',
+    label: counted(draftPages.length, 'page', 'pages'),
+    icon: 'layout' as const,
+    items: draftPages,
+    tone: 'page',
+  },
+  {
+    id: 'sections-title',
+    title: 'Draft sections on live pages',
+    note: 'Each is marked with a dashed box on its page.',
+    label: counted(draftSections.length, 'section', 'sections'),
+    icon: 'layers' as const,
+    items: draftSections,
+    tone: 'alt',
+  },
+];
 ---
 
 <Base
@@ -15,53 +43,156 @@ export function getStaticPaths() {
   noindex
   cta={false}
 >
-  <header class="page-head wrap">
-    <p class="eyebrow">Preview only</p>
-    <h1>Drafts for review</h1>
-    <p class="lede">
-      Nothing on this list appears on the live site. Each item says what it needs from you before it can go live.
-    </p>
+  <header class="page-head">
+    <div class="glow" aria-hidden="true"><span></span><span></span><span></span></div>
+    <div class="container">
+      <Label icon="eye">Preview only</Label>
+      <h1>Drafts for review</h1>
+      <p class="lede">
+        Nothing on this list appears on the live site. Each item says what it needs from you before it can go live.
+      </p>
+    </div>
   </header>
 
-  <section class="section" aria-labelledby="pages-title">
-    <div class="wrap section-grid">
-      <div class="section-head">
-        <h2 id="pages-title">Draft pages</h2>
-        <p>New pages, built only in previews.</p>
-      </div>
-      <dl class="facts">
-        {
-          draftPages.map((d) => (
-            <div>
-              <dt>
-                <a href={d.path}>{d.name}</a>
-              </dt>
-              <dd>{d.needs}</dd>
-            </div>
-          ))
-        }
-      </dl>
-    </div>
-  </section>
-
-  <section class="section" aria-labelledby="sections-title">
-    <div class="wrap section-grid">
-      <div class="section-head">
-        <h2 id="sections-title">Draft sections on live pages</h2>
-        <p>Each is marked with a dashed box on its page.</p>
-      </div>
-      <dl class="facts">
-        {
-          draftSections.map((d) => (
-            <div>
-              <dt>
-                <a href={d.path}>{d.name}</a>
-              </dt>
-              <dd>{d.needs}</dd>
-            </div>
-          ))
-        }
-      </dl>
-    </div>
-  </section>
+  {
+    lists.map((list) => (
+      <section class:list={['section', { 'section-alt': list.tone === 'alt' }]} aria-labelledby={list.id}>
+        <div class="container">
+          <div class="intro">
+            <Label icon={list.icon}>{list.label}</Label>
+            <h2 id={list.id} data-split>
+              {list.title}
+            </h2>
+            <p>{list.note}</p>
+          </div>
+          <dl class="review">
+            {list.items.map((d) => (
+              <div class="review-item" data-rise>
+                <dt>
+                  <a href={d.path}>{d.name}</a>
+                </dt>
+                <dd class="review-path">{d.path}</dd>
+                <dd class="review-needs">{d.needs}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </section>
+    ))
+  }
 </Base>
+
+<style>
+  /* Each draft is a row card: number, name and address, and what it needs. The whole card is the link; on
+     hover the card lifts and the name underlines. */
+  .review {
+    display: grid;
+    gap: 0.75rem;
+    counter-reset: review;
+  }
+
+  .review-item {
+    counter-increment: review;
+    position: relative;
+    display: grid;
+    grid-template-columns: 2.25rem minmax(0, 1fr);
+    grid-template-areas:
+      'num name'
+      'num path'
+      'num needs';
+    column-gap: 1rem;
+    row-gap: 0.375rem;
+    padding: 1.5rem 1.25rem;
+    border-radius: var(--radius-m);
+    background: var(--paper);
+    transition: transform var(--mid) var(--ease-out), box-shadow var(--mid) var(--ease-out);
+  }
+
+  .review-item::before {
+    content: counter(review, decimal-leading-zero);
+    grid-area: num;
+    padding-top: 0.3rem;
+    font-size: var(--fs-caption);
+    font-weight: 500;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-3);
+  }
+
+  .review-item dt {
+    grid-area: name;
+    font-size: var(--fs-lead);
+    font-weight: 500;
+    line-height: 1.25;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+  }
+
+  .review-item a {
+    text-decoration: none;
+  }
+
+  /* The link covers the whole card */
+  .review-item a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: inherit;
+  }
+
+  .review-item a:focus-visible {
+    outline: none;
+  }
+
+  .review-item a:focus-visible::after {
+    outline: 2px solid var(--ink);
+    outline-offset: 3px;
+  }
+
+  .review-path {
+    grid-area: path;
+    font-family: var(--font-mono);
+    font-size: var(--fs-caption);
+    color: var(--text-3);
+    overflow-wrap: anywhere;
+  }
+
+  .review-needs {
+    grid-area: needs;
+    margin-top: 0.5rem;
+    color: var(--text-2);
+  }
+
+  @media (min-width: 60rem) {
+    .review-item {
+      grid-template-columns: 3rem minmax(14rem, 26rem) minmax(0, 1fr);
+      grid-template-areas:
+        'num name needs'
+        'num path needs';
+      align-items: start;
+      column-gap: 2rem;
+      padding: 1.75rem 2rem;
+    }
+
+    .review-needs {
+      align-self: center;
+      max-width: 52ch;
+      margin-top: 0;
+    }
+  }
+
+  @media (hover: hover) {
+    .review-item:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-card);
+    }
+
+    .review-item:hover a {
+      text-decoration: underline;
+      text-decoration-thickness: 1.5px;
+      text-underline-offset: 0.2em;
+    }
+  }
+</style>

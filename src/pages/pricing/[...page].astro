@@ -2,12 +2,14 @@
 import Base from '../../layouts/Base.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import DraftNote from '../../components/DraftNote.astro';
-import Facts from '../../components/Facts.astro';
-import { pageTitle } from '../../data/site';
+import Icon, { type IconName } from '../../components/Icon.astro';
+import Label from '../../components/Label.astro';
+import { pageTitle, site } from '../../data/site';
 import { services } from '../../data/services';
 import { products } from '../../data/products';
 import { priceReferences } from '../../data/review';
 import { showDrafts } from '../../lib/drafts';
+import { serviceIcons } from '../../lib/icons';
 import { webPage, breadcrumbs } from '../../lib/schema';
 
 // Draft page, built only in previews (lib/drafts.ts). To publish it: replace every bracketed price
@@ -49,21 +51,46 @@ const schema = [
   webPage({ path, title, description, updated: '2026-11-04', hasBreadcrumb: true }),
   breadcrumbs(path, crumbs),
 ];
+
+// Line icons for the cards, matched by name. Decorative only.
+const priceIcons: Record<string, IconName> = {
+  ...Object.fromEntries(services.map((s): [string, IconName] => [s.name, serviceIcons[s.slug] ?? 'spark'])),
+  'Sales leak audit': 'chart',
+  'Own store launch': 'store',
+  [nexova.name]: 'spark',
+};
+const termIcons: Record<string, IconName> = {
+  Accounts: 'users',
+  Reporting: 'chart',
+  'Minimum term': 'clock',
+};
 ---
 
 <Base title={title} description={description} schema={schema} noindex>
-  <Breadcrumbs items={crumbs} />
-
-  <header class="page-head wrap">
-    <p class="eyebrow">Prices</p>
-    <h1>Prices</h1>
-    <p class="lede">
-      Starting prices in ringgit, with the month they were set. We agree the exact scope and price with you before any
-      work starts.
-    </p>
+  <header class="page-head">
+    <div class="glow" aria-hidden="true"><span></span><span></span><span></span></div>
+    <div class="container">
+      <Breadcrumbs items={crumbs} />
+      <Label icon="tag">Prices</Label>
+      <h1>Prices</h1>
+      <p class="lede">
+        Starting prices in ringgit, with the month they were set. We agree the exact scope and price with you before any
+        work starts.
+      </p>
+      <div class="actions">
+        <a class="btn btn-primary" href={site.whatsapp} data-magnetic>
+          <Icon name="chat" />
+          WhatsApp us
+        </a>
+        <a class="btn btn-secondary" href={`tel:${site.phone}`} data-magnetic>
+          <Icon name="phone" />
+          Call {site.phoneDisplay}
+        </a>
+      </div>
+    </div>
   </header>
 
-  <div class="wrap" style="padding-bottom: 3rem">
+  <div class="narrow draft-wrap">
     <DraftNote label="Draft page: not on the live site">
       <p>
         Seven of the twelve Malaysian agencies in the research publish prices, and the AI answers it recorded quote RM
@@ -74,22 +101,192 @@ const schema = [
     </DraftNote>
   </div>
 
-  <section class="section" aria-labelledby="prices-title">
-    <div class="wrap section-grid">
-      <div class="section-head">
-        <h2 id="prices-title">Starting prices</h2>
+  <section class="section section-white" aria-labelledby="prices-title">
+    <div class="container">
+      <div class="intro">
+        <h2 id="prices-title" data-split>Starting prices</h2>
         <p>As of <span class="placeholder">[month and year]</span>.</p>
       </div>
-      <Facts facts={prices} />
+      <dl class="price-grid">
+        {
+          prices.map(([name, value]) => (
+            <div class:list={['price-card', { 'price-dark': name === nexova.name, 'price-wide': value.length > 42 }]} data-rise>
+              <dt>
+                <span class="icon-tile" aria-hidden="true">
+                  <Icon name={priceIcons[name] ?? 'spark'} />
+                </span>
+                <span class="price-name">{name}</span>
+              </dt>
+              <dd>{value}</dd>
+            </div>
+          ))
+        }
+      </dl>
     </div>
   </section>
 
-  <section class="section" aria-labelledby="terms-title">
-    <div class="wrap section-grid">
-      <div class="section-head">
-        <h2 id="terms-title">Always included</h2>
+  <section class="section section-alt" aria-labelledby="terms-title">
+    <div class="container">
+      <div class="intro">
+        <h2 id="terms-title" data-split>Always included</h2>
       </div>
-      <Facts facts={terms} />
+      <dl class="term-grid">
+        {
+          terms.map(([name, value]) => (
+            <div class="term-card" data-rise>
+              <dt>
+                <span class="icon-tile" aria-hidden="true">
+                  <Icon name={termIcons[name] ?? 'check'} />
+                </span>
+                <span>{name}</span>
+              </dt>
+              <dd>{value}</dd>
+            </div>
+          ))
+        }
+      </dl>
     </div>
   </section>
 </Base>
+
+<style>
+  .draft-wrap {
+    padding-block: 2.5rem;
+  }
+
+  /* Starting prices: one card per service or package, Nexova as the dark wide card */
+  .price-grid {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  @media (min-width: 45rem) {
+    .price-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .price-wide {
+      grid-column: span 2;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .price-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .price-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    min-height: 17rem;
+    padding: clamp(1.5rem, 1rem + 1vw, 2.25rem);
+    border-radius: var(--radius-l);
+    background: var(--page);
+  }
+
+  .price-card dt {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+
+  .price-card .icon-tile {
+    background: var(--paper);
+    box-shadow: var(--shadow-chip);
+  }
+
+  .price-name {
+    margin-top: auto;
+    font-size: var(--fs-small);
+    font-weight: 500;
+    color: var(--text-2);
+  }
+
+  .price-card dd {
+    font-size: var(--fs-lead);
+    font-weight: 500;
+    line-height: 1.25;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+    overflow-wrap: anywhere;
+  }
+
+  .price-dark {
+    background: var(--dark);
+  }
+
+  .price-dark .icon-tile {
+    background: rgb(255 255 255 / 0.1);
+    box-shadow: none;
+    color: var(--on-dark);
+  }
+
+  .price-dark .price-name {
+    color: var(--on-dark-2);
+  }
+
+  .price-dark dd {
+    max-width: 36rem;
+    color: var(--on-dark);
+  }
+
+  /* Always included: three cards with an icon, the term and what to confirm */
+  .term-grid {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  @media (min-width: 45rem) {
+    .term-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .term-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    min-height: 15rem;
+    padding: clamp(1.5rem, 1rem + 1vw, 2.25rem);
+    border-radius: var(--radius-l);
+    background: var(--paper);
+  }
+
+  .term-card dt {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+    font-size: var(--fs-lead);
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+  }
+
+  .term-card dt > span:last-child {
+    margin-top: auto;
+  }
+
+  .term-card dd {
+    color: var(--text-2);
+  }
+
+  @media (max-width: 47.99rem) {
+    .price-card,
+    .term-card {
+      min-height: 0;
+      border-radius: var(--radius-m);
+    }
+
+    .price-card dt,
+    .term-card dt {
+      gap: 1.25rem;
+    }
+  }
+</style>

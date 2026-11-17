@@ -1,12 +1,20 @@
 {
   "name": "Lean X Digital",
-  "short_name": "lean.x digital",
+  "short_name": "leanx digital",
   "start_url": "/",
   "display": "browser",
-  "background_color": "#ffffff",
-  "theme_color": "#0b0b0b",
+  "background_color": "#f9fafa",
+  "theme_color": "#010101",
   "icons": [
-    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
   ]
 }

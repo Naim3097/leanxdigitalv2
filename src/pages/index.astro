@@ -1,17 +1,20 @@
 ---
 import Base from '../layouts/Base.astro';
-import RowList from '../components/RowList.astro';
-import Features from '../components/Features.astro';
 import Facts from '../components/Facts.astro';
-import Faq from '../components/Faq.astro';
 import Icon from '../components/Icon.astro';
+import Label from '../components/Label.astro';
 import DraftNote from '../components/DraftNote.astro';
+import MockCard, { type MockKind } from '../components/MockCard.astro';
+import NexovaStage from '../components/NexovaStage.astro';
+import ServiceStack from '../components/ServiceStack.astro';
+import FaqBlock from '../components/FaqBlock.astro';
+import DarkGrid from '../components/DarkGrid.astro';
+import type { IconName } from '../components/Icon.astro';
 import { site, fullAddress } from '../data/site';
 import { products } from '../data/products';
 import { services } from '../data/services';
 import { updatedFor } from '../data/pages';
 import { webPage, productList, serviceList, faqPage } from '../lib/schema';
-import { serviceRows } from '../lib/rows';
 import { countWord, listOf } from '../lib/text';
 import { showDrafts } from '../lib/drafts';
 
@@ -25,7 +28,7 @@ const description =
   'Lean X Digital makes Nexova, a store website that grows itself, and its team does creative work, paid ads, SEO and development for Malaysian businesses.';
 
 const facts: [string, string][] = [
-  ['Company', `${site.name} (written “lean.x digital” in the logo)`],
+  ['Company', `${site.name} (written “leanx digital” in the logo)`],
   ...(site.legalName ? [['Registered name', site.legalName] as [string, string]] : []),
   ...(site.foundingDate ? [['Founded', site.foundingDate] as [string, string]] : []),
   ['What we do', 'Help Malaysian businesses turn traffic into sales'],
@@ -64,141 +67,1663 @@ const schema = [
   serviceList(path),
   faqPage(path, faqs),
 ];
+
+// Content for the new sections, taken from the data files and the About page so nothing is invented.
+const svc = (slug: string) => services.find((s) => s.slug === slug)!;
+const statementWords = 'Clicks and followers are only worth something when some of them become paying customers.'.split(' ');
+// The five places on the way from a click to a paid order, shown as glass pills around the statement.
+const pathPills: [string, IconName][] = [
+  ['Content', 'content'],
+  ['Ads and search', 'megaphone'],
+  ['Your website', 'layout'],
+  ['WhatsApp chats', 'chat'],
+  ['Paid orders', 'card'],
+];
+
+const path4: { label: string; title: string; text: string; links: [string, string][]; visuals: MockKind[] }[] = [
+  {
+    label: svc('creative-agency').name,
+    title: 'The content they see',
+    text: svc('creative-agency').summary,
+    links: [[svc('creative-agency').name, '/services/creative-agency/']],
+    visuals: ['poster', 'reel'],
+  },
+  {
+    label: 'Paid advertising and SEO',
+    title: 'The ad or search result they click',
+    text: `${svc('paid-advertising').summary} ${svc('seo').summary}`,
+    links: [
+      [svc('paid-advertising').name, '/services/paid-advertising/'],
+      [svc('seo').name, '/services/seo/'],
+    ],
+    visuals: ['ad', 'search'],
+  },
+  {
+    label: svc('web-development').name,
+    title: 'The page or WhatsApp chat where they decide to buy',
+    text: svc('web-development').summary,
+    links: [[svc('web-development').name, '/services/web-development/']],
+    visuals: ['store', 'chat'],
+  },
+  {
+    label: nexova.name,
+    title: 'Selling online? Let Nexova run it',
+    text: nexova.summary,
+    links: [[nexova.name, `/products/${nexova.slug}/`]],
+    visuals: ['sync', 'chart'],
+  },
+];
+
+const makeIcons: Record<string, IconName> = {
+  'Ad posters': 'megaphone',
+  'Short-form video': 'play',
+  'Social media content': 'chat',
+  'Brand identity': 'spark',
+  'Landing pages': 'layout',
+  'Photography and retouching': 'content',
+  Websites: 'store',
+  'CRM systems': 'users',
+  Apps: 'code',
+  'Booking and lead capture': 'clock',
+  Tracking: 'chart',
+};
+const seenMake = new Set<string>();
+const makes = ['creative-agency', 'web-development']
+  .flatMap((slug) => svc(slug).includes.map(([name, text]) => ({ name, text, service: svc(slug).name, href: `/services/${slug}/` })))
+  .filter((m) => !seenMake.has(m.name) && Boolean(seenMake.add(m.name)))
+  .map((m) => ({ ...m, icon: makeIcons[m.name] ?? ('spark' as IconName) }));
+
+// Hero video: a seamless 6.8 s loop made from the 4K source, at 1080p and 720p in AV1, VP9 and H.264.
+// scripts/hero.ts picks the size and codec for the screen; the poster (the loop's first frame) shows first.
+const heroFiles = import.meta.glob('../assets/hero/hero-*.{mp4,webm,avif,webp,jpg}', {
+  eager: true,
+  query: '?url',
+  import: 'default',
+}) as Record<string, string>;
+const heroUrl = (name: string) => encodeURI(heroFiles[`../assets/hero/${name}`]);
+const heroSources = [
+  { res: 1080, codec: 'av1', src: heroUrl('hero-1080.av1.mp4'), type: 'video/mp4; codecs="av01.0.08M.08"', kbps: 566 },
+  { res: 1080, codec: 'vp9', src: heroUrl('hero-1080.webm'), type: 'video/webm; codecs="vp09.00.40.08"', kbps: 506 },
+  { res: 1080, codec: 'h264', src: heroUrl('hero-1080.mp4'), type: 'video/mp4; codecs="avc1.640028"', kbps: 760 },
+  { res: 720, codec: 'av1', src: heroUrl('hero-720.av1.mp4'), type: 'video/mp4; codecs="av01.0.05M.08"', kbps: 350 },
+  { res: 720, codec: 'vp9', src: heroUrl('hero-720.webm'), type: 'video/webm; codecs="vp09.00.31.08"', kbps: 313 },
+  { res: 720, codec: 'h264', src: heroUrl('hero-720.mp4'), type: 'video/mp4; codecs="avc1.640028"', kbps: 403 },
+];
+const posterSet = (ext: string) => [720, 1280, 1920].map((w) => `${heroUrl(`hero-poster-${w}.${ext}`)} ${w}w`).join(', ');
+// Wide screens draw the poster across the viewport; narrower ones crop it into the lower half. On phones the
+// size is capped, so even 3x screens take the 1280 file (the same resolution as the 720p video that follows).
+const posterSizes = '(min-aspect-ratio: 7/5) 100vw, min(64vh, 26rem)';
+
+const how: { icon: IconName; title: string; text: string }[] = [
+  { icon: 'check', title: 'Price agreed first', text: 'We agree the scope and price with you before any work starts.' },
+  { icon: 'target', title: 'A specialist for each ad platform', text: 'Google Ads and Meta ads each have their own specialist on our team.' },
+  { icon: 'chat', title: 'English or Bahasa Malaysia', text: 'We reply in English or Bahasa Malaysia.' },
+  { icon: 'users', title: 'The team behind Nexova', text: `Our own team, the same people who build ${nexova.name}.` },
+];
 ---
 
 <Base title={title} description={description} schema={schema}>
-  <section class="hero wrap" aria-labelledby="hero-title">
-    <p class="eyebrow">Digital solutions · Kuala Lumpur</p>
-    <h1 id="hero-title">{site.tagline}</h1>
-    <p class="lede">
-      Lean X Digital helps Malaysian businesses sell more, two ways. {nexova.name} is a store website that
-      grows itself. Or our team does the work for you: creative, ads, SEO and development.
-    </p>
-    <div class="actions">
-      <a class="btn btn-solid" href="#nexova">See {nexova.name}</a>
-      <a class="btn btn-line" href="#services">See the services</a>
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero-frame" aria-hidden="true" data-sources={JSON.stringify(heroSources)}>
+      <picture>
+        <source type="image/avif" srcset={posterSet('avif')} sizes={posterSizes} />
+        <source type="image/webp" srcset={posterSet('webp')} sizes={posterSizes} />
+        <img
+          src={heroUrl('hero-poster-1280.jpg')}
+          srcset={posterSet('jpg')}
+          sizes={posterSizes}
+          alt=""
+          width="1920"
+          height="1080"
+          fetchpriority="high"
+        />
+      </picture>
+      <video class="hero-video" muted playsinline preload="none" disablepictureinpicture disableRemotePlayback tabindex="-1"
+      ></video>
+      <video class="hero-video" muted playsinline preload="none" disablepictureinpicture disableRemotePlayback tabindex="-1"
+      ></video>
     </div>
+    <div class="container hero-inner">
+      <div class="badges">
+        <Label icon="pin" class="badge">Digital solutions · Kuala Lumpur</Label>
+        <Label icon="tag" class="badge" aria-hidden="true">{nexova.name} is free to start</Label>
+        <Label icon="language" class="badge" aria-hidden="true">We reply in English or Bahasa Malaysia</Label>
+      </div>
+      <h1 id="hero-title" class="sweep">{site.tagline}</h1>
+      <p class="lede">
+        Lean X Digital helps Malaysian businesses sell more, two ways. {nexova.name} is a store website that
+        grows itself. Or our team does the work for you: creative, ads, SEO and development.
+      </p>
+      <div class="actions">
+        <a class="btn btn-primary" href="#nexova" data-magnetic>See {nexova.name}</a>
+        <a class="btn btn-secondary" href="#services" data-magnetic>See the services</a>
+      </div>
+    </div>
+    <button class="hero-toggle" type="button" aria-label="Pause the animation" hidden>
+      <Icon name="pause" class="i-pause" />
+      <Icon name="play" class="i-play" />
+    </button>
   </section>
 
-  {
-    showDrafts && (
-      <div class="wrap" style="padding-bottom: 3rem">
-        <DraftNote label="Draft: proposed hero copy and title, for your decision">
-          <p>
-            The strategy report recommends keeping the promise and adding one line that says who it is for and how
-            results are measured:
-          </p>
-          <ul>
-            <li>Promise, kept: “We turn traffic into sales.”</li>
-            <li>Sub-headline: “Own-store growth for Malaysian online sellers, measured in paid orders.”</li>
-            <li>
-              Seller headline, to test in ads first: “Keep Shopee and TikTok Shop. Add a store you own, with ads that
-              bring paid orders.”
-            </li>
-            <li>Bahasa Malaysia promise, to test with native speakers: “Kami tukar traffic jadi sales.”</li>
-          </ul>
-          <p>
-            Also settle the page title. The live site’s title includes “Digital Marketing Agency In Kuala Lumpur” and
-            v2’s does not. This is the only page with ranking history, so decide with your keyword data. A draft of the
-            seller page is at <a href="/online-sellers/">/online-sellers/</a>.
-          </p>
-        </DraftNote>
-      </div>
-    )
-  }
+  <div class="over">
+    {
+      showDrafts && (
+        <div class="container draft-wrap">
+          <DraftNote label="Draft: proposed hero copy and title, for your decision">
+            <p>
+              The strategy report recommends keeping the promise and adding one line that says who it is for and how
+              results are measured:
+            </p>
+            <ul>
+              <li>Promise, kept: “We turn traffic into sales.”</li>
+              <li>Sub-headline: “Own-store growth for Malaysian online sellers, measured in paid orders.”</li>
+              <li>
+                Seller headline, to test in ads first: “Keep Shopee and TikTok Shop. Add a store you own, with ads that
+                bring paid orders.”
+              </li>
+              <li>Bahasa Malaysia promise, to test with native speakers: “Kami tukar traffic jadi sales.”</li>
+            </ul>
+            <p>
+              Also settle the page title. The live site’s title includes “Digital Marketing Agency In Kuala Lumpur” and
+              v2’s does not. This is the only page with ranking history, so decide with your keyword data. A draft of the
+              seller page is at <a href="/online-sellers/">/online-sellers/</a>.
+            </p>
+          </DraftNote>
+        </div>
+      )
+    }
 
-  <section class="section" aria-labelledby="ways-title">
-    <div class="wrap section-grid">
-      <div class="section-head">
-        <h2 id="ways-title">Two ways to grow</h2>
-        <p>{nexova.name} automates the same workflows our team runs for clients.</p>
+    <section class="ways" aria-labelledby="ways-title">
+      <div class="ways-track">
+        <div class="ways-stage">
+          <div class="ways-cards" aria-hidden="true">
+            <MockCard kind="poster" class="wc c1" />
+            <MockCard kind="reel" class="wc c2" />
+            <MockCard kind="search" class="wc c3" />
+            <MockCard kind="chat" class="wc c4" />
+            <MockCard kind="store" class="wc c5" />
+            <MockCard kind="crm" class="wc c6" />
+            <MockCard kind="chart" class="wc c7" />
+            <MockCard kind="ad" class="wc c8" />
+          </div>
+          <div class="intro ways-intro">
+            <h2 id="ways-title" data-split>Two ways to grow</h2>
+            <p>{nexova.name} automates the same workflows our team runs for clients.</p>
+          </div>
+        </div>
       </div>
-      <div class="split">
-        <div>
+      <div class="container card-grid card-grid-2 ways-choice">
+        <div class="card card-dark on-dark way" data-surface="dark" data-rise>
+          <span class="icon-tile"><Icon name="spark" /></span>
           <p class="eyebrow">Automated</p>
           <h3>{nexova.name}</h3>
           <p>
             A store website that grows itself. It creates its own content, runs its own Meta ads and handles its
             own SEO, with stock synced to Shopee and TikTok Shop. Free to start.
           </p>
-          <a class="btn btn-solid" href={`/products/${nexova.slug}/`}>
-            See {nexova.name}
-            <Icon name="arrow" />
-          </a>
+          <a class="btn btn-primary" href={`/products/${nexova.slug}/`}>See {nexova.name}</a>
         </div>
-        <div>
+        <div class="card way" data-rise>
+          <span class="icon-tile"><Icon name="users" /></span>
           <p class="eyebrow">Done for you</p>
           <h3>Our team</h3>
           <p>
             Our team makes your ads, runs your campaigns, works on your SEO and builds your website, CRM or
             app. {count.charAt(0).toUpperCase() + count.slice(1)} services, priced to the job.
           </p>
-          <a class="btn btn-line" href="/services/">
-            See the services
-            <Icon name="arrow" />
-          </a>
+          <a class="btn btn-secondary" href="/services/">See the services</a>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section class="section" id="nexova" aria-labelledby="nexova-title">
-    <div class="wrap section-grid">
-      <div class="section-head">
-        <p class="eyebrow">Product · {nexova.category}</p>
-        <h2 id="nexova-title" style="margin-top: 0.75rem">
-          <a href={`/products/${nexova.slug}/`}>{nexova.name}</a>
-        </h2>
-      </div>
-      <div>
-        <p>{nexova.definition}</p>
-        <div class="actions" style="margin-top: 1.5rem">
-          <a class="btn btn-solid" href={`/products/${nexova.slug}/`}>
-            About {nexova.name}
-            <Icon name="arrow" />
-          </a>
+    <div class="pinned">
+      <div class="pinned-stage">
+        <div class="pinned-glow" aria-hidden="true"></div>
+        <p class="pinned-text">
           {
-            nexova.website && (
-              <a class="btn btn-line" href={nexova.website.url} rel="noopener">
-                Start free at {nexova.website.label}
-                <Icon name="external" />
-              </a>
-            )
+            statementWords.map((w, i) => (
+              <>
+                <span class="w" style={`--i: ${i}`}>
+                  {w}
+                </span>{' '}
+              </>
+            ))
           }
-        </div>
-        <h3 class="subhead">What {nexova.name} does</h3>
-        <Features items={nexova.features} level="h4" />
+        </p>
+        {
+          pathPills.map(([text, icon], i) => (
+            <Label as="span" icon={icon} class={`sticker glass-pill s${i + 1}`} aria-hidden="true">
+              {text}
+            </Label>
+          ))
+        }
       </div>
     </div>
-  </section>
 
-  <section class="section" id="services" aria-labelledby="services-title">
-    <div class="wrap section-grid">
-      <div class="section-head">
-        <p class="eyebrow">Done for you</p>
-        <h2 id="services-title" style="margin-top: 0.75rem">Services</h2>
+    <section class="path section-dark" data-surface="dark" aria-labelledby="path-title">
+      <div class="path-stage">
+        <div class="container intro path-intro">
+          <Label icon="route">The path to a sale</Label>
+          <h2 id="path-title" data-split>We look at the whole path a customer takes</h2>
+        </div>
+        <ol class="path-track">
+          {
+            path4.map((step, i) => (
+              <li class:list={['path-panel', i % 2 ? 'is-dark' : 'is-light']} data-surface={i % 2 ? 'dark' : 'light'}>
+                <div class="path-copy">
+                  <p class="eyebrow">{String(i + 1).padStart(2, '0')} · {step.label}</p>
+                  <h3>{step.title}</h3>
+                  <p>{step.text}</p>
+                  <p class="path-links">
+                    {step.links.map(([name, href]) => (
+                      <a href={href}>{name}</a>
+                    ))}
+                  </p>
+                </div>
+                <div class="path-visual" aria-hidden="true">
+                  <div class="path-art">
+                    {step.visuals.map((k) => (
+                      <MockCard kind={k} />
+                    ))}
+                  </div>
+                </div>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+    </section>
+
+    <NexovaStage />
+
+    <section class="services-sec" id="services" aria-labelledby="services-title">
+      <div class="container intro">
+        <Label icon="users">Done for you</Label>
+        <h2 id="services-title" data-split>Services</h2>
         <p>Priced to the job. Message us on WhatsApp to start.</p>
       </div>
-      <RowList items={serviceRows(services)} />
-    </div>
-  </section>
+      <ServiceStack variant="home" />
+    </section>
 
-  <section class="section" aria-labelledby="facts-title">
-    <div class="wrap section-grid">
-      <div class="section-head">
-        <h2 id="facts-title">At a glance</h2>
-        <p>The short version, for anyone who needs the facts in one place.</p>
+    <section class="section section-white make" aria-labelledby="make-title">
+      <div class="container intro">
+        <Label icon="pen">Creative and development</Label>
+        <h2 id="make-title" data-split>What we make</h2>
+        <p>Each piece links to the service that makes it.</p>
       </div>
-      <Facts facts={facts} />
-    </div>
-  </section>
+      <div class="carousel" data-carousel>
+        <ul class="carousel-track">
+          {
+            makes.map((m, i) => (
+              <li class="carousel-card" style={`--c1: var(--card-${(i % 4) + 1}); --c2: var(--card-${(i % 4) + 1}b)`}>
+                <a href={m.href}>
+                  <span class="make-art" aria-hidden="true">
+                    <Icon name={m.icon} />
+                  </span>
+                  <span class="make-tag">{m.service}</span>
+                  <strong>{m.name}</strong>
+                  <span class="make-text">{m.text}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+        <div class="container carousel-nav">
+          <button class="btn-round" type="button" data-prev aria-label="Previous">
+            <Icon name="chevron-left" />
+          </button>
+          <button class="btn-round" type="button" data-next aria-label="Next">
+            <Icon name="chevron-right" />
+          </button>
+        </div>
+        <div class="drag-badge" aria-hidden="true">Drag</div>
+      </div>
+    </section>
 
-  <section class="section" aria-labelledby="faq-title">
-    <div class="wrap section-grid">
-      <div class="section-head">
-        <h2 id="faq-title">Questions</h2>
+    <section class="section how" aria-labelledby="how-title">
+      <div class="container">
+        <div class="intro">
+          <h2 id="how-title" data-split>How we work with you</h2>
+        </div>
+        <ul class="card-grid card-grid-4">
+          {
+            how.map((h) => (
+              <li class="card drop" data-rise>
+                <span class="icon-tile">
+                  <Icon name={h.icon} />
+                </span>
+                <h3>{h.title}</h3>
+                <p>{h.text}</p>
+              </li>
+            ))
+          }
+        </ul>
       </div>
-      <Faq faqs={faqs} />
-    </div>
-  </section>
+    </section>
+
+    <section class="section section-white" aria-labelledby="facts-title">
+      <div class="container">
+        <div class="intro">
+          <h2 id="facts-title" data-split>At a glance</h2>
+          <p>The short version, for anyone who needs the facts in one place.</p>
+        </div>
+        <Facts facts={facts} variant="bento" />
+      </div>
+    </section>
+
+    <FaqBlock faqs={faqs} title="Questions" openFirst />
+
+    <DarkGrid title="Industries" id="industries-title" note="Sectors our clients work in." items={site.industries} />
+  </div>
+  <script>
+    import '../scripts/hero';
+  </script>
 </Base>
+
+<style>
+  /* Hero: the background video under a soft wash of the page colour, sticky so the page rises over it.
+     Narrow and tall screens: the scene fills the lower half, cropped to the middle and lifted clear of the
+     nav pill. Wide screens (7:5 and wider): it fills the hero and the text sits in the sky. scripts/hero.ts
+     plays the video, sets --hero-over (the extra height when the hero is taller than the screen) and runs
+     the fade where CSS can't. */
+  .hero {
+    --wash: 249 250 250;
+    --frame-h: max(16rem, 46vh);
+    --frame-b: 5.25rem;
+    position: sticky;
+    top: calc(-1 * var(--hero-over, 0px));
+    display: grid;
+    place-items: center;
+    min-height: 100vh;
+    padding-block: 6.5rem calc(var(--frame-b) + var(--frame-h) * 0.7);
+    /* overflow, not only clip-path: the scene grows a little as it fades, and must not widen the page.
+       Safe here because nothing in the hero uses a view timeline (the fade follows the root scroller). */
+    overflow: hidden;
+    clip-path: inset(0);
+    background: var(--page);
+    text-align: center;
+  }
+
+  @supports (min-height: 100svh) {
+    .hero {
+      --frame-h: max(16rem, 46svh);
+      min-height: 100svh;
+    }
+  }
+
+  .hero-inner {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    justify-items: center;
+    gap: clamp(1.25rem, 3vh, 2rem);
+  }
+
+  /* The poster is the video's first frame, so the hero is complete before (or without) the video */
+  .hero-frame {
+    position: absolute;
+    inset: auto 0 var(--frame-b);
+    z-index: 0;
+    height: var(--frame-h);
+    pointer-events: none;
+    transform-origin: 50% 70%;
+  }
+
+  .hero-frame picture,
+  .hero-frame img,
+  .hero-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .hero-frame img,
+  .hero-video {
+    object-fit: cover;
+    object-position: 50% 100%;
+  }
+
+  .hero-video {
+    opacity: 0;
+  }
+
+  .hero-video.is-on {
+    opacity: 1;
+  }
+
+  /* The copy coming in fades over the one finishing (scripts/hero.ts uses the same 320 ms) */
+  .hero-video.is-front {
+    z-index: 1;
+    transition: opacity 0.32s linear;
+  }
+
+  /* The wash: the page colour melts into the sky, so the text sits on calm light (and, on narrow screens,
+     the floor fades into the page above the nav pill) */
+  .hero-frame::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background: linear-gradient(
+      to bottom,
+      rgb(var(--wash)) 0%,
+      rgb(var(--wash) / 0.92) 7%,
+      rgb(var(--wash) / 0.74) 15%,
+      rgb(var(--wash) / 0.5) 23%,
+      rgb(var(--wash) / 0.27) 31%,
+      rgb(var(--wash) / 0.1) 38%,
+      rgb(var(--wash) / 0) 45%,
+      rgb(var(--wash) / 0) 80%,
+      rgb(var(--wash) / 0.3) 88%,
+      rgb(var(--wash) / 0.72) 95%,
+      rgb(var(--wash)) 100%
+    );
+  }
+
+  /* Pause and play, required for motion that runs on its own */
+  .hero-toggle {
+    position: absolute;
+    right: var(--gutter);
+    /* At least 6.5 rem above the screen's bottom edge, so a hero taller than a small phone's screen never
+       loads with the button under the nav pill */
+    bottom: max(calc(var(--frame-b) + var(--frame-h) * 0.42), calc(var(--hero-over, 0px) + 6.5rem));
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    border: 1px solid rgb(1 1 1 / 0.08);
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.72);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    color: var(--ink);
+    cursor: pointer;
+    transition: background-color var(--fast), transform var(--mid) var(--ease-out);
+  }
+
+  /* Once the text has faded out (scripts/hero.ts adds .is-faded), the invisible controls stop taking clicks */
+  .hero:global(.is-faded) :is(.hero-inner, .hero-toggle) {
+    pointer-events: none;
+  }
+
+  .hero-toggle[hidden] {
+    display: none;
+  }
+
+  .hero-toggle:hover {
+    background: var(--paper);
+  }
+
+  .hero-toggle:active {
+    transform: scale(0.94);
+  }
+
+  .hero-toggle :global(svg) {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+
+  .hero-toggle :global(.i-play),
+  .hero-toggle.is-paused :global(.i-pause) {
+    display: none;
+  }
+
+  .hero-toggle.is-paused :global(.i-play) {
+    display: block;
+  }
+
+  /* Wide screens: the scene fills the hero and the text sits high in the sky, with clear space above the
+     people (their heads are at about 63% of the frame). Screens wider than 16:9 crop the video, so they crop
+     from the middle of the frame rather than the top, which keeps the people low and their feet in view. */
+  @media (min-aspect-ratio: 7 / 5) {
+    .hero {
+      align-content: start;
+      padding-block: clamp(5.75rem, 12.5vh, 8.5rem) 4rem;
+    }
+
+    .hero-inner {
+      gap: clamp(1rem, 2.6vh, 1.75rem);
+    }
+
+    .hero-frame {
+      inset: 0;
+      height: auto;
+    }
+
+    .hero-frame img,
+    .hero-video {
+      object-position: 50% 50%;
+    }
+
+    .hero-frame::after {
+      background: linear-gradient(
+        to bottom,
+        rgb(var(--wash)) 0%,
+        rgb(var(--wash) / 0.94) 12%,
+        rgb(var(--wash) / 0.82) 22%,
+        rgb(var(--wash) / 0.62) 32%,
+        rgb(var(--wash) / 0.4) 42%,
+        rgb(var(--wash) / 0.2) 51%,
+        rgb(var(--wash) / 0.07) 59%,
+        rgb(var(--wash) / 0) 66%
+      );
+    }
+
+    .hero-toggle {
+      bottom: clamp(1.25rem, 4vh, 2.5rem);
+    }
+  }
+
+  .hero h1 {
+    max-width: 15ch;
+    font-size: clamp(2.5rem, 1rem + 5.4vw, 5.5rem);
+    line-height: 1.04;
+    letter-spacing: -0.035em;
+  }
+
+  .hero .lede {
+    max-width: var(--measure-2);
+  }
+
+  /* On wide screens the heading also scales with the height (72 px at most), so the whole block stays in
+     the sky on short laptop screens too; the intro gets a slightly wider measure and a height-aware size */
+  @media (min-aspect-ratio: 7 / 5) {
+    .hero h1 {
+      font-size: clamp(2.5rem, min(1rem + 4.2vw, 8.2vh), 4.5rem);
+    }
+
+    .hero .lede {
+      max-width: 46rem;
+      font-size: clamp(1rem, 2.2vh, 1.25rem);
+    }
+  }
+
+  .hero .actions {
+    justify-content: center;
+  }
+
+
+  /* Rotating badge: three facts take turns */
+  .badges {
+    display: grid;
+  }
+
+  .badges :global(.badge) {
+    grid-area: 1 / 1;
+    justify-self: center;
+    align-self: center;
+    margin: 0;
+  }
+
+  .badges :global(.badge + .badge) {
+    visibility: hidden;
+  }
+
+  /* Everything after the hero rides over it. Its leading edge is a soft veil of the page colour, so the
+     hero dissolves into the page instead of meeting a hard edge. */
+  .over {
+    --veil: clamp(7rem, 24vh, 15rem);
+    position: relative;
+    z-index: 1;
+    padding-top: var(--veil);
+    background: linear-gradient(
+      to bottom,
+      rgb(249 250 250 / 0) 0,
+      rgb(249 250 250 / 0.18) calc(var(--veil) * 0.2),
+      rgb(249 250 250 / 0.45) calc(var(--veil) * 0.4),
+      rgb(249 250 250 / 0.75) calc(var(--veil) * 0.62),
+      rgb(249 250 250 / 0.94) calc(var(--veil) * 0.82),
+      var(--page) var(--veil)
+    );
+  }
+
+  .over > .draft-wrap {
+    padding-top: 2.5rem;
+  }
+
+  /* Two ways to grow: a sticky stage with interface cards around the title */
+  .ways {
+    background: var(--page);
+  }
+
+  .ways-track {
+    position: relative;
+  }
+
+  .ways-stage {
+    position: relative;
+    display: grid;
+    place-items: center;
+    padding-block: var(--section-s) 3rem;
+  }
+
+  .ways-cards {
+    display: none;
+  }
+
+  .ways-intro h2 {
+    font-size: var(--fs-h1);
+  }
+
+  .ways-choice {
+    padding-bottom: var(--section-s);
+  }
+
+  .way {
+    min-height: 22rem;
+  }
+
+  .way h3 {
+    font-size: var(--fs-h3);
+  }
+
+  .way .icon-tile {
+    margin-bottom: 1rem;
+  }
+
+  @media (min-width: 64rem) {
+    /* A full-screen stage with the collage around the title; the motion block pins it and makes it fly */
+    .ways-stage {
+      min-height: 100vh;
+      padding: 0;
+      /* clip-path, not overflow, so the heading's scroll timeline still follows the page */
+      clip-path: inset(0);
+    }
+
+    .ways-cards {
+      display: block;
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+
+    .ways-cards :global(.wc) {
+      position: absolute;
+      left: calc(50% + var(--x));
+      top: calc(50% + var(--y));
+      transform: translate(-50%, -50%) rotate(var(--r));
+    }
+
+    .ways-cards :global(.c1) { --x: -36vw; --y: -24vh; --r: -4deg; --fx: -30vw; --fy: -30vh; }
+    .ways-cards :global(.c2) { --x: 34vw; --y: -22vh; --r: 5deg; --fx: 28vw; --fy: -34vh; }
+    .ways-cards :global(.c3) { --x: -30vw; --y: 18vh; --r: 3deg; --fx: -34vw; --fy: 24vh; }
+    .ways-cards :global(.c4) { --x: 36vw; --y: 20vh; --r: -3deg; --fx: 30vw; --fy: 30vh; }
+    .ways-cards :global(.c5) { --x: -14vw; --y: -34vh; --r: 2deg; --fx: -10vw; --fy: -40vh; }
+    .ways-cards :global(.c6) { --x: 15vw; --y: 33vh; --r: -2deg; --fx: 12vw; --fy: 40vh; }
+    .ways-cards :global(.c7) { --x: 16vw; --y: -36vh; --r: -5deg; --fx: 14vw; --fy: -44vh; }
+    .ways-cards :global(.c8) { --x: -17vw; --y: 34vh; --r: 4deg; --fx: -16vw; --fy: 42vh; }
+
+    .ways-intro {
+      position: relative;
+      z-index: 2;
+      max-width: 40rem;
+    }
+  }
+
+  /* Pinned statement: words ink in as it holds; five glass pills pop on around it */
+  .pinned {
+    position: relative;
+    background: var(--page);
+  }
+
+  .pinned-stage {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 0.75rem;
+    padding: var(--section-s) var(--gutter);
+  }
+
+  /* A faint colour field behind the statement, so the glass pills pick up a tint through their blur */
+  .pinned-glow {
+    position: absolute;
+    inset: 6% 2%;
+    z-index: 0;
+    background:
+      radial-gradient(26% 32% at 16% 28%, rgb(143 230 244 / 0.3), transparent 70%),
+      radial-gradient(28% 34% at 84% 34%, rgb(91 124 240 / 0.16), transparent 72%),
+      radial-gradient(30% 34% at 24% 76%, rgb(153 62 255 / 0.11), transparent 72%),
+      radial-gradient(28% 32% at 78% 78%, rgb(241 60 164 / 0.11), transparent 72%);
+    pointer-events: none;
+  }
+
+  .pinned-text {
+    position: relative;
+    z-index: 1;
+    flex: 0 0 100%;
+    /* The measure comes from padding, not max-width, so the statement still fills its own line and the
+       pills wrap onto centred rows below it */
+    padding-inline: max(0px, (100% - 30ch) / 2);
+    margin-bottom: 1.25rem;
+    font-size: var(--fs-statement);
+    font-weight: 500;
+    line-height: 1.3;
+    letter-spacing: -0.018em;
+    text-align: center;
+    color: var(--ink);
+  }
+
+  /* The pills (Label markup with the shared .glass-pill style). Here they sit in a centred row under the
+     statement; when the scene is pinned (motion block) they float around it, clear of every word. */
+  .pinned-stage :global(.sticker) {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* The path to a sale: a black section whose four steps are full-bleed panels. Without the scroll scene they
+     are stacked full-width bands (light and dark in turn); the motion block pins the section and slides them
+     in sideways, after the reference's "Your creative partner" section. */
+  .path {
+    --bite: 0.875rem;
+    --bite-y: 3.5rem;
+    padding-top: var(--section);
+  }
+
+  .path-track {
+    display: grid;
+    margin-top: clamp(2.5rem, 2rem + 3vw, 4.5rem);
+  }
+
+  .path-panel {
+    display: grid;
+    align-content: center;
+    gap: clamp(2rem, 1.5rem + 2vw, 3.5rem);
+    padding: clamp(3rem, 2rem + 4vw, 5.5rem) var(--gutter);
+  }
+
+  /* Light panels: ticket notches, four small round bites on the side edges near the top and the bottom */
+  .path-panel.is-light {
+    background: var(--paper);
+    color: var(--text);
+    -webkit-mask:
+      radial-gradient(circle var(--bite) at 0 var(--bite-y), #0000 calc(100% - 0.5px), #000) top left / 51% 51% no-repeat,
+      radial-gradient(circle var(--bite) at 100% var(--bite-y), #0000 calc(100% - 0.5px), #000) top right / 51% 51% no-repeat,
+      radial-gradient(circle var(--bite) at 0 calc(100% - var(--bite-y)), #0000 calc(100% - 0.5px), #000) bottom left / 51% 51% no-repeat,
+      radial-gradient(circle var(--bite) at 100% calc(100% - var(--bite-y)), #0000 calc(100% - 0.5px), #000) bottom right / 51% 51% no-repeat;
+    mask:
+      radial-gradient(circle var(--bite) at 0 var(--bite-y), #0000 calc(100% - 0.5px), #000) top left / 51% 51% no-repeat,
+      radial-gradient(circle var(--bite) at 100% var(--bite-y), #0000 calc(100% - 0.5px), #000) top right / 51% 51% no-repeat,
+      radial-gradient(circle var(--bite) at 0 calc(100% - var(--bite-y)), #0000 calc(100% - 0.5px), #000) bottom left / 51% 51% no-repeat,
+      radial-gradient(circle var(--bite) at 100% calc(100% - var(--bite-y)), #0000 calc(100% - 0.5px), #000) bottom right / 51% 51% no-repeat;
+  }
+
+  .path-panel.is-dark {
+    background: var(--dark);
+    color: var(--on-dark);
+  }
+
+  .path-copy {
+    display: grid;
+    justify-items: center;
+    gap: 1rem;
+    text-align: center;
+  }
+
+  .path-copy .eyebrow {
+    color: var(--text-3);
+  }
+
+  .is-dark .path-copy .eyebrow {
+    color: var(--on-dark-3);
+  }
+
+  .path-copy h3 {
+    max-width: 16ch;
+    color: var(--ink);
+    font-size: var(--fs-display-s, clamp(2rem, 1.25rem + 2.6vw, 3rem));
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+  }
+
+  .is-dark .path-copy h3 {
+    color: var(--on-dark);
+  }
+
+  .path-copy p:not(.eyebrow) {
+    max-width: 34rem;
+    font-size: var(--fs-large);
+    color: var(--text-2);
+  }
+
+  .is-dark .path-copy p:not(.eyebrow) {
+    color: var(--on-dark-2);
+  }
+
+  .path-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem 1.5rem;
+    margin-top: 0.25rem;
+  }
+
+  .path-copy .path-links a {
+    color: var(--ink);
+    font-weight: 500;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.25em;
+    transition: text-decoration-thickness var(--fast);
+  }
+
+  .path-copy .path-links a:hover {
+    text-decoration-thickness: 2px;
+  }
+
+  .is-dark .path-copy .path-links a {
+    color: var(--on-dark);
+  }
+
+  .path-panel :focus-visible {
+    outline-color: var(--ink);
+  }
+
+  .path-panel.is-dark :focus-visible {
+    outline-color: var(--on-dark);
+  }
+
+  /* The visual: the step's interface sketches on a soft tile, larger than in a card */
+  .path-visual {
+    display: grid;
+    place-items: center;
+    min-width: 0;
+  }
+
+  .path-art {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    width: min(100%, 36rem);
+    padding: clamp(1.5rem, 1rem + 3vw, 3rem) clamp(1rem, 0.5rem + 2vw, 2rem);
+    border-radius: var(--radius-l);
+    background: linear-gradient(160deg, #eef1ff, #fbeefe);
+    overflow: hidden;
+  }
+
+  .is-dark .path-art {
+    background: linear-gradient(165deg, #1d2742, #4a5f95);
+  }
+
+  .path-art :global(.mock) {
+    flex: 0 1 auto;
+    min-width: 0;
+  }
+
+  /* The two sketches sit a little apart in height, half up and half down, so neither leaves the tile */
+  .path-art :global(.mock:nth-child(1)) {
+    translate: 0 -0.625rem;
+  }
+
+  .path-art :global(.mock:nth-child(2)) {
+    translate: 0 0.625rem;
+  }
+
+  @media (min-width: 40rem) {
+    .path-art :global(.mock) {
+      zoom: 1.15;
+    }
+  }
+
+  /* Wide screens, stacked: copy and visual side by side, swapping sides on the dark bands */
+  @media (min-width: 64rem) {
+    .path {
+      --bite: 1rem;
+      --bite-y: 4rem;
+    }
+
+    .path-panel {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      align-items: center;
+      /* Longhands: Safari 14.0 drops a padding-inline shorthand that holds var() */
+      padding-inline-start: max(var(--gutter), calc((100% - var(--container)) / 2 + var(--gutter)));
+      padding-inline-end: max(var(--gutter), calc((100% - var(--container)) / 2 + var(--gutter)));
+    }
+
+    .path-panel.is-dark .path-visual {
+      order: -1;
+    }
+  }
+
+  /* What we make: a horizontal carousel whose cards ride an arc */
+  .carousel {
+    position: relative;
+  }
+
+  .carousel-track {
+    display: flex;
+    gap: 1rem;
+    padding: 2.5rem max(var(--gutter), calc(50vw - 11rem)) 4rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    cursor: grab;
+  }
+
+  .carousel-track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .carousel-track:global(.is-dragging) {
+    cursor: grabbing;
+    scroll-snap-type: none;
+  }
+
+  .carousel-track:global(.is-gliding) {
+    scroll-snap-type: none;
+  }
+
+  .carousel-card {
+    flex: none;
+    width: min(22rem, 78vw);
+    scroll-snap-align: center;
+  }
+
+  .carousel-card a {
+    display: grid;
+    align-content: start;
+    gap: 0.75rem;
+    height: 100%;
+    min-height: 26rem;
+    padding: 1rem 1rem 1.75rem;
+    border-radius: var(--radius-xl);
+    background: var(--page);
+    text-decoration: none;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  .make-art {
+    display: grid;
+    place-items: center;
+    height: 13rem;
+    margin-bottom: 0.5rem;
+    border-radius: calc(var(--radius-xl) - 0.75rem);
+    background: linear-gradient(160deg, var(--c1), var(--c2));
+    color: var(--paper);
+  }
+
+  .make-art :global(svg) {
+    width: 4rem;
+    height: 4rem;
+    stroke-width: 1.2;
+  }
+
+  .make-tag,
+  .carousel-card strong,
+  .make-text {
+    padding-inline: 0.75rem;
+  }
+
+  .make-tag {
+    font-size: var(--fs-label);
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+
+  .carousel-card strong {
+    font-size: var(--fs-h3);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+
+  .make-text {
+    color: var(--text-2);
+  }
+
+  .carousel-card a:hover strong {
+    text-decoration: underline;
+    text-decoration-thickness: 1.5px;
+  }
+
+  .carousel-nav {
+    display: flex;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+
+  .drag-badge {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 5;
+    display: grid;
+    place-items: center;
+    width: 6.5rem;
+    height: 6.5rem;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--paper);
+    font-size: var(--fs-caption);
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s, transform 0.12s linear;
+  }
+
+  .drag-badge:global(.is-on) {
+    opacity: 1;
+  }
+
+  /* Arc: cards tilt and dip the further they are from the centre (set by the script) */
+  .carousel:global(.is-arc) .carousel-card {
+    transform: translateY(calc(min(var(--ad, 0), 1.5) * min(var(--ad, 0), 1.5) * 1rem))
+      rotate(calc(clamp(-1.5, var(--d, 0), 1.5) * 4deg)) scale(calc(1 - min(var(--ad, 0), 3) * 0.04));
+    transform-origin: 50% 100%;
+  }
+
+  /* How we work with you: cards drop a little on hover */
+  .drop {
+    min-height: 12rem;
+    transition: translate 0.35s var(--ease-out), box-shadow 0.35s var(--ease-out);
+  }
+
+  .drop .icon-tile {
+    margin-bottom: auto;
+  }
+
+  .drop h3 {
+    margin-top: 1.5rem;
+  }
+
+  @media (min-width: 64rem) {
+    .drop {
+      min-height: 17rem;
+    }
+
+    .drop h3 {
+      margin-top: 2.5rem;
+    }
+  }
+
+  @media (hover: hover) and (min-width: 64rem) {
+    .drop:hover {
+      translate: 0 1.5rem;
+      box-shadow: var(--shadow-card);
+    }
+  }
+
+  @media screen and (prefers-reduced-motion: no-preference) {
+    /* Hero into the next section: as the page rises, the text drifts up and fades, and the scene eases
+       in a little and fades, in step with the scroll. Only the hero does this. */
+    @supports (animation-timeline: scroll()) {
+      .hero-inner {
+        animation: hero-out linear both;
+        animation-timeline: scroll(root);
+        animation-range: var(--hero-over, 0px) calc(var(--hero-over, 0px) + 60vh);
+      }
+
+      .hero-toggle {
+        animation: hero-toggle-out linear both;
+        animation-timeline: scroll(root);
+        animation-range: var(--hero-over, 0px) calc(var(--hero-over, 0px) + 60vh);
+      }
+
+      .hero-frame {
+        animation: hero-media-out linear both;
+        animation-timeline: scroll(root);
+        animation-range: calc(var(--hero-over, 0px) + 10vh) calc(var(--hero-over, 0px) + 100vh);
+      }
+
+      /* The text and the pause button only fade: they stay focusable, so Shift+Tab from the page below
+         reaches them and the hero scrolls back into view (scripts/hero.ts). Once faded they stop taking
+         clicks (.is-faded below). */
+      @keyframes hero-out {
+        45% {
+          opacity: 0.78;
+        }
+
+        to {
+          opacity: 0;
+          transform: translate3d(0, -7vh, 0) scale(0.965);
+        }
+      }
+
+      @keyframes hero-toggle-out {
+        to {
+          opacity: 0;
+        }
+      }
+
+      @keyframes hero-media-out {
+        to {
+          opacity: 0;
+          transform: scale(1.06);
+          visibility: hidden;
+        }
+      }
+    }
+
+    .badges :global(.badge) {
+      animation: badge 12s infinite both;
+      animation-delay: -0.24s;
+    }
+
+    .badges :global(.badge + .badge) {
+      visibility: visible;
+    }
+
+    .badges :global(.badge:nth-child(2)) {
+      animation-delay: -8.24s;
+    }
+
+    .badges :global(.badge:nth-child(3)) {
+      animation-delay: -4.24s;
+    }
+
+    /* Paused while pointed at, and with the hero's pause button */
+    .badges:hover :global(.badge),
+    .hero:global(.is-still) .badges :global(.badge) {
+      animation-play-state: paused;
+    }
+
+    @keyframes badge {
+      0% {
+        opacity: 0;
+        transform: translateY(0.5rem);
+      }
+
+      2%,
+      31% {
+        opacity: 1;
+        transform: none;
+      }
+
+      33.333%,
+      100% {
+        opacity: 0;
+        transform: translateY(-0.5rem);
+      }
+    }
+
+    @supports (animation-timeline: view()) {
+      /* Two ways: interface cards gather in, hold around the title, then fly outward */
+      @media (min-width: 64rem) {
+        .ways-track {
+          height: 210vh;
+          view-timeline-name: --ways;
+        }
+
+        .ways-stage {
+          position: sticky;
+          top: 0;
+          height: 100vh;
+        }
+
+        .ways-cards :global(.wc) {
+          animation: ways-fly linear both;
+          animation-timeline: --ways;
+          animation-range: contain 0% contain 100%;
+        }
+
+        @keyframes ways-fly {
+          0% {
+            opacity: 0;
+            transform: translate(calc(-50% - var(--x) * 0.55), calc(-50% - var(--y) * 0.55)) rotate(0deg) scale(0.7);
+            animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
+          }
+
+          30% {
+            opacity: 1;
+            transform: translate(-50%, -50%) rotate(var(--r)) scale(1);
+          }
+
+          55% {
+            opacity: 1;
+            transform: translate(-50%, -50%) rotate(var(--r)) scale(1);
+            animation-timing-function: cubic-bezier(0.5, 0, 0.75, 0);
+          }
+
+          100% {
+            opacity: 0;
+            transform: translate(calc(-50% + var(--fx)), calc(-50% + var(--fy))) rotate(calc(var(--r) * 2)) scale(1.25);
+          }
+        }
+      }
+
+      /* Pinned statement */
+      .pinned {
+        height: 220vh;
+        view-timeline-name: --pin;
+      }
+
+      .pinned-stage {
+        position: sticky;
+        top: 0;
+        display: grid;
+        place-items: center;
+        height: 100vh;
+        padding: 0 var(--gutter);
+      }
+
+      .pinned-text {
+        margin-bottom: 0;
+      }
+
+      /* Phones: two above, one between, two below the statement, clear of the nav pill */
+      .pinned-stage :global(.sticker) {
+        position: absolute;
+      }
+
+      .pinned-stage :global(.s1) {
+        left: var(--gutter);
+        top: 11%;
+      }
+
+      .pinned-stage :global(.s2) {
+        right: var(--gutter);
+        top: 11%;
+      }
+
+      .pinned-stage :global(.s3) {
+        left: 0;
+        right: 0;
+        top: 19%;
+        width: fit-content;
+        margin-inline: auto;
+      }
+
+      .pinned-stage :global(.s4) {
+        left: var(--gutter);
+        bottom: 24%;
+      }
+
+      .pinned-stage :global(.s5) {
+        right: var(--gutter);
+        bottom: 24%;
+      }
+
+      /* Tablets and small laptops: two above, three below */
+      @media (min-width: 48rem) {
+        .pinned-stage :global(.s1) {
+          left: max(var(--gutter), 8%);
+          top: 13%;
+        }
+
+        .pinned-stage :global(.s2) {
+          right: max(var(--gutter), 9%);
+          top: 18%;
+        }
+
+        .pinned-stage :global(.s3) {
+          left: max(var(--gutter), 6%);
+          right: auto;
+          top: auto;
+          bottom: 25%;
+          margin: 0;
+        }
+
+        .pinned-stage :global(.s4) {
+          left: auto;
+          right: max(var(--gutter), 7%);
+          bottom: 21%;
+        }
+
+        /* Centred over the nav pill, so it keeps at least 8 rem from the bottom (pill and pop-in clear) */
+        .pinned-stage :global(.s5) {
+          left: 0;
+          right: 0;
+          bottom: max(14%, 8rem);
+          width: fit-content;
+          margin-inline: auto;
+        }
+      }
+
+      /* Wide screens: around the statement, two on each side and one below */
+      @media (min-width: 80rem) {
+        .pinned-stage :global(.s1) {
+          left: max(var(--gutter), 11%);
+          top: 19%;
+        }
+
+        .pinned-stage :global(.s2) {
+          right: max(var(--gutter), 12%);
+          top: 25%;
+        }
+
+        .pinned-stage :global(.s3) {
+          left: max(var(--gutter), 6%);
+          top: 54%;
+          bottom: auto;
+        }
+
+        .pinned-stage :global(.s4) {
+          right: max(var(--gutter), 7%);
+          top: 60%;
+          bottom: auto;
+        }
+
+        .pinned-stage :global(.s5) {
+          left: 32%;
+          right: auto;
+          bottom: max(17%, 8rem);
+          margin: 0;
+        }
+      }
+
+      .pinned-text :global(.w) {
+        opacity: 0.12;
+        animation: word-ink linear both;
+        animation-timeline: --pin;
+        animation-range: contain calc(4% + var(--i) * 2.6%) contain calc(9% + var(--i) * 2.6%);
+      }
+
+      @keyframes word-ink {
+        to {
+          opacity: 1;
+        }
+      }
+
+      .pinned-stage :global(.sticker) {
+        animation: pop linear both;
+        animation-timeline: --pin;
+      }
+
+      .pinned-stage :global(.s1) {
+        animation-range: contain 18% contain 26%;
+      }
+
+      .pinned-stage :global(.s2) {
+        animation-range: contain 30% contain 38%;
+      }
+
+      .pinned-stage :global(.s3) {
+        animation-range: contain 42% contain 50%;
+      }
+
+      .pinned-stage :global(.s4) {
+        animation-range: contain 54% contain 62%;
+      }
+
+      .pinned-stage :global(.s5) {
+        animation-range: contain 66% contain 74%;
+      }
+
+      @keyframes pop {
+        from {
+          opacity: 0;
+          transform: translateY(1rem);
+          animation-timing-function: var(--ease-out);
+        }
+
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+
+      /* The path to a sale, after the reference's "Your creative partner" section: the section pins and the
+         four steps arrive from the right as full-height panels, one screen each on phones and two side by side
+         on wide screens, where the heading first makes room in the left half. Only on screens tall enough. */
+      @media (min-height: 36rem) {
+        .path {
+          --pw: 100cqw;
+          height: 560vh;
+          padding: 0;
+          view-timeline-name: --path;
+        }
+
+        /* overflow: clip keeps the sliding track out of the page width without making a scroll container, so
+           the heading's timeline still follows the page. The stage is a container, so the panels measure the
+           visible width (cqw) rather than the viewport with its scrollbar (vw). */
+        .path-stage {
+          position: sticky;
+          top: 0;
+          display: grid;
+          place-items: center;
+          height: 100vh;
+          height: 100svh;
+          container: path-stage / inline-size;
+          overflow: clip;
+          clip-path: inset(0);
+        }
+
+        .path-intro {
+          animation: path-intro-m linear both;
+          animation-timeline: --path;
+          animation-range: contain 0% contain 100%;
+        }
+
+        .path-track {
+          position: absolute;
+          top: 0;
+          left: 0;
+          display: flex;
+          width: max-content;
+          height: 100%;
+          margin: 0;
+          animation: path-steps-m linear both;
+          animation-timeline: --path;
+          animation-range: contain 0% contain 100%;
+        }
+
+        /* Each panel: the words, then the sketch filling what is left (the sketch first on the dark panels).
+           The bottom padding keeps every line at least 1 rem clear of the nav pill. */
+        .path-panel {
+          flex: none;
+          display: flex;
+          flex-direction: column;
+          align-items: stretch;
+          gap: clamp(1.25rem, 4svh, 3rem);
+          width: var(--pw);
+          height: 100%;
+          padding: clamp(2.5rem, 7svh, 5rem) clamp(1.25rem, 4cqw, 3.5rem) clamp(5.75rem, 11svh, 7rem);
+        }
+
+        @media (min-width: 48rem) {
+          .path-panel {
+            padding-bottom: clamp(6.75rem, 12svh, 8rem);
+          }
+        }
+
+        .path-panel.is-dark .path-visual {
+          order: -1;
+        }
+
+        .path-copy {
+          flex: none;
+        }
+
+        .path-copy h3 {
+          max-width: 16ch;
+          font-size: max(1.75rem, min(var(--fs-display-s, 3rem), 5.6svh));
+        }
+
+        /* The sketch area takes the height that is left and is a container, so the sketches can step down
+           in size, and leave, when a panel has little room */
+        .path-visual {
+          flex: 1 1 0;
+          min-height: 0;
+          container: path-visual / size;
+        }
+
+        /* The steps fit the tallest sketch (the 13 rem reel) plus the tile's padding */
+        .path-art {
+          max-height: 100%;
+          padding-block: 1.25rem;
+        }
+
+        @container path-visual (max-height: 17.5rem) {
+          .path-art :global(.mock) {
+            zoom: 1;
+          }
+        }
+
+        @container path-visual (max-height: 15.5rem) {
+          .path-art :global(.mock) {
+            zoom: 0.8;
+          }
+        }
+
+        @container path-visual (max-height: 13rem) {
+          .path-art :global(.mock) {
+            zoom: 0.7;
+          }
+        }
+
+        @container path-visual (max-height: 11.5rem) {
+          .path-art {
+            display: none;
+          }
+        }
+
+        /* Landscape screens that show one panel at a time (tablets on their side, short laptop screens): the
+           words and the sketch side by side, the sketch on the left of the dark panels */
+        @media (min-width: 48rem) and (max-width: 63.99rem) and (min-aspect-ratio: 4 / 3),
+          (min-width: 48rem) and (max-height: 45.99rem) and (min-aspect-ratio: 4 / 3) {
+          .path-panel {
+            flex-direction: row;
+            align-items: center;
+            gap: clamp(2rem, 5cqw, 5rem);
+            padding-inline: max(var(--gutter), calc((100cqw - var(--container)) / 2 + var(--gutter)));
+          }
+
+          .path-copy {
+            flex: 1 1 0;
+          }
+
+          .path-visual {
+            align-self: stretch;
+          }
+        }
+
+        /* Keyboard users get a swipeable row instead, so the focused link scrolls into view */
+        .path-stage:has(:focus-visible) .path-intro {
+          animation: none;
+          opacity: 0;
+        }
+
+        .path-stage:has(:focus-visible) .path-track {
+          right: 0;
+          width: auto;
+          animation: none;
+          overflow-x: auto;
+          scroll-snap-type: x mandatory;
+          scrollbar-width: none;
+        }
+
+        .path-stage:has(:focus-visible) .path-panel {
+          scroll-snap-align: start;
+        }
+
+        @keyframes path-intro-m {
+          0%,
+          5% {
+            opacity: 1;
+            transform: none;
+          }
+
+          19%,
+          100% {
+            opacity: 0;
+            transform: scale(0.92);
+          }
+        }
+
+        @keyframes path-steps-m {
+          0%,
+          5% {
+            transform: translateX(var(--pw));
+          }
+
+          19%,
+          27% {
+            transform: translateX(0);
+          }
+
+          41%,
+          49% {
+            transform: translateX(calc(var(--pw) * -1));
+          }
+
+          63%,
+          71% {
+            transform: translateX(calc(var(--pw) * -2));
+          }
+
+          85%,
+          100% {
+            transform: translateX(calc(var(--pw) * -3));
+          }
+        }
+
+        /* Wide screens tall enough for words and sketch in a half-width panel: two panels side by side. The
+           heading moves into the left half as the first panel takes the right half, then leaves with it;
+           after that the panels step along one at a time. */
+        @media (min-width: 64rem) and (min-height: 46rem) {
+          .path {
+            --pw: 50cqw;
+            height: 460vh;
+          }
+
+          .path-intro {
+            max-width: calc(50cqw - 4rem);
+            animation-name: path-intro-d;
+          }
+
+          .path-track {
+            animation-name: path-steps-d;
+          }
+
+          @keyframes path-intro-d {
+            0%,
+            4% {
+              opacity: 1;
+              transform: none;
+            }
+
+            16%,
+            22% {
+              opacity: 1;
+              transform: translateX(-25cqw);
+            }
+
+            34%,
+            100% {
+              opacity: 0;
+              transform: translateX(-75cqw);
+            }
+          }
+
+          @keyframes path-steps-d {
+            0%,
+            4% {
+              transform: translateX(calc(var(--pw) * 2));
+            }
+
+            16%,
+            22% {
+              transform: translateX(var(--pw));
+            }
+
+            34%,
+            46% {
+              transform: translateX(0);
+            }
+
+            58%,
+            70% {
+              transform: translateX(calc(var(--pw) * -1));
+            }
+
+            82%,
+            100% {
+              transform: translateX(calc(var(--pw) * -2));
+            }
+          }
+        }
+      }
+    }
+  }
+</style>

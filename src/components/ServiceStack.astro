@@ -1,0 +1,329 @@
+---
+// The services as full-width colour cards that stack while the page scrolls: each new card slides over
+// the last, which shrinks and tilts back. Without scroll-driven animation support the cards still
+// stack (sticky), just without the tilt.
+import Icon from './Icon.astro';
+import MockCard, { type MockKind } from './MockCard.astro';
+import { services, whatsappUrl } from '../data/services';
+import { products } from '../data/products';
+import { lcFirst } from '../lib/text';
+
+interface Props {
+  /** home: name, category, summary and a link. full: the services page with definition and WhatsApp. */
+  variant?: 'home' | 'full';
+  titleTag?: 'h2' | 'h3';
+}
+const { variant = 'home', titleTag = 'h3' } = Astro.props;
+const Title = titleTag;
+const nexova = products[0];
+// Interface sketches per service, standing in for project thumbnails until real work can be shown.
+const sketches: Record<string, MockKind[]> = {
+  'creative-agency': ['poster', 'reel', 'ad'],
+  'paid-advertising': ['ad', 'chart', 'search'],
+  seo: ['search', 'chart', 'store'],
+  'web-development': ['store', 'crm', 'chat'],
+};
+---
+
+<div class:list={['stack', `stack-${variant}`]} style={`--n: ${services.length}`}>
+  {
+    services.map((s, i) => {
+      const n = String(i + 1).padStart(2, '0');
+      const c = (i % 4) + 1;
+      return (
+        <article
+          class="stack-card on-dark"
+          style={`--k: ${i}; --c1: var(--card-${c}); --c2: var(--card-${c}b)`}
+          aria-labelledby={`${s.slug}-title`}
+        >
+          <div class="stack-top">
+            <Title id={`${s.slug}-title`} class="stack-title">
+              <a href={`/services/${s.slug}/`}>{s.name}</a>
+            </Title>
+            <span class="stack-num" aria-hidden="true">
+              /{n}
+            </span>
+          </div>
+          <div class="stack-sketches" aria-hidden="true">
+            {(sketches[s.slug] ?? []).map((k) => (
+              <MockCard kind={k} />
+            ))}
+          </div>
+          <div class="stack-panel">
+            <div class="stack-copy">
+              {variant === 'full' ? (
+                <p class="stack-cat">
+                  {n} · {s.category}
+                </p>
+              ) : (
+                <p class="stack-cat">
+                  <span class="visually-hidden">{n} </span>
+                  {s.category}
+                </p>
+              )}
+              {variant === 'full' ? (
+                <>
+                  <p>{s.definition}</p>
+                  {s.automated && (
+                    <p class="stack-auto">
+                      Prefer it automated? <a href={`/products/${nexova.slug}/`}>{nexova.name} {s.automated.feature}</a>{' '}
+                      does this on its own.
+                    </p>
+                  )}
+                </>
+              ) : (
+                <p>{s.summary}</p>
+              )}
+            </div>
+            <div class="actions">
+              <a class="btn btn-primary" href={`/services/${s.slug}/`}>
+                About {lcFirst(s.name)}
+              </a>
+              {variant === 'full' && (
+                <a class="btn btn-secondary" href={whatsappUrl(s)}>
+                  <Icon name="chat" />
+                  WhatsApp us
+                </a>
+              )}
+            </div>
+          </div>
+        </article>
+      );
+    })
+  }
+</div>
+
+<style>
+  .stack {
+    display: grid;
+    gap: 1.5rem;
+    width: min(100% - var(--gutter) * 2, var(--container));
+    margin-inline: auto;
+    perspective: 2400px;
+  }
+
+  /* Cards stack (sticky) only where a whole card can come into view before the next one covers it */
+  .stack-card {
+    min-width: 0;
+    position: relative;
+    top: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 3rem;
+    min-height: min(46rem, 82vh);
+    padding: clamp(1.5rem, 1rem + 3vw, 4rem);
+    border-radius: var(--radius-xl);
+    background: linear-gradient(180deg, var(--c1), var(--c2));
+    color: var(--on-dark);
+    transform-origin: 50% 0;
+    box-shadow: 0 -20px 50px rgb(0 0 0 / 0.08);
+  }
+
+  @media (min-height: 36rem) {
+    .stack-card {
+      position: sticky;
+    }
+  }
+
+  @media (min-width: 48rem) {
+    .stack-card {
+      top: 2rem;
+    }
+  }
+
+  /* Keyboard focus inside a covered card brings that card to the front */
+  .stack-card:focus-within {
+    z-index: 1;
+  }
+
+  .stack-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+
+  .stack-title {
+    max-width: 14ch;
+    color: var(--on-dark);
+    font-size: var(--fs-h1);
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+
+  .stack-title a {
+    text-decoration: none;
+  }
+
+  .stack-title a:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.12em;
+  }
+
+  .stack-num {
+    font-size: var(--fs-h1);
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    opacity: 0.9;
+  }
+
+  .stack-sketches {
+    display: none;
+  }
+
+  /* The sketches only where there's height to spare */
+  @media (min-width: 64rem) and (min-height: 50rem) {
+    .stack-sketches {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 1.25rem;
+      margin-top: -1rem;
+    }
+
+    .stack-sketches :global(.mock) {
+      transform: rotate(-3deg);
+    }
+
+    .stack-sketches :global(.mock:nth-child(2)) {
+      transform: translateY(-1.5rem) rotate(2.5deg);
+    }
+
+    .stack-sketches :global(.mock:nth-child(3)) {
+      transform: rotate(-1.5deg);
+    }
+  }
+
+  .stack-panel {
+    display: grid;
+    gap: 1.75rem;
+    padding: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+    border-radius: clamp(1.75rem, 1rem + 3vw, 4.375rem) clamp(1.75rem, 1rem + 3vw, 4.375rem) var(--radius-l)
+      var(--radius-l);
+    /* A slightly darker glass, so the white text on every card colour reads at 4.5:1 or more */
+    background: linear-gradient(180deg, rgb(0 0 0 / 0.08), rgb(0 0 0 / 0.16));
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.25);
+  }
+
+  /* Text and buttons side by side: from 960 px on the home page, from 1280 px on the services page,
+     where the buttons are longer */
+  @media (min-width: 60rem) {
+    .stack-home .stack-panel {
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: end;
+      gap: 3rem;
+    }
+  }
+
+  @media (min-width: 80rem) {
+    .stack-full .stack-panel {
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: end;
+      gap: 3rem;
+    }
+  }
+
+  .stack-copy {
+    display: grid;
+    gap: 0.75rem;
+    max-width: 40rem;
+    font-size: var(--fs-large);
+  }
+
+  .stack-copy p + p {
+    margin-top: 0;
+  }
+
+  .stack-cat {
+    font-size: var(--fs-label);
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--on-dark);
+  }
+
+  .stack-auto {
+    font-size: var(--fs-body);
+    color: var(--on-dark);
+  }
+
+  .stack-panel .actions {
+    min-width: 0;
+  }
+
+  @media (max-width: 47.99rem) {
+    .stack-panel .btn {
+      white-space: normal;
+      text-align: center;
+      text-wrap: balance;
+    }
+
+    .stack-num {
+      font-size: var(--fs-lead);
+    }
+  }
+
+  .stack-card :focus-visible {
+    outline-color: var(--on-dark);
+  }
+
+  @media screen and (prefers-reduced-motion: no-preference) and (min-height: 36rem) {
+    @supports (animation-timeline: view()) {
+      .stack {
+        view-timeline-name: --stack;
+      }
+
+      .stack-card {
+        animation: stack-tilt linear both;
+        animation-timeline: --stack;
+        animation-range: exit-crossing calc(var(--k) / var(--n) * 100%) exit-crossing calc((var(--k) + 1) / var(--n) * 100%);
+      }
+
+      .stack-card:nth-child(odd) {
+        --ry: -8deg;
+      }
+
+      .stack-card:nth-child(even) {
+        --ry: 8deg;
+      }
+
+      .stack-card:last-child {
+        animation: none;
+      }
+
+      @keyframes stack-tilt {
+        to {
+          transform: translateY(5%) scale(0.75) rotateX(15deg) rotateY(var(--ry));
+        }
+      }
+
+      /* The covered card dims a little (an overlay's opacity, cheaper than a filter) */
+      .stack-card::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background: #000;
+        opacity: 0;
+        pointer-events: none;
+        animation: stack-dim linear both;
+        animation-timeline: --stack;
+        animation-range: exit-crossing calc(var(--k) / var(--n) * 100%) exit-crossing calc((var(--k) + 1) / var(--n) * 100%);
+      }
+
+      .stack-card:last-child::after {
+        animation: none;
+      }
+
+      @keyframes stack-dim {
+        to {
+          opacity: 0.22;
+        }
+      }
+    }
+  }
+</style>

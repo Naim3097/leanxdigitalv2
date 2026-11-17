@@ -3,7 +3,9 @@ import Base from '../../layouts/Base.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import DraftNote from '../../components/DraftNote.astro';
 import Facts from '../../components/Facts.astro';
-import Faq from '../../components/Faq.astro';
+import FaqBlock from '../../components/FaqBlock.astro';
+import Icon from '../../components/Icon.astro';
+import Label from '../../components/Label.astro';
 import { pageTitle, whatsappLink } from '../../data/site';
 import { showDrafts } from '../../lib/drafts';
 import { webPage, breadcrumbs } from '../../lib/schema';
@@ -62,24 +64,32 @@ const schema = [
   webPage({ path, title, description, updated: '2026-11-04', hasBreadcrumb: true }),
   breadcrumbs(path, crumbs),
 ];
+
+// Bar lengths for the decorative report sketch: leaks listed most valuable first.
+const reportRows = [92, 74, 58, 41, 27];
 ---
 
 <Base title={title} description={description} schema={schema} noindex whatsapp={whatsapp}>
-  <Breadcrumbs items={crumbs} />
-
-  <header class="page-head wrap">
-    <p class="eyebrow">Fixed-price audit</p>
-    <h1>Sales leak audit</h1>
-    <p class="lede">
-      Ads running but sales not coming in? We check your tracking, ads, landing page, WhatsApp follow-up and
-      checkout, and show you where buyers drop off after the click.
-    </p>
-    <div class="actions">
-      <a class="btn btn-solid" href={whatsapp}>Ask for an audit on WhatsApp</a>
+  <header class="page-head">
+    <div class="glow" aria-hidden="true"><span></span><span></span><span></span></div>
+    <div class="container">
+      <Breadcrumbs items={crumbs} />
+      <Label icon="search">Fixed-price audit</Label>
+      <h1>Sales leak audit</h1>
+      <p class="lede">
+        Ads running but sales not coming in? We check your tracking, ads, landing page, WhatsApp follow-up and
+        checkout, and show you where buyers drop off after the click.
+      </p>
+      <div class="actions">
+        <a class="btn btn-primary" href={whatsapp} data-magnetic>
+          <Icon name="chat" />
+          Ask for an audit on WhatsApp
+        </a>
+      </div>
     </div>
   </header>
 
-  <div class="wrap" style="padding-bottom: 3rem">
+  <div class="narrow draft-wrap">
     <DraftNote label="Draft page: not on the live site">
       <p>
         The strategy report recommends this audit as the entry offer that the service pages and the “traffic but no
@@ -95,43 +105,352 @@ const schema = [
     </DraftNote>
   </div>
 
-  <section class="section" aria-labelledby="checks-title">
-    <div class="wrap section-grid">
-      <div class="section-head">
-        <h2 id="checks-title">What we check</h2>
+  <section class="section section-dark checks" data-surface="dark" aria-labelledby="checks-title">
+    <div class="container">
+      <div class="intro">
+        <Label icon="route">Ad click to paid order</Label>
+        <h2 id="checks-title" data-split>What we check</h2>
         <p>Five places a sale can leak between the ad and the payment.</p>
       </div>
-      <Facts facts={checks} />
+      <div class="checks-grid" data-rise>
+        <Facts facts={checks} variant="bento" />
+      </div>
     </div>
   </section>
 
-  <section class="section" aria-labelledby="steps-title">
-    <div class="wrap section-grid">
-      <div class="section-head">
-        <h2 id="steps-title">How it works</h2>
+  <section class="section section-white how" aria-labelledby="steps-title">
+    <div class="container duo">
+      <div class="how-head">
+        <h2 id="steps-title" data-split>How it works</h2>
+        <div class="report" aria-hidden="true">
+          <div class="report-top">
+            <span class="report-dot"></span>
+            <span class="report-title">Leak report</span>
+            <span class="report-tag">Most valuable first</span>
+          </div>
+          <ol class="report-rows">
+            {
+              reportRows.map((w, i) => (
+                <li style={`--w: ${w}%; --k: ${i}`}>
+                  <span class="report-n">{String(i + 1).padStart(2, '0')}</span>
+                  <span class="report-bar">
+                    <span />
+                  </span>
+                </li>
+              ))
+            }
+          </ol>
+        </div>
       </div>
-      <ol class="steps">{steps.map((s) => <li>{s}</li>)}</ol>
+      <ol class="process">{steps.map((s) => <li data-rise><p>{s}</p></li>)}</ol>
     </div>
   </section>
 
-  <section class="section" aria-labelledby="price-title">
-    <div class="wrap section-grid">
-      <div class="section-head">
-        <h2 id="price-title">Price</h2>
+  <section class="section price" aria-labelledby="price-title">
+    <div class="container">
+      <div class="mesh-card price-card" data-rise>
+        <h2 id="price-title" data-split>Price</h2>
+        <p class="price-line">
+          <span class="placeholder">RM [amount]</span>, fixed, as of <span class="placeholder">[month and year]</span>.
+        </p>
+        <p class="price-time">
+          The report arrives within <span class="placeholder">[number]</span> working days of getting access.
+        </p>
+        <div class="actions">
+          <a class="btn btn-primary" href={whatsapp} data-magnetic>
+            <Icon name="chat" />
+            Ask for an audit on WhatsApp
+          </a>
+        </div>
       </div>
-      <p>
-        <span class="placeholder">RM [amount]</span>, fixed, as of <span class="placeholder">[month and year]</span>.
-        The report arrives within <span class="placeholder">[number]</span> working days of getting access.
-      </p>
     </div>
   </section>
 
-  <section class="section" aria-labelledby="faq-title">
-    <div class="wrap section-grid">
-      <div class="section-head">
-        <h2 id="faq-title">Questions</h2>
-      </div>
-      <Faq faqs={faqs} />
-    </div>
-  </section>
+  <FaqBlock faqs={faqs} title="Questions" id="faq-title" whatsapp={whatsapp} openFirst />
 </Base>
+
+<style>
+  @media (max-width: 30rem) {
+    .price-card .actions {
+      flex-direction: column;
+      align-items: stretch;
+      align-self: stretch;
+      justify-self: stretch;
+    }
+  }
+
+  /* What we check: five numbered cards on the dark band. On wide screens they sit on one line, like
+     stops on the way from the ad to the payment. */
+  .checks-grid :global(.facts-bento) {
+    position: relative;
+    counter-reset: check;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .checks-grid :global(.facts-bento div) {
+    counter-increment: check;
+    position: relative;
+    justify-content: flex-start;
+    gap: 0.625rem;
+    min-height: 0;
+    padding: 1.5rem;
+    border: 1px solid var(--dark-line);
+    background: rgb(255 255 255 / 0.05);
+  }
+
+  .checks-grid :global(.facts-bento div::before) {
+    content: counter(check, decimal-leading-zero);
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    margin-bottom: 0.75rem;
+    border: 1px solid rgb(255 255 255 / 0.22);
+    border-radius: 50%;
+    background: var(--dark);
+    color: var(--on-dark);
+    font-size: var(--fs-caption);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .checks-grid :global(.facts-bento dt) {
+    color: var(--on-dark);
+    font-size: var(--fs-lead);
+    font-weight: 500;
+    letter-spacing: -0.015em;
+  }
+
+  .checks-grid :global(.facts-bento dd) {
+    color: var(--on-dark-2);
+    font-size: var(--fs-body);
+    font-weight: 400;
+    line-height: 1.45;
+    letter-spacing: -0.01em;
+  }
+
+  @media (min-width: 36rem) {
+    .checks-grid :global(.facts-bento) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .checks-grid :global(.facts-bento div:last-child) {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .checks-grid :global(.facts-bento) {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+
+    .checks-grid :global(.facts-bento div),
+    .checks-grid :global(.facts-bento .wide) {
+      grid-column: span 2;
+      min-height: 15rem;
+    }
+
+    .checks-grid :global(.facts-bento div:nth-child(n + 4)) {
+      grid-column: span 3;
+    }
+  }
+
+  @media (min-width: 80rem) {
+    .checks-grid :global(.facts-bento) {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      padding-top: 4.5rem;
+    }
+
+    .checks-grid :global(.facts-bento div),
+    .checks-grid :global(.facts-bento .wide),
+    .checks-grid :global(.facts-bento div:nth-child(n + 4)) {
+      grid-column: auto;
+      min-height: 17rem;
+    }
+
+    /* Each number sits on a line above its card */
+    .checks-grid :global(.facts-bento div::before) {
+      position: absolute;
+      left: 1.5rem;
+      top: -4.5rem;
+      z-index: 1;
+      margin: 0;
+    }
+
+    .checks-grid :global(.facts-bento::before) {
+      content: '';
+      position: absolute;
+      left: 1.5rem;
+      right: 0;
+      top: 1.375rem;
+      height: 1px;
+      background: linear-gradient(90deg, var(--spectrum-1), var(--spectrum-2), var(--spectrum-3), var(--spectrum-4) 85%, transparent);
+      transform-origin: 0 50%;
+    }
+  }
+
+  /* How it works: the steps on the right, a sketch of the report on the left */
+  .how .duo {
+    row-gap: 2.5rem;
+  }
+
+  .how-head h2 {
+    font-size: var(--fs-h2);
+  }
+
+  .report {
+    display: none;
+  }
+
+  @media (min-width: 64rem) {
+    .report {
+      display: grid;
+      gap: 1.25rem;
+      max-width: 26rem;
+      margin-top: 2.5rem;
+      padding: 1.5rem;
+      border: 1px solid #f0f0f0;
+      border-radius: var(--radius-m);
+      background: #fdfdfd;
+      box-shadow: 0 24px 40px -18px rgb(0 0 0 / 0.18);
+      transform: rotate(-2deg);
+    }
+  }
+
+  .report-top {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: var(--fs-caption);
+  }
+
+  .report-dot {
+    width: 0.875rem;
+    height: 0.875rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--spectrum-3), var(--spectrum-4));
+  }
+
+  .report-title {
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .report-tag {
+    margin-left: auto;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    background: var(--page-alt);
+    color: var(--text-2);
+    font-size: 0.6875rem;
+    font-weight: 500;
+  }
+
+  .report-rows {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .report-rows li {
+    display: grid;
+    grid-template-columns: 1.75rem 1fr;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .report-n {
+    color: var(--text-3);
+    font-size: 0.6875rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .report-bar {
+    height: 0.625rem;
+    border-radius: 999px;
+    background: #f1f1f1;
+  }
+
+  .report-bar span {
+    display: block;
+    width: var(--w);
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--spectrum-4), var(--spectrum-3));
+    opacity: calc(1 - var(--k) * 0.14);
+  }
+
+  .how .process li {
+    padding-bottom: 2.5rem;
+  }
+
+  .how .process li:last-child {
+    padding-bottom: 0;
+  }
+
+  .how .process p {
+    color: var(--text);
+  }
+
+  /* Price: one colourful card */
+  .price-card {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    gap: 1.25rem;
+    padding-block: clamp(3rem, 2rem + 4vw, 6rem);
+    text-align: center;
+  }
+
+  @media (max-width: 22rem) {
+    .price-card .btn {
+      white-space: normal;
+    }
+  }
+
+  .price-card h2 {
+    font-size: var(--fs-h2);
+  }
+
+  .price-card .price-line {
+    max-width: 22ch;
+    color: var(--ink);
+    font-size: var(--fs-statement);
+    font-weight: 500;
+    line-height: 1.3;
+    letter-spacing: -0.018em;
+  }
+
+  .price-card .price-time {
+    max-width: 34rem;
+  }
+
+  .price-card .actions {
+    justify-content: center;
+    margin-top: 0.75rem;
+  }
+
+  @media screen and (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      /* The line under the numbers draws itself as the cards come into view */
+      @media (min-width: 80rem) {
+        .checks-grid :global(.facts-bento::before) {
+          animation: draw-line linear both;
+          animation-timeline: view();
+          animation-range: entry 30% cover 55%;
+        }
+      }
+
+      .report-bar span {
+        transform-origin: 0 50%;
+        animation: draw-line linear both;
+        animation-timeline: view();
+        animation-range: entry 40% cover 45%;
+      }
+    }
+
+    @keyframes draw-line {
+      from {
+        transform: scaleX(0);
+      }
+    }
+  }
+</style>
