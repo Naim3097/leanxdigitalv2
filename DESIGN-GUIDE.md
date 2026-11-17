@@ -235,11 +235,11 @@ partner" section. Light panels have four small round notches in their side edges
 
 - Pinned scene (motion allowed, `animation-timeline` supported, window at least 576 px tall): the section
   holds while the panels slide in from the right, driven by the scroll.
-  - Wide and tall enough (1024 px wide, 736 px tall): two panels side by side. The heading first moves into
+  - Laptops and desktops (1024 px wide and up, any height): two panels side by side, so each step reads as
+    a card. The heading first moves into
     the left half as panel 1 takes the right half, then leaves with it; the panels then step along one at a
     time. Words on top; on the dark panels the sketch is on top and the words below.
-  - Landscape screens below that (short laptop screens, tablets on their side): one panel at a time, words and
-    sketch side by side.
+  - Tablets on their side (768 to 1023 px wide): one panel at a time, words and sketch side by side.
   - Phones and portrait tablets: one panel at a time, words and sketch stacked.
   - The sketch area is a size container: the sketches step down (zoom 1.15, 1, 0.8, 0.7) to fit the room a
     panel has, and leave only when there is too little. Panels keep their words at least 1 rem clear of the

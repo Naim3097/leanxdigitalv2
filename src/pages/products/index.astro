@@ -49,8 +49,8 @@ const staged = products[0]?.slug;
       <Label icon="store">{products.length === 1 ? 'Our product' : `${count} products`}</Label>
       <h1>Products</h1>
       <p class="lede">
-        Lean X Digital makes {names}, a store website that grows itself. It runs the same content, Meta ads
-        and SEO workflows our team uses with clients, automatically.
+        Lean X Digital makes {names}, a store website that grows itself. On its own, it runs the same content, Meta ads
+        and SEO workflows our team uses with clients. You run the shop.
       </p>
       {
         showDrafts && (
@@ -73,7 +73,7 @@ const staged = products[0]?.slug;
       products.map((p, i) => {
         const n = String(i + 1).padStart(2, '0');
         return p.slug === staged ? (
-          <NexovaStage intro eyebrow={`${n} · ${p.category}`} titleId={`${p.slug}-title`} siteLabel={p.website?.label} />
+          <NexovaStage intro eyebrow={`${n} · ${p.category}`} titleId={`${p.slug}-title`} />
         ) : (
           <section class="section product" aria-labelledby={`${p.slug}-title`}>
             <div class="container">

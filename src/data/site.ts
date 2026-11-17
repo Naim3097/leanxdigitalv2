@@ -23,7 +23,7 @@ export const site = {
   phone: '+601133095095',
   phoneDisplay: '+60 11-3309 5095',
   whatsapp:
-    'https://wa.me/601133095095?text=Hi%2C%20I%27m%20interested%20to%20work%20with%20Lean%20X%20Digital',
+    'https://wa.me/601133095095?text=Hi%20Lean%20X%20Digital!%20I%E2%80%99d%20like%20to%20ask%20about%20working%20with%20you.%20Here%E2%80%99s%20my%20business%3A%20',
 
   address: {
     street: '8trium, M1-13A-08, Tower 1, Jalan Cempaka SD 12/5',

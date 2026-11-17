@@ -47,7 +47,7 @@ export const caseStudies: CaseStudy[] = [
       '[Set up tracking so each sale on the website is tied to the ad that brought the buyer.]',
     ],
     results: [
-      ['Sales on the own store', '[RM amount], [month to month, year]'],
+      ['Sales on their own store', '[RM amount], [month to month, year]'],
       ['Return on ad spend', '[ratio], [period]'],
       ['Repeat buyers', '[number or share], [period]'],
     ],

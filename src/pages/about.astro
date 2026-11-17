@@ -21,7 +21,7 @@ const updated = updatedFor(path);
 const nexova = products[0];
 const title = `About ${site.name} | Digital solutions company in Kuala Lumpur`;
 const description =
-  'Lean X Digital is a Kuala Lumpur company that makes Nexova, a self-growing store website, and offers creative work, paid ads, SEO and development as services.';
+  'Lean X Digital is a Kuala Lumpur company that makes Nexova, a self-growing store website. Our team also does creative work, paid ads, SEO and development for you.';
 const crumbs: [string, string][] = [
   ['Home', '/'],
   ['About', path],
@@ -53,7 +53,7 @@ const quote = `“${site.tagline}”`.split(' ');
 const statement = [
   ...'Our line is'.split(' ').map((w) => ({ w, q: -1 })),
   ...quote.map((w, i) => ({ w, q: quote.length > 1 ? i / (quote.length - 1) : 0 })),
-  ...'Clicks and followers are only worth something when some of them become paying customers. So we look at the whole path a customer takes: the content they see, the ad or search result they click, and the page or WhatsApp chat where they decide to buy.'
+  ...'Traffic is nice. Customers who pay are nicer. So we look at the whole path your customers take: the content they see, the ad or search result they click, and the page or WhatsApp chat where they decide to buy.'
     .split(' ')
     .map((w) => ({ w, q: -1 })),
 ];
@@ -92,7 +92,7 @@ const focusIcon = (focus: string): IconName =>
       <h1>About <span class="nowrap">Lean X Digital</span></h1>
       <p class="lede">
         Lean X Digital (written “leanx digital” in our logo) is a digital solutions company in
-        <span class="nowrap">Bandar Sri Damansara</span>, <span class="nowrap">Kuala Lumpur</span>. We make {nexova.name}, and our team offers the same work as a service.
+        <span class="nowrap">Bandar Sri Damansara</span>, <span class="nowrap">Kuala Lumpur</span>. We make {nexova.name}, and our team does the same work for you.
       </p>
       <div class="actions">
         <a class="btn btn-primary" href="#team" data-magnetic>Meet the team</a>
@@ -117,8 +117,8 @@ const focusIcon = (focus: string): IconName =>
       </p>
       <p class="approach-more" data-rise>
         Our strategists built their workflows for that path over years of client work. {nexova.name} runs
-        those workflows automatically, as a store website that grows itself. Our services are the same work,
-        done by the people who built it.
+        those workflows automatically, as a store website that grows itself. Or pick our services, and
+        the team behind those workflows does the work.
       </p>
       <Label as="span" icon="content" class="sticker glass-pill s1" aria-hidden="true">Content</Label>
       <Label as="span" icon="megaphone" class="sticker glass-pill s2" aria-hidden="true">Ads and search</Label>

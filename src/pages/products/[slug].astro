@@ -89,7 +89,7 @@ const stickers: Record<string, [string, IconName][]> = {
           {
             primary && (
               <a class="btn btn-primary" href={primary.url} rel="noopener" data-magnetic>
-                {p.website ? `Visit ${p.website.label}` : p.buy?.label}
+                {p.website ? `Build on ${p.website.label}` : p.buy?.label}
               </a>
             )
           }
@@ -227,7 +227,7 @@ const stickers: Record<string, [string, IconName][]> = {
           {
             primary && (
               <a class="btn btn-primary" href={primary.url} rel="noopener" data-magnetic>
-                {p.website ? `Go to ${p.website.label}` : p.buy?.label}
+                {p.website ? `Build on ${p.website.label}` : p.buy?.label}
               </a>
             )
           }
@@ -322,9 +322,9 @@ const stickers: Record<string, [string, IconName][]> = {
           <div class="intro">
             <Label icon="users">Done for you</Label>
             <h2 id="others-title" data-split>
-              Rather have it done for you?
+              Want it done for you?
             </h2>
-            <p>The same tools, run by our team.</p>
+            <p>Then let our team do it. You agree the price for each job before work starts.</p>
           </div>
         )
       }

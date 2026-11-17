@@ -40,29 +40,29 @@ const leaks: { title: string; looks: string; check: string; fix: string }[] = [
       'You see likes, reach and clicks, but not which ads led to a sale. Sales you close on WhatsApp never show up in Meta or Google.',
     check:
       'In Meta Events Manager and in Google Ads, find a purchase or lead conversion recorded in the last seven days. Compare the count with the orders you actually received.',
-    fix: 'Record purchases and enquiries as conversions, and send the sales you close on WhatsApp back to Meta and Google, so their bidding learns which clicks become buyers.',
+    fix: 'Record purchases and enquiries as conversions, and send the sales you close on WhatsApp back to Meta and Google. That way, their bidding learns which clicks become buyers.',
   },
   {
     title: '2. Ads: the budget reaches people who won’t buy',
     looks:
-      'Boosted posts collect likes from outside Malaysia, or searches unrelated to what you sell use up the budget.',
+      'Boosted posts collect likes from outside Malaysia, or the budget goes to searches unrelated to what you sell.',
     check:
       'In Meta Ads Manager, break results down by country and placement. In Google Ads, read the search terms report.',
-    fix: 'Run campaigns in Ads Manager rather than with the Boost button, target the places you deliver to, and exclude searches that never turn into sales.',
+    fix: 'Run campaigns in Meta Ads Manager instead of using the Boost button, and target the places you deliver to. In Google Ads, exclude searches that never turn into sales.',
   },
   {
     title: '3. Landing page: the page after the click doesn’t sell',
     looks: 'People click the ad, look for a few seconds and leave.',
     check:
       'Open your own ad on a phone, on mobile data. Can you see the product, the price and how to buy without scrolling or waiting?',
-    fix: 'Send each ad to a page about that one product or offer, show the price, and make the next step one tap: buy now, or chat on WhatsApp.',
+    fix: 'Send each ad to a page about that one product or offer, and show the price. Then make the next step one tap: buy now, or chat on WhatsApp.',
   },
   {
     title: '4. WhatsApp: buyers ask the price, then go quiet',
     looks: 'Plenty of chats, few sales. Many buyers stop replying after the first answer.',
     check:
       'For one week, note how long your first reply takes and how many chats get a second message from you.',
-    fix: 'Reply within minutes during working hours, answer the price question with the price and the next step, and follow up once or twice with buyers who go quiet.',
+    fix: 'Reply within minutes during working hours, and answer the price question with the price and the next step. Follow up once or twice with buyers who go quiet.',
   },
   {
     title: '5. Checkout: buyers can’t pay the way they want',
@@ -201,11 +201,11 @@ const shortName = (t: string) => split(t).rest.split(':')[0];
             <h2 id="help-title" data-split>Not sure where your leak is?</h2>
             <p>
               Our sales leak audit checks all five for a fixed price and shows you what each leak costs in ringgit, most
-              valuable first.
+              valuable first. Then you decide what to fix, and who fixes it.
             </p>
           </div>
           <div class="actions">
-            <a class="btn btn-primary" href="/sales-leak-audit/" data-magnetic>About the audit</a>
+            <a class="btn btn-primary" href="/sales-leak-audit/" data-magnetic>See the audit</a>
             <a class="btn btn-secondary" href={whatsapp} data-magnetic>
               <Icon name="chat" />
               Ask us on WhatsApp

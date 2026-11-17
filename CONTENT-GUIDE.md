@@ -64,6 +64,8 @@ additionally, furthermore, moreover.
 - Specifics: product names, RM prices, Shopee, TikTok Shop, WhatsApp, real timings ("about two minutes").
 - Say "we" for Lean X Digital and "you" for the reader.
 - Malaysian English spelling (organise, colour, labelled).
+- Tone of voice: follow VOICE-GUIDE.md (the result first, plain sentences, a little wit, never near facts,
+  prices or anything search engines read).
 
 ## What helps AI answers (GEO)
 

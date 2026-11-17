@@ -26,9 +26,9 @@ const path = '/online-sellers/';
 const nexova = products[0];
 const title = pageTitle('Own store growth for Shopee and TikTok Shop sellers');
 const description =
-  'Keep Shopee and TikTok Shop, and add a store you own. Lean X Digital builds it from your listings, sets up checkout and runs the ads that feed it, reported in paid orders.';
+  'Keep Shopee and TikTok Shop, and add a store you own. Lean X Digital builds it from your listings, sets up checkout and runs the ads, measured in paid orders.';
 const whatsapp = whatsappLink(
-  'Hi Lean X Digital! I sell on Shopee or TikTok Shop and want a store of my own. Here’s my shop: ',
+  'Hi Lean X Digital! I sell on Shopee or TikTok Shop, and I’d like a store of my own. Here’s my shop: ',
 );
 const crumbs: [string, string][] = [
   ['Home', '/'],
@@ -80,14 +80,14 @@ const schema = [
       <Label icon="store">For online sellers</Label>
       <h1>Keep Shopee and TikTok Shop. Add a store you own.</h1>
       <p class="lede">
-        For established Malaysian sellers. We build a store you own from your existing listings, set up checkout
-        through a registered payment provider and run the ads that bring buyers to it. Then we report what counts: paid
-        orders.
+        For established Malaysian sellers. We build a store you own from your existing listings and set up checkout
+        through a registered payment provider. Then we run the ads that bring buyers to your store. We report what
+        counts: paid orders.
       </p>
       <div class="actions">
         <a class="btn btn-primary" href={whatsapp} data-magnetic>
           <Icon name="chat" />
-          Talk to us about your store
+          WhatsApp us
         </a>
         <a class="btn btn-secondary" href={`/products/${nexova.slug}/`} data-magnetic>See {nexova.name}</a>
       </div>
@@ -142,8 +142,8 @@ const schema = [
             </div>
           </div>
           <p>
-            A store of your own is an address you control. Buyers who come back can order there directly, and your own
-            ads and messages bring them back without paying the marketplace again for the same customer.
+            A store of your own is an address you control. Your own ads and messages bring buyers back to it, and they
+            can order there directly. You don’t pay the marketplace again for the same customer.
           </p>
         </div>
       </div>
@@ -225,7 +225,7 @@ const schema = [
     )
   }
 
-  <FaqBlock faqs={faqs} title="Questions" id="faq-title" whatsapp={whatsapp} openFirst />
+  <FaqBlock faqs={faqs} title="Questions about your own store" id="faq-title" whatsapp={whatsapp} openFirst />
 </Base>
 
 <style>

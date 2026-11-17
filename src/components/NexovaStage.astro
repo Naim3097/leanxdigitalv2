@@ -30,7 +30,7 @@ const {
   intro = true,
   eyebrow = `Product · ${nexova.category}`,
   titleId = 'nexova-title',
-  siteLabel = nexova.website ? `Start free at ${nexova.website.label}` : undefined,
+  siteLabel = nexova.website ? `Build on ${nexova.website.label}` : undefined,
   featuresTitle = `What ${nexova.name} does`,
   featuresId = 'nexova-features-title',
   featuresTag = 'h3',
@@ -180,7 +180,7 @@ const slug = (t: string) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-');
                 )}
                 {nexova.website && (
                   <a class="btn btn-primary btn-sm" href={nexova.website.url} rel="noopener">
-                    Try it on {nexova.website.label}
+                    Build on {nexova.website.label}
                   </a>
                 )}
               </div>

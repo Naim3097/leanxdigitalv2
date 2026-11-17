@@ -5,11 +5,11 @@ import { liveCaseStudies } from './work';
 // Every indexable page and the date its content last changed.
 // The sitemap's <lastmod> comes from here, so only bump a date when the page really changed.
 export const staticPages = [
-  { path: '/', updated: '2026-11-03' },
-  { path: '/products/', updated: '2026-11-03' },
-  { path: '/services/', updated: '2026-11-03' },
-  { path: '/about/', updated: '2026-11-03' },
-  { path: '/contact/', updated: '2026-11-03' },
+  { path: '/', updated: '2026-11-17' },
+  { path: '/products/', updated: '2026-11-17' },
+  { path: '/services/', updated: '2026-11-17' },
+  { path: '/about/', updated: '2026-11-17' },
+  { path: '/contact/', updated: '2026-11-17' },
 ];
 
 const aboutUpdated = staticPages.find((p) => p.path === '/about/')?.updated ?? staticPages[0].updated;

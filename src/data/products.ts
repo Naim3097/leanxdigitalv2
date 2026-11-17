@@ -44,7 +44,7 @@ export const products: Product[] = [
     name: 'Nexova',
     category: 'Self-growing store website',
     summary:
-      'A store website that grows itself: it creates its own content, runs its own Meta ads and handles its own SEO.',
+      'A store website that grows itself: it creates its own content, runs its own Meta ads and works on its SEO.',
     definition:
       'Nexova is a self-growing store website for Malaysian online sellers. It creates its own ad content, runs its own Facebook and Instagram ads and handles its own SEO, while smart inventory keeps your stock in sync with Shopee and TikTok Shop.',
     audience:
@@ -59,10 +59,10 @@ export const products: Product[] = [
     features: [
       ['Auto content', 'Creates posters, videos and social media posts for your products.'],
       ['Auto Meta ads', 'Runs Facebook and Instagram ads for your store.'],
-      ['Auto SEO', 'Checks how visible your store is on Google and handles its SEO.'],
+      ['Auto SEO', 'Checks how visible your store is on Google and works on its SEO.'],
       [
         'Smart inventory',
-        'Keeps stock in sync with Shopee and TikTok Shop, so an order on one updates the others.',
+        'Keeps your stock in sync with Shopee and TikTok Shop, so an order on one updates the others.',
       ],
       ['E-commerce CMS', 'Build and edit your store, products and pages without code.'],
       ['Start from a link', 'Paste a TikTok Shop or Shopee link, or start from your website or from scratch.'],
@@ -79,7 +79,7 @@ export const products: Product[] = [
       ['Help', 'WhatsApp +60 10-764 8227'],
       ['Website', 'nexova.my'],
     ],
-    stepsTitle: 'How to start with Nexova',
+    stepsTitle: 'How to start with Nexova: paste a link, press Build',
     steps: [
       'Go to nexova.my.',
       'Paste a TikTok Shop product link or your Shopee shop link and press Build. No marketplace store? Start from your website or from scratch.',
@@ -91,32 +91,32 @@ export const products: Product[] = [
         title: 'What “self-growing” means',
         body: [
           'A store website only sells if people find it. Usually that takes three kinds of work: making content, running ads and doing SEO. Nexova does all three on its own.',
-          'Auto content makes posters, videos and social posts for your products. Auto Meta ads runs them as Facebook and Instagram ads. Auto SEO checks how visible the store is on Google and works on it. The store keeps bringing in customers while you look after orders, or sleep.',
+          'Auto content makes posters, videos and social posts for your products. Auto Meta ads runs them as Facebook and Instagram ads. Auto SEO checks how visible the store is on Google and works on it. You decide when to switch these three features on.',
         ],
       },
       {
         title: 'Built from our team’s own workflows',
         body: [
-          'Nexova is built by the same Lean X Digital team that runs creative work, Meta ads, Google Ads and SEO for clients. The auto features follow the workflows we use with those clients, and are built on Claude, Anthropic’s AI model.',
-          'If you would rather have people do the work, the same team offers it as a service.',
+          'Nexova is built by the same Lean X Digital team that runs creative work, Meta ads, Google Ads and SEO for clients. The auto features follow the workflows we use with those clients. They’re built on Claude, Anthropic’s AI model.',
+          'If you’d rather have people do the work, the same team does it for you.',
         ],
       },
       {
         title: 'Why sellers want their own website',
         body: [
           'A marketplace store sits inside someone else’s platform. Shoppers reach you through the marketplace search, with competing sellers listed next to you, under rules and fees the platform sets.',
-          'A website gives you an address that belongs to you. You can print it on packaging, use it in ads and send it in WhatsApp chats, and the page shows your products only.',
+          'A website gives you an address that belongs to you. You can print it on packaging, use it in ads and send it in WhatsApp chats. On your website, nobody else’s products sit next to yours. If you also sell on a marketplace, you keep that store too.',
         ],
       },
     ],
     faqs: [
       [
         'What is Nexova?',
-        'Nexova is a self-growing store website for Malaysian online sellers. It creates its own content, runs its own Meta ads and handles its own SEO, and keeps your stock in sync with Shopee and TikTok Shop.',
+        'Nexova is a self-growing store website for Malaysian online sellers. It creates its own content, runs its own Meta ads and handles its own SEO. It also keeps your stock in sync with Shopee and TikTok Shop.',
       ],
       [
         'What does “self-growing” mean?',
-        'Nexova does the work that brings customers to a store: auto content makes posts and videos, auto Meta ads runs Facebook and Instagram ads, and auto SEO works on your Google visibility.',
+        '“Self-growing” means Nexova does the work that brings customers to a store. Auto content makes posts and videos, auto Meta ads runs Facebook and Instagram ads, and auto SEO works on your Google visibility.',
       ],
       [
         'Does Nexova sync stock with Shopee and TikTok Shop?',
@@ -126,7 +126,7 @@ export const products: Product[] = [
         'Do I need a Shopee or TikTok Shop store to use Nexova?',
         'No. You can build from a TikTok Shop or Shopee link, from your existing website, or from scratch.',
       ],
-      ['Do I need design or coding skills?', 'No. Nexova is a no-code platform.'],
+      ['Do I need design or coding skills?', 'No. Nexova is a no-code platform: you build and edit your store without writing code.'],
       ['How much does Nexova cost?', 'Nexova is free to start.'],
       [
         'What AI does Nexova use?',
@@ -134,7 +134,7 @@ export const products: Product[] = [
       ],
       ['How do I get help with Nexova?', 'Message the Nexova team on WhatsApp at +60 10-764 8227.'],
     ],
-    updated: '2026-11-03',
+    updated: '2026-11-17',
   },
 ];
 

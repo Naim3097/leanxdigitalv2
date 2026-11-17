@@ -39,7 +39,7 @@ const checks: [string, string][] = [
   ['WhatsApp', 'How fast enquiries get a reply, and what happens to buyers who ask the price and then go quiet.'],
   [
     'Checkout',
-    'Which ways to pay buyers are offered, how many payments fail, and how many orders are cash on delivery.',
+    'Which ways buyers can pay you, how many payments fail, and how many orders are cash on delivery.',
   ],
 ];
 
@@ -83,7 +83,7 @@ const reportRows = [92, 74, 58, 41, 27];
       <div class="actions">
         <a class="btn btn-primary" href={whatsapp} data-magnetic>
           <Icon name="chat" />
-          Ask for an audit on WhatsApp
+          Ask for an audit
         </a>
       </div>
     </div>
@@ -159,14 +159,14 @@ const reportRows = [92, 74, 58, 41, 27];
         <div class="actions">
           <a class="btn btn-primary" href={whatsapp} data-magnetic>
             <Icon name="chat" />
-            Ask for an audit on WhatsApp
+            Ask for an audit
           </a>
         </div>
       </div>
     </div>
   </section>
 
-  <FaqBlock faqs={faqs} title="Questions" id="faq-title" whatsapp={whatsapp} openFirst />
+  <FaqBlock faqs={faqs} title="Questions about the sales leak audit" id="faq-title" whatsapp={whatsapp} openFirst />
 </Base>
 
 <style>

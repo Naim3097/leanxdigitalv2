@@ -15,13 +15,12 @@ import { products } from '../data/products';
 import { services } from '../data/services';
 import { updatedFor } from '../data/pages';
 import { webPage, productList, serviceList, faqPage } from '../lib/schema';
-import { countWord, listOf } from '../lib/text';
+import { listOf } from '../lib/text';
 import { showDrafts } from '../lib/drafts';
 
 const path = '/';
 const nexova = products[0];
 const serviceNames = listOf(services.map((s) => s.short));
-const count = countWord(services.length);
 
 const title = 'Lean X Digital | Nexova and digital services, Kuala Lumpur';
 const description =
@@ -70,7 +69,7 @@ const schema = [
 
 // Content for the new sections, taken from the data files and the About page so nothing is invented.
 const svc = (slug: string) => services.find((s) => s.slug === slug)!;
-const statementWords = 'Clicks and followers are only worth something when some of them become paying customers.'.split(' ');
+const statementWords = 'Lots of likes, no sales? Clicks and followers only count when some become paying customers.'.split(' ');
 // The five places on the way from a click to a paid order, shown as glass pills around the statement.
 const pathPills: [string, IconName][] = [
   ['Content', 'content'],
@@ -100,7 +99,7 @@ const path4: { label: string; title: string; text: string; links: [string, strin
   },
   {
     label: svc('web-development').name,
-    title: 'The page or WhatsApp chat where they decide to buy',
+    title: 'The page or WhatsApp chat where they buy',
     text: svc('web-development').summary,
     links: [[svc('web-development').name, '/services/web-development/']],
     visuals: ['store', 'chat'],
@@ -157,8 +156,8 @@ const posterSizes = '(min-aspect-ratio: 7/5) 100vw, min(64vh, 26rem)';
 const how: { icon: IconName; title: string; text: string }[] = [
   { icon: 'check', title: 'Price agreed first', text: 'We agree the scope and price with you before any work starts.' },
   { icon: 'target', title: 'A specialist for each ad platform', text: 'Google Ads and Meta ads each have their own specialist on our team.' },
-  { icon: 'chat', title: 'English or Bahasa Malaysia', text: 'We reply in English or Bahasa Malaysia.' },
-  { icon: 'users', title: 'The team behind Nexova', text: `Our own team, the same people who build ${nexova.name}.` },
+  { icon: 'chat', title: 'English or Bahasa Malaysia', text: 'We work in both, so you don’t have to switch languages to talk to us.' },
+  { icon: 'users', title: 'The team behind Nexova', text: `You work with the people who build ${nexova.name}.` },
 ];
 ---
 
@@ -192,12 +191,12 @@ const how: { icon: IconName; title: string; text: string }[] = [
       <div class="badges">
         <Label icon="pin" class="badge">Digital solutions · Kuala Lumpur</Label>
         <Label icon="tag" class="badge" aria-hidden="true">{nexova.name} is free to start</Label>
-        <Label icon="language" class="badge" aria-hidden="true">We reply in English or Bahasa Malaysia</Label>
+        <Label icon="language" class="badge" aria-hidden="true">English or Bahasa Malaysia, your choice</Label>
       </div>
       <h1 id="hero-title" class="sweep">{site.tagline}</h1>
       <p class="lede">
-        Lean X Digital helps Malaysian businesses sell more, two ways. {nexova.name} is a store website that
-        grows itself. Or our team does the work for you: creative, ads, SEO and development.
+        Lean X Digital helps Malaysian businesses sell more, and you pick how. {nexova.name} is a store website that
+        grows itself. Or our team does the creative work, ads, SEO and development for you.
       </p>
       <div class="actions">
         <a class="btn btn-primary" href="#nexova" data-magnetic>See {nexova.name}</a>
@@ -259,8 +258,8 @@ const how: { icon: IconName; title: string; text: string }[] = [
           <p class="eyebrow">Automated</p>
           <h3>{nexova.name}</h3>
           <p>
-            A store website that grows itself. It creates its own content, runs its own Meta ads and handles its
-            own SEO, with stock synced to Shopee and TikTok Shop. Free to start.
+            A self-growing store website: on its own, it makes content, runs Meta ads and works on SEO for your
+            store. It also syncs your stock with Shopee and TikTok Shop. Free to start.
           </p>
           <div class="actions">
             <a class="btn btn-primary" href={`/products/${nexova.slug}/`}>See {nexova.name}</a>
@@ -271,8 +270,8 @@ const how: { icon: IconName; title: string; text: string }[] = [
           <p class="eyebrow">Done for you</p>
           <h3>Our team</h3>
           <p>
-            Our team makes your ads, runs your campaigns, works on your SEO and builds your website, CRM or
-            app. {count.charAt(0).toUpperCase() + count.slice(1)} services, priced to the job.
+            We make your ads, run your campaigns, work on your SEO and build your website, CRM or
+            app. You agree the price for each job before work starts.
           </p>
           <div class="actions">
             <a class="btn btn-secondary" href="/services/">See the services</a>
@@ -309,7 +308,7 @@ const how: { icon: IconName; title: string; text: string }[] = [
       <div class="path-stage">
         <div class="container intro path-intro">
           <Label icon="route">The path to a sale</Label>
-          <h2 id="path-title" data-split>We look at the whole path a customer takes</h2>
+          <h2 id="path-title" data-split>From the first scroll to the sale</h2>
         </div>
         <ol class="path-track">
           {
@@ -345,7 +344,7 @@ const how: { icon: IconName; title: string; text: string }[] = [
       <div class="container intro">
         <Label icon="users">Done for you</Label>
         <h2 id="services-title" data-split>Services</h2>
-        <p>Priced to the job. Message us on WhatsApp to start.</p>
+        <p>Hand us the work you don’t have time for. Message us on WhatsApp to start.</p>
       </div>
       <ServiceStack variant="home" />
     </section>
@@ -410,13 +409,13 @@ const how: { icon: IconName; title: string; text: string }[] = [
       <div class="container">
         <div class="intro">
           <h2 id="facts-title" data-split>At a glance</h2>
-          <p>The short version, for anyone who needs the facts in one place.</p>
+          <p>The short version, if you need the facts in one place.</p>
         </div>
         <Facts facts={facts} variant="bento" />
       </div>
     </section>
 
-    <FaqBlock faqs={faqs} title="Questions" openFirst />
+    <FaqBlock faqs={faqs} title="Questions about Lean X Digital" openFirst />
 
     <DarkGrid title="Industries" id="industries-title" note="Sectors our clients work in." items={site.industries} />
   </div>
@@ -1764,10 +1763,9 @@ const how: { icon: IconName; title: string; text: string }[] = [
           }
         }
 
-        /* Landscape screens that show one panel at a time (tablets on their side, short laptop screens): the
-           words and the sketch side by side, the sketch on the left of the dark panels */
-        @media (min-width: 48rem) and (max-width: 63.99rem) and (min-aspect-ratio: 4 / 3),
-          (min-width: 48rem) and (max-height: 45.99rem) and (min-aspect-ratio: 4 / 3) {
+        /* Tablets on their side show one panel at a time: the words and the sketch side by side, the sketch on
+           the left of the dark panels */
+        @media (min-width: 48rem) and (max-width: 63.99rem) and (min-aspect-ratio: 4 / 3) {
           .path-panel {
             flex-direction: row;
             align-items: center;
@@ -1844,10 +1842,11 @@ const how: { icon: IconName; title: string; text: string }[] = [
           }
         }
 
-        /* Wide screens tall enough for words and sketch in a half-width panel: two panels side by side. The
-           heading moves into the left half as the first panel takes the right half, then leaves with it;
-           after that the panels step along one at a time. */
-        @media (min-width: 64rem) and (min-height: 46rem) {
+        /* Laptops and desktops, 1024 px wide and up, whatever the window height: two panels side by side, so
+           each step reads as a card. The heading moves into the left half as the first panel takes the right
+           half, then leaves with it; after that the panels step along one at a time. On short windows the
+           sketches step down in size (the container queries above) so words and sketch share the half panel. */
+        @media (min-width: 64rem) {
           .path {
             --pw: 50cqw;
             height: 460vh;

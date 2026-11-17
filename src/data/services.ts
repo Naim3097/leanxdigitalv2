@@ -170,10 +170,10 @@ export const services: Service[] = [
       ],
       [
         'Can I make content myself instead?',
-        'Yes. Nexova’s auto content creates posters, videos and social posts for your products automatically.',
+        'Yes. If you sell products online, switch on Nexova’s auto content, and it makes posters, videos and social posts for them.',
       ],
     ],
-    updated: '2026-11-03',
+    updated: '2026-11-17',
   },
 
   {
@@ -211,7 +211,7 @@ export const services: Service[] = [
       ['Ad copy and creative', 'Headlines, posters and videos that earn the click.'],
       ['Bidding and budget', 'Where the money goes, and the bidding strategy that fits your goal.'],
       ['Landing pages and funnel', 'Why visitors do or don’t become leads and sales.'],
-      ['Analytics and tracking', 'Whether conversions are measured correctly.'],
+      ['Analytics and tracking', 'Whether conversions, such as leads and sales, are measured correctly.'],
     ],
     stepsTitle: 'How it works',
     steps: [
@@ -224,14 +224,14 @@ export const services: Service[] = [
       {
         title: 'Google Ads or Meta ads?',
         body: [
-          'Google Ads reach people who are already searching for what you sell. Meta ads reach people on Facebook and Instagram by who they are and what they are interested in, before they search.',
-          'Many businesses run both. If you are not sure where to start, ask us and we will tell you which fits.',
+          'Google Ads reach people who are already searching for what you sell. Meta ads reach people on Facebook and Instagram before they search, based on who they are and what they’re interested in.',
+          'Many businesses run both: one for the search, one for the scroll. If you’re not sure where to start, ask us and we’ll tell you which fits.',
         ],
       },
       {
         title: 'What is Google Ads?',
         body: [
-          'Google Ads is Google’s advertising platform. Search ads appear when someone searches for the terms you bid on, and for most search campaigns you pay only when someone clicks. The same account can also run ads on YouTube, Google Maps, Gmail and Google’s partner websites.',
+          'Google Ads is Google’s advertising platform. Your search ads can appear when someone searches for the terms you bid on. For most search campaigns, you pay only when someone clicks. The same account can also run ads on YouTube, Google Maps, Gmail and Google’s partner websites.',
         ],
       },
       {
@@ -248,14 +248,14 @@ export const services: Service[] = [
       ],
       [
         'Do I need to be running ads already?',
-        'No. Send us your website or page even if you are only thinking about ads.',
+        'No. Send us your website or page, even if you’re only thinking about ads.',
       ],
       [
         'How much does it cost?',
         'There are two parts: your ad budget, which goes to the ad platform, and our fee. We agree both with you before anything runs.',
       ],
     ],
-    updated: '2026-11-03',
+    updated: '2026-11-17',
   },
 
   {
@@ -275,7 +275,7 @@ export const services: Service[] = [
     whatsappAsk: 'I’d like help with my SEO. Here’s my website: ',
     automated: {
       feature: 'auto SEO',
-      text: 'Nexova’s auto SEO checks how visible your store is on Google and handles its SEO automatically, following the same workflow our team uses.',
+      text: 'Nexova’s auto SEO checks how visible your store is on Google and works on it automatically, following the same workflow our team uses.',
     },
     facts: [
       ['Service', 'SEO audits, strategy and tracking'],
@@ -304,14 +304,14 @@ export const services: Service[] = [
       {
         title: 'What is SEO?',
         body: [
-          'Search engine optimisation is the work of getting a website to show up in Google’s unpaid results. You don’t pay per click, but results take longer to build than ads, so many businesses run Google Ads while their SEO catches up.',
+          'Search engine optimisation is the work of getting a website to show up in Google’s unpaid results. You don’t pay per click. But results take longer to build than ads, so many businesses run Google Ads while their SEO catches up.',
         ],
       },
     ],
     faqs: [
       [
         'How long does SEO take to work?',
-        'Longer than ads. Ads can bring visitors the day they go live, while SEO builds over months. We tell you what to fix first so the early work counts.',
+        'It takes months. Ads can bring visitors the day they go live, while SEO builds up over time. We tell you what to fix first, so the early work counts.',
       ],
       [
         'How much does SEO cost?',
@@ -322,7 +322,7 @@ export const services: Service[] = [
         'A link to your website. Access to Google Search Console or GA4 helps if you have it.',
       ],
     ],
-    updated: '2026-11-03',
+    updated: '2026-11-17',
   },
 
   {
@@ -339,7 +339,7 @@ export const services: Service[] = [
     seoTitle: 'Website, CRM and app development in Malaysia',
     metaDescription:
       'Lean X Digital builds websites, landing pages, CRM systems and apps for Malaysian businesses, from the same team that builds Nexova.',
-    whatsappAsk: 'I’d like to talk about a website / CRM / app. Here’s my business: ',
+    whatsappAsk: 'I’d like to talk about a website, CRM or app. Here’s my business: ',
     facts: [
       ['Service', 'Websites, landing pages, CRM systems and apps'],
       ['Tracking', 'GA4 and Google Tag Manager'],
@@ -351,7 +351,7 @@ export const services: Service[] = [
     includes: [
       ['Websites', 'Company websites and online stores.'],
       ['Landing pages', 'Pages built for one ad campaign, made to turn visitors into leads.'],
-      ['CRM systems', 'One place to track leads, customers and follow-ups.'],
+      ['CRM systems', 'Your leads, customers and follow-ups in one place, instead of spreadsheets and chat threads.'],
       ['Apps', 'Apps for your staff or your customers, built around how your business works.'],
       ['Booking and lead capture', 'Forms, booking systems and WhatsApp hand-offs.'],
       ['Tracking', 'GA4 and Google Tag Manager set up from the start.'],
@@ -365,9 +365,9 @@ export const services: Service[] = [
     ],
     sections: [
       {
-        title: 'Selling online? Start with Nexova',
+        title: 'For online stores, start with Nexova',
         body: [
-          'If what you need is an online store, Nexova may already do it: a store website that creates its own content, runs its own Meta ads and handles its own SEO. We build to order for anything Nexova doesn’t cover.',
+          'If you need an online store, Nexova may already do it. It’s a store website that creates its own content, runs its own Meta ads and works on its SEO. We build to order for anything Nexova doesn’t cover.',
         ],
       },
     ],
@@ -381,7 +381,7 @@ export const services: Service[] = [
         'Yes. For most online sellers we suggest Nexova, our own self-growing store website. For anything Nexova doesn’t cover, we build to order.',
       ],
     ],
-    updated: '2026-11-03',
+    updated: '2026-11-17',
   },
 ];
 
