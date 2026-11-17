@@ -224,6 +224,15 @@ const copyright = `© ${year} ${company}${reg}. Kuala Lumpur, Malaysia.`;
     }
   }
 
+  /* Beside the brand block each column takes its longest link's width, so no service name wraps, and the
+     columns are spread evenly. With enlarged text they narrow (names wrap) rather than overflow. */
+  @media (min-width: 90rem) {
+    .footer-cols {
+      grid-template-columns: repeat(3, auto) max-content;
+      justify-content: space-between;
+    }
+  }
+
   .footer h2 {
     margin-bottom: 1rem;
     font-size: var(--fs-label);

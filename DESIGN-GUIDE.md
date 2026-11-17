@@ -75,24 +75,26 @@ ink in with the colour wave; both settle on ink.
 | Home hero H1 | 40 → 72 px (on wide screens also capped by the window height) | 1.04 | 500 | −0.035em | Ink |
 | Nexova page H1 | 40 → 88 px | 1.04 | 500 | −0.035em | Ink |
 | 404 H1 | 40 → 80 px | 1.04 | 500 | −0.035em | Ink |
-| Inner page H1 (`--fs-h1`) | 34 → 64 px | 1.10 | 500 | −0.02em | Ink |
+| Inner page H1 (`.page-head h1`) | 40 → 64 px | 1.10 | 500 | −0.02em | Ink |
 | Nexova name on the stage | 56 → 120 px | 1.00 | 500 | −0.03em | White |
-| Large section H2 ("Two ways to grow") | 34 → 64 px | 1.20 | 500 | −0.01em | Ink |
+| Large section H2 ("Two ways to grow", `--fs-h1`) | 34 → 64 px | 1.20 | 500 | −0.01em | Ink |
 | Section H2, call-to-action H2 (`--fs-h2`) | 34 → 52 px | 1.20 | 500 | −0.01em | Ink (white on dark) |
 | Footer tagline | 34 → 52 px | 1.10 | 500 | −0.02em | Ink |
 | Service card title and number | 34 → 64 px (number 20 → 64) | 1.10 | 500 | −0.02em | White |
 | Statements (`--fs-statement`): homepage, About, Nexova, audience panels | 24 → 44 px | 1.30 | 500 | −0.018em | Ink (white on colour panels) |
 | Path panel titles (`--fs-display-s`; in the pinned scene also at most 5.6% of the window height) | 32 → 48 px | 1.10 | 500 | −0.03em | Ink (white on dark panels) |
-| Card H3, feature title (Nexova tabs, H4 or H3) (`--fs-h3`) | 24 → 32 px | 1.24 | 500 | 0 | Ink (white on dark cards) |
+| Large card titles: "Two ways to grow" cards, Nexova tab titles (`--fs-h3`) | 24 → 32 px | 1.24 | 500 | 0 | Ink (white on dark cards) |
+| Card H3: "How we work with you", "What's included" (`--fs-lead`) | 20 → 24 px | 1.20–1.24 | 500 | 0 to −0.015em | Ink |
 | Nexova cards under the stage | 20 → 24 px | 1.20 | 500 | −0.01em | Ink |
 | Explainer H2 | 24 → 32 px | 1.20 | 500 | −0.01em | Ink |
 | Team names | 24 → 32 px | 1.24 | 500 | −0.02em | Ink |
-| Carousel card title | 24 → 32 px | 1.45 | 500 | −0.02em | Ink |
+| Carousel card title | 24 → 32 px | 1.24 | 500 | −0.02em | Ink |
 | Team figures | 24 → 31 px | 1.05 | 500 | −0.03em | Ink |
-| Contact page number | 22 → 30 px | 1.45 | 500 | −0.02em | White |
+| Contact method titles (number, email, office) | 22 → 30 px | 1.20 | 500 | −0.02em | White on the WhatsApp card, ink on the others |
 | Row list name (`--fs-lead`) | 20 → 24 px | 1.45 | 500 | −0.015em | Ink |
 | FAQ question (`--fs-question`) | 18 → 22 px | 1.20 | 500 | 0 | `--text-question` `#222222` |
 | Lede, section intro, explainer and feature text (`--fs-large`) | 17.2 → 20 px | 1.45 | 400 | 0 | Text-2 |
+| Home hero intro on wide screens | 17 → 20 px with the window height, in balanced lines | 1.45 | 400 | 0 | Text-2 |
 | Process step text | 17.2 → 20 px | 1.45 | 400 | 0 | Ink |
 | Service card text | 17.2 → 20 px | 1.45 | 400 | −0.009em | White |
 | Fact value (bento) | 17.2 → 20 px | 1.30 | 500 | −0.01em | Ink |
@@ -102,7 +104,8 @@ ink in with the colour wave; both settle on ink.
 | Card text, FAQ answer, row text, team bio, carousel card text | 16.1 → 18 px | 1.45 | 400 | −0.01em | Text-2 (white 70% on dark) |
 | Label (icon + text) and hero messages | 15 → 16 px | 1.40 | 400 | −0.005em | Text-2, icon 18 px in ink |
 | Glass pills | 15 → 16 px | 1.20 | 400 | −0.005em | Ink, icon 18 px in ink |
-| Buttons | 15 → 16 px | 1.20 | 500 | −0.01em | White on ink, or ink on white |
+| Buttons (`.btn`, `--fs-body`) | 16.1 → 18 px | 1.20 | 500 | −0.01em | White on ink, or ink on white |
+| Small buttons (`.btn-sm`: "Contact us" in the top bar, "Try it on nexova.my") | 15 → 16 px | 1.20 | 500 | −0.01em | White on ink, or ink on white |
 | Tabs | 15 → 16 px | 1.45 | 500 | 0 | Ink (selected), text-2 |
 | Footer links | 15 → 16 px | 1.45 | 500 | 0 | `--text-subtle` `#424242` |
 | Footer contact (email, phone) | 15 → 16 px | 1.45 | 500 | −0.011em | Text |
@@ -164,6 +167,13 @@ of each section in `global.css`.
   `data-carousel`, `data-tabs`, `data-count`.
 - Anything that loops on its own must be listed in the `html.motion-paused` rule in `global.css`, so the
   footer's "Pause animations" button stops it (WCAG 2.2.2).
+- Pinned scenes need room: the homepage statement with its five pills, like the path scene, runs only on
+  windows at least 576 px tall. Shorter ones (landscape phones, a large zoom) get the static layout, where no
+  pill can land on the words.
+- Print: everything prints black on white (`@media print` in `global.css`), without the top bar, nav pill or
+  pause buttons. The hero prints without its scene, the Nexova tabs print all four panels, the carousel prints
+  every card in two columns, service cards print at their content's height and count-ups show their real
+  values.
 
 ## Hero video
 
@@ -184,8 +194,19 @@ of each section in `global.css`.
   with reduced motion, Save-Data or a 2G connection (the poster shows instead).
 - The round button in the hero pauses the video and the rotating messages; the choice is remembered. The
   footer's "Pause animations" sets the same choice, so the two never disagree.
-- Wide screens (7:5, about 1.4:1, and wider): the scene fills the hero and the text sits in the sky. Narrower screens:
-  the scene fills the lower half, cropped to the middle and lifted clear of the nav pill.
+- Wide screens (7:5, about 1.4:1, and wider, at least 480 px tall): the scene fills the hero and the text sits in
+  the sky. Narrower screens: the scene fills the lower half, cropped to the middle and lifted clear of the nav
+  pill. On phones 656 px tall and up whose hero is taller than the screen, `src/scripts/hero.ts` lifts it
+  (`--frame-lift`) towards the bottom of the first screen, as far as it can while the people stay 12 px clear
+  of the buttons (a little smaller up to 700 px tall), so the nav pill doesn't cover them. Landscape phones (wide
+  but under 480 px tall) use the stacked layout with a compact text block (under 360 px tall: a one-line
+  heading and no rotating badge); the people rise into view on the first scroll. Short wide windows (481 to
+  576 px tall) keep the wide layout, set tighter.
+- The pause button sits in the sky beside the scene. On phones up to 820 px tall, and on landscape phones,
+  there is no free spot there, so it sits top right, centred in the gap under the top bar (36 px to look at,
+  a 44 px tap area); the top bar's empty area lets taps through (`pointer-events`). It comes first in the
+  hero's markup, so keyboard users reach it before the hero's links, and Shift+Tab back to it scrolls it into
+  view.
 - Only the hero fades into the next section (text drifts up and fades, the scene eases in and fades, the
   next section's top edge is a soft veil). No other section uses this transition. The faded text and pause
   button stay focusable (opacity only, never `visibility: hidden`): Shift+Tab from the page below reaches them
@@ -225,6 +246,9 @@ partner" section. Light panels have four small round notches in their side edges
     nav pill.
   - Keyboard: when focus moves to a link inside, the scene becomes a sideways-scrolling row, so the focused
     link is in view.
+  - Phones: the stage is as tall as the screen with the browser toolbar retracted (`100lvh`), and the panels
+    add the toolbar's height (`--bar`, `100lvh - 100svh`) to their bottom padding, so no strip of the black
+    section shows when the toolbar hides and the words stay clear of the nav pill when it shows.
 - Everywhere else (reduced motion, older browsers, very short windows): the panels are stacked full-width bands,
   words and sketch side by side from 1024 px.
 

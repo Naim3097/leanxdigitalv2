@@ -25,18 +25,33 @@ if (hero) {
   document.body.append(probe);
   let over = 0;
   let screenH = probe.offsetHeight;
+  const actions = hero.querySelector<HTMLElement>('.actions');
   const measure = () => {
     screenH = probe.offsetHeight;
     over = Math.max(0, Math.round(hero.offsetHeight - screenH));
     hero.style.setProperty('--hero-over', `${over}px`);
+    // On phones whose hero is taller than the screen, the CSS lifts the scene by --frame-lift so it sits
+    // at the bottom of the first screen rather than below it. It rises at most that far, and never so far
+    // that the people (from 62% of the drawn video downwards) come within 12 px of the hero buttons.
+    if (frame && inner && actions) {
+      hero.style.setProperty('--frame-lift', '0px');
+      const base = parseFloat(getComputedStyle(frame).bottom) || 0;
+      const drawn = Math.max(frame.offsetHeight, (frame.offsetWidth * 9) / 16);
+      const buttonsEnd = inner.offsetTop + actions.offsetTop + actions.offsetHeight;
+      const room = hero.offsetHeight - base - 0.38 * drawn - buttonsEnd - 12;
+      hero.style.setProperty('--frame-lift', `${Math.max(0, Math.round(Math.min(over, room)))}px`);
+    }
   };
   measure();
   new ResizeObserver(measure).observe(hero);
   addEventListener('resize', measure, { passive: true });
 
-  // Keyboard focus on a hero link while the page covers the hero brings the hero back into view.
-  hero.addEventListener('focusin', () => {
-    if (scrollY > over + 1) scrollTo(0, over);
+  // Keyboard focus on a hero control while the page covers the hero brings the hero back into view, far
+  // enough that the control itself shows (the pause button sits near the hero's top on small phones).
+  hero.addEventListener('focusin', (e) => {
+    const r = (e.target as HTMLElement).getBoundingClientRect();
+    const target = Math.min(over, Math.max(0, Math.round(r.top - hero.getBoundingClientRect().top - 12)));
+    if (scrollY > target + 1) scrollTo(0, target);
   });
 
   /* ---------- Scroll fade, for browsers without scroll-driven CSS animations ----------

@@ -183,6 +183,11 @@ const how: { icon: IconName; title: string; text: string }[] = [
       <video class="hero-video" muted playsinline preload="none" disablepictureinpicture disableRemotePlayback tabindex="-1"
       ></video>
     </div>
+    {/* First in the hero, so keyboard users reach the pause control before the hero's links */}
+    <button class="hero-toggle" type="button" aria-label="Pause the animation" hidden>
+      <Icon name="pause" class="i-pause" />
+      <Icon name="play" class="i-play" />
+    </button>
     <div class="container hero-inner">
       <div class="badges">
         <Label icon="pin" class="badge">Digital solutions · Kuala Lumpur</Label>
@@ -199,10 +204,6 @@ const how: { icon: IconName; title: string; text: string }[] = [
         <a class="btn btn-secondary" href="#services" data-magnetic>See the services</a>
       </div>
     </div>
-    <button class="hero-toggle" type="button" aria-label="Pause the animation" hidden>
-      <Icon name="pause" class="i-pause" />
-      <Icon name="play" class="i-play" />
-    </button>
   </section>
 
   <div class="over">
@@ -261,7 +262,9 @@ const how: { icon: IconName; title: string; text: string }[] = [
             A store website that grows itself. It creates its own content, runs its own Meta ads and handles its
             own SEO, with stock synced to Shopee and TikTok Shop. Free to start.
           </p>
-          <a class="btn btn-primary" href={`/products/${nexova.slug}/`}>See {nexova.name}</a>
+          <div class="actions">
+            <a class="btn btn-primary" href={`/products/${nexova.slug}/`}>See {nexova.name}</a>
+          </div>
         </div>
         <div class="card way" data-rise>
           <span class="icon-tile"><Icon name="users" /></span>
@@ -271,7 +274,9 @@ const how: { icon: IconName; title: string; text: string }[] = [
             Our team makes your ads, runs your campaigns, works on your SEO and builds your website, CRM or
             app. {count.charAt(0).toUpperCase() + count.slice(1)} services, priced to the job.
           </p>
-          <a class="btn btn-secondary" href="/services/">See the services</a>
+          <div class="actions">
+            <a class="btn btn-secondary" href="/services/">See the services</a>
+          </div>
         </div>
       </div>
     </section>
@@ -575,10 +580,53 @@ const how: { icon: IconName; title: string; text: string }[] = [
     display: block;
   }
 
+  /* Phones at least 656 px tall: when the hero is taller than the screen, the scene rises by --frame-lift
+     (scripts/hero.ts) towards the bottom of the first screen, out from under the nav pill, but never into
+     the hero buttons. Up to 700 px tall the scene is also a little smaller, so the people fit between them. */
+  @media (max-width: 47.99rem) and (min-height: 41rem) and (max-aspect-ratio: 7 / 5) {
+    .hero-frame {
+      bottom: calc(var(--frame-b) + var(--frame-lift, 0px));
+    }
+
+    .hero-toggle {
+      bottom: calc(var(--frame-b) + var(--frame-lift, 0px) + var(--frame-h) * 0.42);
+    }
+  }
+
+  @media (max-width: 47.99rem) and (min-height: 41rem) and (max-height: 43.75rem) and (max-aspect-ratio: 7 / 5) {
+    .hero {
+      --frame-h: max(14rem, 36svh);
+    }
+  }
+
+  /* Phones up to about 820 px tall, and landscape phones, have no free spot beside the scene that clears the
+     hero buttons, the people and the nav pill. There the pause button sits on the right, centred in the gap
+     between the top bar and the first line of the hero (the bar's empty area lets taps through, see .topbar
+     in global.css). It looks 36 px wide; its tap area is 44 px. */
+  @media (max-width: 47.99rem) and (max-height: 51.25rem) and (max-aspect-ratio: 7 / 5),
+    (min-aspect-ratio: 7 / 5) and (max-height: 30rem) {
+    .hero-toggle {
+      top: 3.875rem;
+      bottom: auto;
+      width: 2.25rem;
+      height: 2.25rem;
+      outline-offset: 1px;
+    }
+
+    .hero-toggle::after {
+      content: '';
+      position: absolute;
+      inset: -0.25rem;
+      border-radius: 50%;
+    }
+  }
+
   /* Wide screens: the scene fills the hero and the text sits high in the sky, with clear space above the
      people (their heads are at about 63% of the frame). Screens wider than 16:9 crop the video, so they crop
-     from the middle of the frame rather than the top, which keeps the people low and their feet in view. */
-  @media (min-aspect-ratio: 7 / 5) {
+     from the middle of the frame rather than the top, which keeps the people low and their feet in view.
+     Windows under 480 px tall (landscape phones) keep the stacked layout instead: in a full-height frame
+     their text and buttons would land on the people and under the nav pill. */
+  @media (min-aspect-ratio: 7 / 5) and (min-height: 30.01rem) {
     .hero {
       align-content: start;
       padding-block: clamp(5.75rem, 12.5vh, 8.5rem) 4rem;
@@ -626,18 +674,85 @@ const how: { icon: IconName; title: string; text: string }[] = [
 
   .hero .lede {
     max-width: var(--measure-2);
+    text-wrap: balance;
   }
 
   /* On wide screens the heading also scales with the height (72 px at most), so the whole block stays in
-     the sky on short laptop screens too; the intro gets a slightly wider measure and a height-aware size */
-  @media (min-aspect-ratio: 7 / 5) {
+     the sky on short laptop screens too. The intro gets a slightly wider measure and scales with the height
+     (17 to 20 px), in balanced lines: two on short laptop screens, three from about 1440 x 900. */
+  @media (min-aspect-ratio: 7 / 5) and (min-height: 30.01rem) {
     .hero h1 {
       font-size: clamp(2.5rem, min(1rem + 4.2vw, 8.2vh), 4.5rem);
     }
 
     .hero .lede {
       max-width: 46rem;
-      font-size: clamp(1rem, 2.2vh, 1.25rem);
+      font-size: clamp(1.0625rem, 2.2vh, 1.25rem);
+      text-wrap: balance;
+    }
+  }
+
+  /* Landscape phones (wide and under 480 px tall): the stacked layout, compact, so the heading, intro and
+     buttons fit the first screen above the nav pill and the people rise into view on the first scroll */
+  @media (min-aspect-ratio: 7 / 5) and (max-height: 30rem) {
+    .hero {
+      align-content: start;
+      padding-block: 4.5rem calc(var(--frame-b) + var(--frame-h) * 0.85);
+    }
+
+    .hero-inner {
+      gap: min(0.625rem, 1.7vh);
+    }
+
+    .hero h1 {
+      font-size: min(2.25rem, 9.6vh);
+    }
+
+    .hero .lede {
+      font-size: 0.9375rem;
+    }
+  }
+
+  /* Landscape phones with the browser's bars showing (under 360 px tall): one line of heading, no rotating
+     badge and a smaller intro, so the buttons still clear the nav pill */
+  @media (min-aspect-ratio: 7 / 5) and (max-height: 22.5rem) {
+    .hero {
+      padding-top: 4rem;
+    }
+
+    .hero-inner {
+      gap: 0.5rem;
+    }
+
+    .hero .badges {
+      display: none;
+    }
+
+    .hero h1 {
+      max-width: none;
+      font-size: min(2rem, 8.5vh);
+    }
+
+    /* Narrower than the screen, so its first line stays clear of the pause button in the corner */
+    .hero .lede {
+      max-width: min(var(--measure-2), 100% - 6rem);
+      font-size: 0.875rem;
+    }
+  }
+
+  /* Short wide windows (481 to 576 px tall) keep the wide layout, set tighter, so the buttons stay clear of
+     the people's heads */
+  @media (min-aspect-ratio: 7 / 5) and (min-height: 30.01rem) and (max-height: 36rem) {
+    .hero {
+      padding-top: 4.75rem;
+    }
+
+    .hero-inner {
+      gap: 0.75rem;
+    }
+
+    .hero .lede {
+      font-size: 1rem;
     }
   }
 
@@ -697,7 +812,7 @@ const how: { icon: IconName; title: string; text: string }[] = [
     position: relative;
     display: grid;
     place-items: center;
-    padding-block: var(--section-s) 3rem;
+    padding: var(--section-s) var(--gutter) 3rem;
   }
 
   .ways-cards {
@@ -955,6 +1070,17 @@ const how: { icon: IconName; title: string; text: string }[] = [
     min-width: 0;
   }
 
+  /* The sync sketch's chips cannot shrink, so they stack instead of running out of its card beside the chart */
+  .path-art :global(.mock > .mock-sync) {
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  /* Stacked, the chips are a little flatter, so the card is no taller than the chart beside it */
+  .path-art :global(.mock > .mock-sync span) {
+    padding-block: 0.25rem;
+  }
+
   /* The two sketches sit a little apart in height, half up and half down, so neither leaves the tile */
   .path-art :global(.mock:nth-child(1)) {
     translate: 0 -0.625rem;
@@ -1072,6 +1198,7 @@ const how: { icon: IconName; title: string; text: string }[] = [
   .carousel-card strong {
     font-size: var(--fs-h3);
     font-weight: 500;
+    line-height: 1.24;
     letter-spacing: -0.02em;
     color: var(--ink);
   }
@@ -1085,10 +1212,16 @@ const how: { icon: IconName; title: string; text: string }[] = [
     text-decoration-thickness: 1.5px;
   }
 
+  /* The previous and next buttons need the script (site.ts adds .carousel-ready). Without it they stay
+     hidden, and the strip still scrolls by touch, trackpad or keyboard. */
   .carousel-nav {
-    display: flex;
+    display: none;
     justify-content: center;
     gap: 0.75rem;
+  }
+
+  .carousel:global(.carousel-ready) .carousel-nav {
+    display: flex;
   }
 
   .drag-badge {
@@ -1137,7 +1270,28 @@ const how: { icon: IconName; title: string; text: string }[] = [
     margin-top: 1.5rem;
   }
 
+  /* From two columns up, the cards in a row share their rows, so every title starts on one line and every
+     text on the next (two rows of two cards, then one row of four) */
+  @media (min-width: 45rem) {
+    .how .card-grid-4 {
+      grid-template-rows: repeat(2, 1fr auto auto);
+    }
+
+    .drop {
+      display: grid;
+      grid-row: span 3;
+      grid-template-rows: subgrid;
+      row-gap: 0.75rem;
+      align-items: start;
+      justify-items: start;
+    }
+  }
+
   @media (min-width: 64rem) {
+    .how .card-grid-4 {
+      grid-template-rows: 1fr auto auto;
+    }
+
     .drop {
       min-height: 17rem;
     }
@@ -1292,174 +1446,200 @@ const how: { icon: IconName; title: string; text: string }[] = [
         }
       }
 
-      /* Pinned statement */
-      .pinned {
-        height: 220vh;
-        view-timeline-name: --pin;
-      }
+      /* Pinned statement. Only on screens at least 576 px tall: on shorter ones (landscape phones, a large
+         zoom) the floating pills would land on the words, so those keep the static layout, the statement
+         with the five pills in centred rows under it. */
+      @media (min-height: 36rem) {
+        .pinned {
+          height: 220vh;
+          view-timeline-name: --pin;
+        }
 
-      .pinned-stage {
-        position: sticky;
-        top: 0;
-        display: grid;
-        place-items: center;
-        height: 100vh;
-        padding: 0 var(--gutter);
-      }
+        .pinned-stage {
+          position: sticky;
+          top: 0;
+          display: grid;
+          place-items: center;
+          height: 100vh;
+          padding: 0 var(--gutter);
+        }
 
-      .pinned-text {
-        margin-bottom: 0;
-      }
+        .pinned-text {
+          margin-bottom: 0;
+        }
 
-      /* Phones: two above, one between, two below the statement, clear of the nav pill */
-      .pinned-stage :global(.sticker) {
-        position: absolute;
-      }
+        /* Phones: two above, one between, two below the statement, clear of the nav pill */
+        .pinned-stage :global(.sticker) {
+          position: absolute;
+        }
 
-      .pinned-stage :global(.s1) {
-        left: var(--gutter);
-        top: 11%;
-      }
-
-      .pinned-stage :global(.s2) {
-        right: var(--gutter);
-        top: 11%;
-      }
-
-      .pinned-stage :global(.s3) {
-        left: 0;
-        right: 0;
-        top: 19%;
-        width: fit-content;
-        margin-inline: auto;
-      }
-
-      .pinned-stage :global(.s4) {
-        left: var(--gutter);
-        bottom: 24%;
-      }
-
-      .pinned-stage :global(.s5) {
-        right: var(--gutter);
-        bottom: 24%;
-      }
-
-      /* Tablets and small laptops: two above, three below */
-      @media (min-width: 48rem) {
         .pinned-stage :global(.s1) {
-          left: max(var(--gutter), 8%);
-          top: 13%;
+          left: var(--gutter);
+          top: 11%;
         }
 
         .pinned-stage :global(.s2) {
-          right: max(var(--gutter), 9%);
-          top: 18%;
+          right: var(--gutter);
+          top: 11%;
         }
 
         .pinned-stage :global(.s3) {
-          left: max(var(--gutter), 6%);
-          right: auto;
-          top: auto;
-          bottom: 25%;
-          margin: 0;
-        }
-
-        .pinned-stage :global(.s4) {
-          left: auto;
-          right: max(var(--gutter), 7%);
-          bottom: 21%;
-        }
-
-        /* Centred over the nav pill, so it keeps at least 8 rem from the bottom (pill and pop-in clear) */
-        .pinned-stage :global(.s5) {
           left: 0;
           right: 0;
-          bottom: max(14%, 8rem);
+          top: 19%;
           width: fit-content;
           margin-inline: auto;
         }
-      }
-
-      /* Wide screens: around the statement, two on each side and one below */
-      @media (min-width: 80rem) {
-        .pinned-stage :global(.s1) {
-          left: max(var(--gutter), 11%);
-          top: 19%;
-        }
-
-        .pinned-stage :global(.s2) {
-          right: max(var(--gutter), 12%);
-          top: 25%;
-        }
-
-        .pinned-stage :global(.s3) {
-          left: max(var(--gutter), 6%);
-          top: 54%;
-          bottom: auto;
-        }
 
         .pinned-stage :global(.s4) {
-          right: max(var(--gutter), 7%);
-          top: 60%;
-          bottom: auto;
+          left: var(--gutter);
+          bottom: 24%;
         }
 
         .pinned-stage :global(.s5) {
-          left: 32%;
-          right: auto;
-          bottom: max(17%, 8rem);
-          margin: 0;
-        }
-      }
-
-      .pinned-text :global(.w) {
-        opacity: 0.12;
-        animation: word-ink linear both;
-        animation-timeline: --pin;
-        animation-range: contain calc(4% + var(--i) * 2.6%) contain calc(9% + var(--i) * 2.6%);
-      }
-
-      @keyframes word-ink {
-        to {
-          opacity: 1;
-        }
-      }
-
-      .pinned-stage :global(.sticker) {
-        animation: pop linear both;
-        animation-timeline: --pin;
-      }
-
-      .pinned-stage :global(.s1) {
-        animation-range: contain 18% contain 26%;
-      }
-
-      .pinned-stage :global(.s2) {
-        animation-range: contain 30% contain 38%;
-      }
-
-      .pinned-stage :global(.s3) {
-        animation-range: contain 42% contain 50%;
-      }
-
-      .pinned-stage :global(.s4) {
-        animation-range: contain 54% contain 62%;
-      }
-
-      .pinned-stage :global(.s5) {
-        animation-range: contain 66% contain 74%;
-      }
-
-      @keyframes pop {
-        from {
-          opacity: 0;
-          transform: translateY(1rem);
-          animation-timing-function: var(--ease-out);
+          right: var(--gutter);
+          bottom: 24%;
         }
 
-        to {
-          opacity: 1;
-          transform: none;
+        /* Phones: the colour field moves under the pills, so each one picks up a tint through its blur and
+           reads as frosted glass rather than a plain white chip */
+        @media (max-width: 47.99rem) {
+          .pinned-glow {
+            inset: 0;
+            background:
+              radial-gradient(30% 13% at 18% 13.5%, rgb(143 230 244 / 0.45), transparent 70%),
+              radial-gradient(34% 13% at 80% 13.5%, rgb(91 124 240 / 0.26), transparent 72%),
+              radial-gradient(34% 12% at 50% 21.5%, rgb(153 62 255 / 0.18), transparent 72%),
+              radial-gradient(32% 13% at 22% 73.5%, rgb(153 62 255 / 0.2), transparent 72%),
+              radial-gradient(32% 13% at 80% 73.5%, rgb(241 60 164 / 0.2), transparent 72%);
+          }
+        }
+
+        /* The narrowest phones: slightly slimmer pills, so the bottom two never touch */
+        @media (max-width: 22.49rem) {
+          .pinned-stage :global(.sticker) {
+            padding-inline: 0.75rem 0.875rem;
+            gap: 0.375rem;
+          }
+        }
+
+        /* Tablets and small laptops: two above, three below */
+        @media (min-width: 48rem) {
+          .pinned-stage :global(.s1) {
+            left: max(var(--gutter), 8%);
+            top: 13%;
+          }
+
+          .pinned-stage :global(.s2) {
+            right: max(var(--gutter), 9%);
+            top: 18%;
+          }
+
+          .pinned-stage :global(.s3) {
+            left: max(var(--gutter), 6%);
+            right: auto;
+            top: auto;
+            bottom: 25%;
+            margin: 0;
+          }
+
+          .pinned-stage :global(.s4) {
+            left: auto;
+            right: max(var(--gutter), 7%);
+            bottom: 21%;
+          }
+
+          /* Centred over the nav pill, so it keeps at least 8 rem from the bottom (pill and pop-in clear) */
+          .pinned-stage :global(.s5) {
+            left: 0;
+            right: 0;
+            bottom: max(14%, 8rem);
+            width: fit-content;
+            margin-inline: auto;
+          }
+        }
+
+        /* Wide screens: around the statement, two on each side and one below */
+        @media (min-width: 80rem) {
+          .pinned-stage :global(.s1) {
+            left: max(var(--gutter), 11%);
+            top: 19%;
+          }
+
+          .pinned-stage :global(.s2) {
+            right: max(var(--gutter), 12%);
+            top: 25%;
+          }
+
+          .pinned-stage :global(.s3) {
+            left: max(var(--gutter), 6%);
+            top: 54%;
+            bottom: auto;
+          }
+
+          .pinned-stage :global(.s4) {
+            right: max(var(--gutter), 7%);
+            top: 60%;
+            bottom: auto;
+          }
+
+          .pinned-stage :global(.s5) {
+            left: 32%;
+            right: auto;
+            bottom: max(17%, 8rem);
+            margin: 0;
+          }
+        }
+
+        .pinned-text :global(.w) {
+          opacity: 0.12;
+          animation: word-ink linear both;
+          animation-timeline: --pin;
+          animation-range: contain calc(4% + var(--i) * 2.6%) contain calc(9% + var(--i) * 2.6%);
+        }
+
+        @keyframes word-ink {
+          to {
+            opacity: 1;
+          }
+        }
+
+        .pinned-stage :global(.sticker) {
+          animation: pop linear both;
+          animation-timeline: --pin;
+        }
+
+        .pinned-stage :global(.s1) {
+          animation-range: contain 18% contain 26%;
+        }
+
+        .pinned-stage :global(.s2) {
+          animation-range: contain 30% contain 38%;
+        }
+
+        .pinned-stage :global(.s3) {
+          animation-range: contain 42% contain 50%;
+        }
+
+        .pinned-stage :global(.s4) {
+          animation-range: contain 54% contain 62%;
+        }
+
+        .pinned-stage :global(.s5) {
+          animation-range: contain 66% contain 74%;
+        }
+
+        @keyframes pop {
+          from {
+            opacity: 0;
+            transform: translateY(1rem);
+            animation-timing-function: var(--ease-out);
+          }
+
+          to {
+            opacity: 1;
+            transform: none;
+          }
         }
       }
 
@@ -1469,6 +1649,8 @@ const how: { icon: IconName; title: string; text: string }[] = [
       @media (min-height: 36rem) {
         .path {
           --pw: 100cqw;
+          /* What a phone's browser toolbar covers while it shows (0 on desktop) */
+          --bar: calc(100lvh - 100svh);
           height: 560vh;
           padding: 0;
           view-timeline-name: --path;
@@ -1476,14 +1658,18 @@ const how: { icon: IconName; title: string; text: string }[] = [
 
         /* overflow: clip keeps the sliding track out of the page width without making a scroll container, so
            the heading's timeline still follows the page. The stage is a container, so the panels measure the
-           visible width (cqw) rather than the viewport with its scrollbar (vw). */
+           visible width (cqw) rather than the viewport with its scrollbar (vw). It is as tall as the screen
+           with the phone's toolbar retracted, so no strip of the black section shows under the panels then;
+           while the toolbar shows, its height is padding (the heading centres in what is visible) and the
+           panels' bottom padding keeps the words above the nav pill. */
         .path-stage {
           position: sticky;
           top: 0;
           display: grid;
           place-items: center;
           height: 100vh;
-          height: 100svh;
+          height: 100lvh;
+          padding-bottom: var(--bar);
           container: path-stage / inline-size;
           overflow: clip;
           clip-path: inset(0);
@@ -1518,12 +1704,12 @@ const how: { icon: IconName; title: string; text: string }[] = [
           gap: clamp(1.25rem, 4svh, 3rem);
           width: var(--pw);
           height: 100%;
-          padding: clamp(2.5rem, 7svh, 5rem) clamp(1.25rem, 4cqw, 3.5rem) clamp(5.75rem, 11svh, 7rem);
+          padding: clamp(2.5rem, 7svh, 5rem) clamp(1.25rem, 4cqw, 3.5rem) calc(var(--bar) + clamp(5.75rem, 11svh, 7rem));
         }
 
         @media (min-width: 48rem) {
           .path-panel {
-            padding-bottom: clamp(6.75rem, 12svh, 8rem);
+            padding-bottom: calc(var(--bar) + clamp(6.75rem, 12svh, 8rem));
           }
         }
 
@@ -1724,6 +1910,45 @@ const how: { icon: IconName; title: string; text: string }[] = [
           }
         }
       }
+    }
+  }
+
+  @media print {
+    /* The hero prints as its words and buttons: no scene, wash or pause button, and no blank first page */
+    .hero {
+      position: static;
+      min-height: 0;
+      padding-block: 1rem 2rem;
+    }
+
+    .hero-frame,
+    .hero-toggle {
+      display: none;
+    }
+
+    .over {
+      padding-top: 0;
+    }
+
+    /* Every "What we make" card, in two columns, rather than the part of the strip that was in view */
+    .carousel-track {
+      flex-wrap: wrap;
+      overflow: visible;
+      padding: 1rem 0;
+    }
+
+    .carousel-card {
+      width: calc(50% - 0.5rem);
+      break-inside: avoid;
+    }
+
+    .carousel:global(.is-arc) .carousel-card {
+      transform: none;
+    }
+
+    .carousel:global(.carousel-ready) .carousel-nav,
+    .drag-badge {
+      display: none;
     }
   }
 </style>

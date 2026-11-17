@@ -39,9 +39,10 @@ const fill = (cols: number, spans: number[]) => {
 // Long values, and values that can't break (an email or a web address), take two cells, so they fit whole.
 const wide = facts.map(([, v]) => bento && (v.length > 42 || /\S{20,}/.test(v)));
 const s4 = fill(columns, wide.map((w) => (w ? 2 : 1)));
-// Phone numbers (for example "+60 10-764 8227") are kept on one line wherever they appear in a value.
-const phone = /(\+?\d[\d -]{6,}\d)/;
-const parts = (v: string) => v.split(phone);
+// Phone numbers (for example "+60 10-764 8227"), place names and "e-commerce" are kept on one line wherever
+// they appear in a value.
+const keep = /(\+?\d[\d -]{6,}\d|Bandar Sri Damansara|Kuala Lumpur|e-commerce)/;
+const parts = (v: string) => v.split(keep);
 const s2 = fill(2, facts.map(() => 1));
 ---
 

@@ -96,7 +96,11 @@ if (pill && progress) {
     dark.clear();
     light.clear();
     const r = pill.getBoundingClientRect();
-    const x = Math.round(r.left + r.width / 2);
+    // One pixel right of the pill's centre. IntersectionObserver also counts a box that only touches the
+    // root, so a point exactly on the seam between two panels (every two-panel hold of the path scene when
+    // the window width is even, as on a Mac or iPad) touched both and the light one always won. Off the
+    // seam, the incoming right-hand panel decides at every width.
+    const x = Math.round(r.left + r.width / 2) + 1;
     const y = Math.round(r.top + r.height / 2);
     // clientWidth leaves out the scrollbar, which the observer's viewport doesn't include either
     const right = Math.max(0, root.clientWidth - x - 1);
@@ -414,6 +418,8 @@ if (finePointer && !reduceMotion) {
 document.querySelectorAll<HTMLElement>('[data-carousel]').forEach((wrap) => {
   const track = wrap.querySelector<HTMLElement>('.carousel-track');
   if (!track) return;
+  // The previous and next buttons only show once they work (without this script the strip still scrolls)
+  wrap.classList.add('carousel-ready');
   const cards = Array.from(track.children) as HTMLElement[];
   let queued = false;
   const arc = () => {
@@ -498,7 +504,9 @@ document.querySelectorAll<HTMLElement>('[data-carousel]').forEach((wrap) => {
     if (badge) {
       const r = wrap.getBoundingClientRect();
       const inside = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
-      const on = inside && e.pointerType === 'mouse';
+      // Not over the previous and next buttons, which the badge would cover
+      const onNav = (e.target as Element | null)?.closest?.('.carousel-nav');
+      const on = inside && e.pointerType === 'mouse' && !onNav;
       const place = () =>
         (badge.style.transform = `translate3d(${e.clientX - r.left}px, ${e.clientY - r.top}px, 0) translate(-50%, -50%) scale(${down ? 0.88 : 1})`);
       if (on && !badge.classList.contains('is-on')) {
@@ -619,4 +627,11 @@ if (!reduceMotion && 'IntersectionObserver' in window) {
     }
     io.observe(c);
   });
+  // A printout shows every figure at its real value, not the 0 it waits at until it scrolls into view
+  addEventListener('beforeprint', () =>
+    counters.forEach((c) => {
+      io.unobserve(c);
+      if (c.dataset.final) c.textContent = c.dataset.final;
+    }),
+  );
 }

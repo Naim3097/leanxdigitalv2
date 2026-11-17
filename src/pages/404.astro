@@ -79,9 +79,27 @@ import { site } from '../data/site';
     }
   }
 
-  @media (forced-colors: active) {
+  /* Print would set the see-through numerals in solid black */
+  @media (forced-colors: active), print {
     .big {
       display: none;
+    }
+  }
+
+  /* Short windows (landscape phones): start near the top with tighter spacing, so the three buttons clear
+     the nav pill */
+  @media (max-height: 30rem) {
+    .notfound {
+      min-height: 0;
+      padding-top: 4.5rem;
+    }
+
+    .notfound .container {
+      gap: 1rem;
+    }
+
+    .notfound h1 {
+      font-size: min(2.5rem, 10vh);
     }
   }
 </style>

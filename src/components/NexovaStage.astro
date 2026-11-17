@@ -322,9 +322,10 @@ const slug = (t: string) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-');
     text-align: center;
   }
 
+  /* Flush with the cards below it up to the container's width; wider screens let it bleed past them */
   .stage {
     position: relative;
-    width: calc(100% - clamp(1rem, 3vw, 3rem));
+    width: calc(100% - 2 * var(--gutter));
     margin-inline: auto;
     isolation: isolate;
   }
@@ -519,6 +520,22 @@ const slug = (t: string) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-');
     }
   }
 
+  @media (max-width: 47.99rem) {
+    /* Less side padding, so the store sketch keeps its width beside the stacked sync card */
+    .tab-visual {
+      padding-inline: 0.75rem;
+    }
+
+    /* As a row, the sync chips ran out of their card and off the tile on phones, so they stack */
+    .tab-visual :global(.mock > .mock-sync) {
+      flex-direction: column;
+    }
+
+    .tab-visual :global(.mock.mock-sync) {
+      flex-shrink: 0;
+    }
+  }
+
   .rest {
     display: grid;
     gap: 1rem;
@@ -663,6 +680,27 @@ const slug = (t: string) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-');
       forced-color-adjust: none;
       background: Highlight;
       color: HighlightText;
+    }
+  }
+
+  /* A printout shows all four features one after another, rather than the chosen tab alone */
+  @media print {
+    .tabs-ready .tablist {
+      display: none;
+    }
+
+    .tabs-ready .tab-panel,
+    .tabs-ready .tab-panel[hidden] {
+      grid-area: auto;
+      visibility: visible;
+    }
+
+    .tabs-ready .tab-panel + .tab-panel {
+      margin-top: 1rem;
+    }
+
+    .tab-copy {
+      break-inside: avoid;
     }
   }
 </style>

@@ -326,4 +326,15 @@ const sketches: Record<string, MockKind[]> = {
       }
     }
   }
+
+  /* Printed, each card is as tall as its content rather than most of a page, and lies flat */
+  @media print {
+    .stack-card {
+      position: static;
+      min-height: 0;
+      animation: none;
+      transform: none;
+      break-inside: avoid;
+    }
+  }
 </style>

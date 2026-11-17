@@ -342,4 +342,17 @@ const schema = [
       }
     }
   }
+
+  /* Printed, the four links wrap onto as many lines as they need instead of running off the page */
+  @media print {
+    .jump {
+      flex-wrap: wrap;
+      justify-content: center;
+      overflow: visible;
+      margin-inline: 0;
+      padding-inline: 0;
+      -webkit-mask-image: none;
+      mask-image: none;
+    }
+  }
 </style>
